@@ -49,18 +49,6 @@ struct SearchBar: View {
             .frame(height: height)
             .background(Color(.systemGray5), in: .rect(cornerRadius: 10))
 
-            if store.isInputingSearchBar {
-                Button {
-                    focusedField = nil
-                    Task {
-                        await store.send(.cancelSearchButtonTapped)
-                    }
-                } label: {
-                    Text("cancel", bundle: .module)
-                }
-                .buttonStyle(.borderless)
-                .transition(.asymmetric(insertion: .push(from: .trailing), removal: .slide))
-            }
         }
         .animation(.easeInOut, value: store.isInputingSearchBar)
         .onChange(of: focusedField) { _, newValue in

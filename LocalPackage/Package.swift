@@ -25,6 +25,10 @@ let package = Package(
             name: "UserInterface",
             targets: ["UserInterface"]
         ),
+        .library(
+            name: "Automation",
+            targets: ["Automation"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", exact: "1.10.1"),
@@ -32,6 +36,14 @@ let package = Package(
         .package(url: "https://github.com/cybozu/WebUI.git", exact: "4.2.1"),
     ],
     targets: [
+        .target(
+            name: "Automation",
+            dependencies: [
+                .product(name: "Logging", package: "swift-log"),
+                .product(name: "WebUI", package: "WebUI"),
+            ],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "DataSource",
             dependencies: [
@@ -51,7 +63,8 @@ let package = Package(
             name: "UserInterface",
             dependencies: [
                 "Model",
-                .product(name: "LicenseList", package: "LicenseList"),
+                "Automation",
+                .product(name: "LicenseList", package: "LicenseList")
             ],
             resources: [.process("Resources")],
             swiftSettings: swiftSettings

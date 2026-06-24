@@ -11,6 +11,7 @@ public struct WebViewProxyClient: DependencyClient {
     public var goBack: @Sendable () async -> Void
     public var canGoForward: @Sendable () async -> Bool
     public var goForward: @Sendable () async -> Void
+    public var evaluateJavaScript: @MainActor @Sendable (String) async throws -> Void
 
     public static let liveValue: Self = {
         let _proxy = OSAllocatedUnfairLock<WebViewProxy?>(initialState: nil)
@@ -33,7 +34,8 @@ public struct WebViewProxyClient: DependencyClient {
             canGoBack: { await proxy().canGoBack },
             goBack: { await proxy().goBack() },
             canGoForward: { await proxy().canGoForward },
-            goForward: { await proxy().goForward() }
+            goForward: { await proxy().goForward() },
+            evaluateJavaScript: { _ = try await proxy().evaluateJavaScript($0) }
         )
     }()
 
@@ -45,6 +47,7 @@ public struct WebViewProxyClient: DependencyClient {
         canGoBack: { false },
         goBack: {},
         canGoForward: { false },
-        goForward: {}
+        goForward: {},
+        evaluateJavaScript: { _ in }
     )
 }

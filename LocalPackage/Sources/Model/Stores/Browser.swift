@@ -29,6 +29,16 @@ import WebUI
     public var customSchemeURL: URL?
     public var isPresentedConfirmationDialog: Bool
     public var isPresentedAlert: Bool
+    public var naviPanelSelection: NaviPanelSelection
+    public var scriptText: String
+    public var scriptFileName: String
+    public var pendingScriptFileName: String
+    public var isPresentedScriptSaveDialog: Bool
+    public var isPresentedScriptImporter: Bool
+    public var logText: String
+    public var processedText: String
+    public var naviPanelMessage: String?
+    public var isPageLoading: Bool
     public let navigationDelegate: BrowserNavigationDelegate
     public let uiDelegate: BrowserUIDelegate
     public var settings: Settings?
@@ -53,6 +63,16 @@ import WebUI
         customSchemeURL: URL? = nil,
         isPresentedConfirmationDialog: Bool = false,
         isPresentedAlert: Bool = false,
+        naviPanelSelection: NaviPanelSelection = .script,
+        scriptText: String = "",
+        scriptFileName: String = "Sem titulo",
+        pendingScriptFileName: String = "",
+        isPresentedScriptSaveDialog: Bool = false,
+        isPresentedScriptImporter: Bool = false,
+        logText: String = "",
+        processedText: String = "",
+        naviPanelMessage: String? = nil,
+        isPageLoading: Bool = false,
         browserNavigation: BrowserNavigation? = nil,
         browserUI: BrowserUI? = nil,
         settings: Settings? = nil,
@@ -80,6 +100,16 @@ import WebUI
         self.customSchemeURL = customSchemeURL
         self.isPresentedConfirmationDialog = isPresentedConfirmationDialog
         self.isPresentedAlert = isPresentedAlert
+        self.naviPanelSelection = naviPanelSelection
+        self.scriptText = scriptText
+        self.scriptFileName = scriptFileName
+        self.pendingScriptFileName = pendingScriptFileName
+        self.isPresentedScriptSaveDialog = isPresentedScriptSaveDialog
+        self.isPresentedScriptImporter = isPresentedScriptImporter
+        self.logText = logText
+        self.processedText = processedText
+        self.naviPanelMessage = naviPanelMessage
+        self.isPageLoading = isPageLoading
         weak var weakSelf: Browser? = nil
         let browserNavigation = browserNavigation ?? .init(appDependencies, action: {
             await weakSelf?.send(.browserNavigation($0))
@@ -101,6 +131,8 @@ import WebUI
             logService.notice(.screenView(name: screenName))
             self.eventBridge = eventBridge
             self.webViewProxyClient.setProxy(webViewProxy)
+            prepareNaviFiles()
+            loadNaviPanelContent(for: naviPanelSelection)
 
         case let .onChangeURL(url):
             currentURL = url
@@ -110,6 +142,20 @@ import WebUI
 
         case let .onChangeTitle(title):
             currentTitle = title
+
+        case let .onChangeIsLoading(isLoading):
+            let wasLoading = isPageLoading
+            isPageLoading = isLoading
+            
+            if wasLoading && !isLoading {
+                let timestamp = ISO8601DateFormatter().string(from: Date())
+                let urlString = currentURL?.absoluteString ?? "URL desconhecida"
+                let loadEntry = "[\(timestamp)] Página carregada: \(urlString)\n"
+                var updatedLog = readNaviDataFile(.log)
+                updatedLog.append(loadEntry)
+                writeNaviDataFile(.log, content: updatedLog)
+                logText = updatedLog
+            }
 
         case let .onOpenURL(url):
             guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
@@ -197,6 +243,44 @@ import WebUI
                 isPresentedToolbar = true
             }
 
+        case let .naviPanelSelectionChanged(selection):
+            naviPanelSelection = selection
+            loadNaviPanelContent(for: selection)
+
+        case .scriptNewButtonTapped:
+            scriptText = ""
+            scriptFileName = "Sem titulo"
+            naviPanelMessage = nil
+
+        case .scriptSaveButtonTapped:
+            pendingScriptFileName = scriptFileName == "Sem titulo" ? "" : scriptFileName.removingNaviExtension
+            isPresentedScriptSaveDialog = true
+
+        case .scriptSaveConfirmed:
+            saveCurrentScript()
+
+        case .scriptLoadButtonTapped:
+            isPresentedScriptImporter = true
+
+        case let .scriptFileImported(url):
+            importScript(from: url)
+
+        case .scriptRunButtonTapped:
+            do {
+                try await webViewProxyClient.evaluateJavaScript(scriptText)
+                    naviPanelMessage = "Script executado."
+            } catch {
+                naviPanelMessage = error.localizedDescription
+        }
+
+        case .clearLogButtonTapped:
+            writeNaviDataFile(.log, content: "")
+            logText = ""
+
+        case .clearProcessedButtonTapped:
+            writeNaviDataFile(.processed, content: "")
+            processedText = ""
+
         case .dialogOKButtonTapped:
             guard let webDialog else { return }
             switch webDialog {
@@ -276,6 +360,100 @@ import WebUI
         }
     }
 
+    private func prepareNaviFiles() {
+        do {
+            try FileManager.default.createDirectory(at: naviScriptsDirectory, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: naviDadosDirectory, withIntermediateDirectories: true)
+            for file in NaviDataFile.allCases where !FileManager.default.fileExists(atPath: file.url(in: naviDadosDirectory).path) {
+                try "".write(to: file.url(in: naviDadosDirectory), atomically: true, encoding: .utf8)
+            }
+        } catch {
+            naviPanelMessage = error.localizedDescription
+        }
+    }
+
+    private func loadNaviPanelContent(for selection: NaviPanelSelection) {
+        switch selection {
+        case .script:
+            break
+        case .log:
+            logText = readNaviDataFile(.log)
+        case .processed:
+            processedText = readNaviDataFile(.processed)
+        }
+    }
+
+    private func readNaviDataFile(_ file: NaviDataFile) -> String {
+        (try? String(contentsOf: file.url(in: naviDadosDirectory), encoding: .utf8)) ?? ""
+    }
+
+    private func writeNaviDataFile(_ file: NaviDataFile, content: String) {
+        do {
+            try FileManager.default.createDirectory(at: naviDadosDirectory, withIntermediateDirectories: true)
+            try content.write(to: file.url(in: naviDadosDirectory), atomically: true, encoding: .utf8)
+            naviPanelMessage = nil
+        } catch {
+            naviPanelMessage = error.localizedDescription
+        }
+    }
+
+    private func saveCurrentScript() {
+        let trimmedName = pendingScriptFileName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
+            naviPanelMessage = "Informe um nome para o script."
+            return
+        }
+        let safeName = trimmedName.replacingOccurrences(of: "/", with: "-")
+        let fileName = safeName.hasSuffix(".navi") ? safeName : "\(safeName).navi"
+        do {
+            try FileManager.default.createDirectory(at: naviScriptsDirectory, withIntermediateDirectories: true)
+            let url = naviScriptsDirectory.appendingPathComponent(fileName)
+            try scriptText.write(to: url, atomically: true, encoding: .utf8)
+            scriptFileName = fileName
+            naviPanelMessage = "Script salvo."
+        } catch {
+            naviPanelMessage = error.localizedDescription
+        }
+    }
+
+    private func importScript(from url: URL) {
+        let isAccessing = url.startAccessingSecurityScopedResource()
+        defer {
+            if isAccessing {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+        guard url.pathExtension.lowercased() == "navi" else {
+            naviPanelMessage = "Escolha um arquivo .navi."
+            return
+        }
+        do {
+            try FileManager.default.createDirectory(at: naviScriptsDirectory, withIntermediateDirectories: true)
+            let destinationURL = uniqueScriptDestinationURL(for: url.lastPathComponent)
+            if FileManager.default.fileExists(atPath: destinationURL.path) {
+                try FileManager.default.removeItem(at: destinationURL)
+            }
+            try FileManager.default.copyItem(at: url, to: destinationURL)
+            scriptText = try String(contentsOf: destinationURL, encoding: .utf8)
+            scriptFileName = destinationURL.lastPathComponent
+            naviPanelMessage = "Script carregado."
+        } catch {
+            naviPanelMessage = error.localizedDescription
+        }
+    }
+
+    private func uniqueScriptDestinationURL(for fileName: String) -> URL {
+        let baseName = (fileName as NSString).deletingPathExtension
+        let ext = (fileName as NSString).pathExtension
+        var candidate = naviScriptsDirectory.appendingPathComponent(fileName)
+        var index = 2
+        while FileManager.default.fileExists(atPath: candidate.path) {
+            candidate = naviScriptsDirectory.appendingPathComponent("\(baseName)-\(index).\(ext)")
+            index += 1
+        }
+        return candidate
+    }
+
     private func search(with text: String) async {
         let searchEngine = userDefaultsRepository.searchEngine ?? .google
         let url: URL? = if text.isEmpty {
@@ -317,10 +495,52 @@ import WebUI
         isPresentedWebDialog = true
     }
 
+    private var naviRootDirectory: URL {
+        let fileManager = FileManager.default
+        if let iCloudURL = fileManager.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents", isDirectory: true) {
+            return iCloudURL
+        }
+        return try! fileManager.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+    }
+
+    private var naviScriptsDirectory: URL {
+        naviRootDirectory.appendingPathComponent("naviScripts", isDirectory: true)
+    }
+
+    private var naviDadosDirectory: URL {
+        naviRootDirectory.appendingPathComponent("naviDados", isDirectory: true)
+    }
+
+    public enum NaviPanelSelection: Hashable, Sendable {
+        case script
+        case log
+        case processed
+    }
+
+    private enum NaviDataFile: CaseIterable {
+        case log
+        case processed
+
+        func url(in directory: URL) -> URL {
+            switch self {
+            case .log:
+                directory.appendingPathComponent("_logProcessamento")
+            case .processed:
+                directory.appendingPathComponent("_itensProcessados")
+            }
+        }
+    }
+
     public enum Action: Sendable {
         case task(String, EventBridge, WebViewProxy)
         case onChangeURL(URL?)
         case onChangeTitle(String?)
+        case onChangeIsLoading(Bool)
         case onOpenURL(URL)
         case onSubmit(String)
         case settingsButtonTapped(AppDependencies)
@@ -334,6 +554,15 @@ import WebUI
         case bookmarkButtonTapped(AppDependencies)
         case hideToolbarButtonTapped
         case showToolbarButtonTapped
+        case naviPanelSelectionChanged(NaviPanelSelection)
+        case scriptNewButtonTapped
+        case scriptSaveButtonTapped
+        case scriptSaveConfirmed
+        case scriptLoadButtonTapped
+        case scriptFileImported(URL)
+        case scriptRunButtonTapped
+        case clearLogButtonTapped
+        case clearProcessedButtonTapped
         case dialogOKButtonTapped
         case dialogCancelButtonTapped
         case onChangeIsPresentedWebDialog(Bool)
@@ -350,5 +579,11 @@ import WebUI
                 self.getResourceURL = getResourceURL
             }
         }
+    }
+}
+
+private extension String {
+    var removingNaviExtension: String {
+        hasSuffix(".navi") ? String(dropLast(".navi".count)) : self
     }
 }

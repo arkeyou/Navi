@@ -10,6 +10,7 @@ import UserInterface
 
 @main
 struct TelescopureApp: App {
+        
     var body: some Scene {
         BrowserScene()
     }
