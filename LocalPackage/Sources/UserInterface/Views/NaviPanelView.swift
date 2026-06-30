@@ -42,6 +42,10 @@ struct NaviBottomTabView: View {
 struct NaviPanelView: View {
     @Bindable var store: Browser
     @State var am = AutomationManager()
+    @State private var processedText: String = ""
+    @State private var queue: NaviQueue<String> = NaviQueue<String>()
+    @State private var LIKE_SCRIPT = "const buttons = document.querySelectorAll(\"button[aria-label='Like item']\"); buttons.forEach(button => button.click())"
+
     
     var body: some View {
         NavigationStack {
@@ -56,7 +60,7 @@ struct NaviPanelView: View {
                     )
                 case .processed:
                     dataView(
-                        text: $store.processedText,
+                        text: $processedText,
                         clearAction: .clearProcessedButtonTapped
                     )
                 }
@@ -115,10 +119,23 @@ struct NaviPanelView: View {
 
                     Button {
                         Task {
+                            print("script \(store.scriptText)")
                             am.start()
-                            store.inputText = "globo.com"
-                            await store.send(.onSubmit("https://globo.com"))
-                            await store.send(.scriptRunButtonTapped)
+                            
+                            for await event in am.actionEvents {
+                                switch event {
+                                case .openPage(let codigo, let url):
+                                    print("Open page: \(codigo) - \(url)")
+                                    processedText.append(contentsOf:  "\n\(codigo)")
+                                    
+                                    await queue.enqueue(url)
+                                }
+                                
+                                
+                            }
+                        }
+                        Task {
+                            await naviProcessamento()
                         }
                     } label: {
                         Label("Rodar", systemImage: "play.fill")
@@ -138,6 +155,42 @@ struct NaviPanelView: View {
                 .padding(8)
 
             messageView
+        }
+    }
+    
+    func naviProcessamento() async {
+        print("NAVI: vai")
+        
+        var isLoadingPage = false
+        while !Task.isCancelled {
+            print("NAVI: esperando")
+            try? await Task.sleep(for: .seconds(1))
+            if await !queue.isEmpty && !isLoadingPage {
+                isLoadingPage = true
+                let url = await queue.dequeue()
+                
+                print("NAVI: abrindo pagina: \(url ?? "0")")
+                
+                store.inputText = url ?? "0"
+                await store.send(.onSubmit(url ?? "0"))
+            }
+            
+            if isLoadingPage && store.isPaginaFoiCarregada {
+                try? await Task.sleep(for: .seconds(1))
+                
+                print("NAVI: rodando script")
+                store.scriptText = LIKE_SCRIPT
+                await store.send(.scriptRunButtonTapped)
+                
+                store.isPaginaFoiCarregada = false
+                isLoadingPage = false
+            }
+            
+            //am.allJobs.forEach { item in
+            //    print("itens na lista: \(item)")
+            //}
+            //let tempArray = am.allJobs
+            //store.processedText = "\(tempArray)"
         }
     }
 

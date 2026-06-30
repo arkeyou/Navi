@@ -6,6 +6,8 @@
 
 @MainActor
 final class ActionAgent {
+    
+    private var URL_ACTION: String = ""
 
     private let store: JobStore
     private var task: Task<Void, Never>?
@@ -38,8 +40,15 @@ final class ActionAgent {
                 guard job.status == .valid
                 else { continue }
 
-                print("ActionAgent - abrindo no browser: \(job.payload.codigo)")
+                print("ActionAgent - validando : \(job.payload.codigo) - \(type(of:job.payload.itemID)) - \(job.payload.shopID)")
+                
+                var current = job
+                current.status = .ok
+                current.payload.url = "\(URL_ACTION)\(current.payload.shopID).\(current.payload.itemID)"
 
+                
+                current.updatedAt = .now
+                await store.update(current)
                 //await execute(job)
             }
         }

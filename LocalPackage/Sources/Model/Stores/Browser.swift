@@ -39,6 +39,7 @@ import WebUI
     public var processedText: String
     public var naviPanelMessage: String?
     public var isPageLoading: Bool
+    public var isPaginaFoiCarregada: Bool
     public let navigationDelegate: BrowserNavigationDelegate
     public let uiDelegate: BrowserUIDelegate
     public var settings: Settings?
@@ -73,6 +74,7 @@ import WebUI
         processedText: String = "",
         naviPanelMessage: String? = nil,
         isPageLoading: Bool = false,
+        isPaginaFoiCarregada: Bool = false,
         browserNavigation: BrowserNavigation? = nil,
         browserUI: BrowserUI? = nil,
         settings: Settings? = nil,
@@ -110,6 +112,7 @@ import WebUI
         self.processedText = processedText
         self.naviPanelMessage = naviPanelMessage
         self.isPageLoading = isPageLoading
+        self.isPaginaFoiCarregada = isPaginaFoiCarregada
         weak var weakSelf: Browser? = nil
         let browserNavigation = browserNavigation ?? .init(appDependencies, action: {
             await weakSelf?.send(.browserNavigation($0))
@@ -155,6 +158,7 @@ import WebUI
                 updatedLog.append(loadEntry)
                 writeNaviDataFile(.log, content: updatedLog)
                 logText = updatedLog
+                isPaginaFoiCarregada = true
             }
 
         case let .onOpenURL(url):

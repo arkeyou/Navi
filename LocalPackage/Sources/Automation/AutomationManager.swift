@@ -12,8 +12,16 @@ import Foundation
     private var monitorAgent: MonitorAgent?
     private var flowAgent: FlowAgent?
     private var actionAgent: ActionAgent?
-
+    
+    //public var allJobs: [String] = []
+    public let actionEvents: AsyncStream<ActionEvent>
+    private let continuation: AsyncStream<ActionEvent>.Continuation
+    
     public init(){
+        let (stream, continuation) = AsyncStream.makeStream(of: ActionEvent.self)
+        
+        self.actionEvents = stream
+        self.continuation = continuation
     }
 
     var isRunning = false
@@ -44,6 +52,21 @@ import Foundation
         actionAgent?.start()
 
         isRunning = true
+        
+        Task {
+            let stream = await store.events()
+            for await job in stream {
+                if Task.isCancelled { break }
+                
+                guard job.status == .ok
+                else { continue }
+                
+                print("AutomationManager - enviando pro browser: \(job.payload.codigo)")
+                emit(.openPage(codigo: job.payload.codigo, url: job.payload.url))
+            }
+            
+            //await syncJobs()
+        }
     }
 
     public func stop() {
@@ -55,8 +78,22 @@ import Foundation
         isRunning = false
     }
     
-    /*func listJobs(type: JobStatus) -> [Job] {
-        return store.jobs(status: .valid)
+    /*func syncJobs() async {
+        await store.all().map(Set.init).forEach(\.ok) {
+            emit(.openPage(item.payload.codigo))
+            
+            var current = item
+            current.status = .ok
+            current.updatedAt = .now
+            //store.update(item)
+        }
     }*/
-
+    
+    func emit(_ event: ActionEvent) {
+        continuation.yield(event)
+    }
+    func finish() {
+        continuation.finish()
+    }
+    
 }

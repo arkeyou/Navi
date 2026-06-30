@@ -8,6 +8,10 @@ import Foundation
 @MainActor
 final class MonitorAgent {
 
+    private var URL_MONITOR: String = ""
+    private var INTERVAL: Int = 5
+    private var TRIGGER: String = "[A-Z]{3}-[A-Z]{3}-[A-Z]{3}"
+    
     private let store: JobStore
     private var task: Task<Void, Never>?
 
@@ -56,7 +60,8 @@ final class MonitorAgent {
                 payload: JobPayload (
                     codigo: item.codigo,
                     shopID: item.shopID,
-                    itemID: item.itemID
+                    itemID: item.itemID,
+                    url: item.url
                 ),
                 status: .added,
                 createdAt: .now,
@@ -69,29 +74,30 @@ final class MonitorAgent {
     
     private func fetchApiChanges() async -> [JobPayload] {
         return [JobPayload (
-            codigo: randomCodigo(),
+            codigo: "BLL-ATM-RVH",
             shopID: 0,
-            itemID: 0
+            itemID: 0,
+            url: ""
         ),JobPayload (
-                codigo: randomCodigo(),
-                shopID: 0,
-                itemID: 0
-        ),JobPayload (
-            codigo: randomCodigo(),
+            codigo: "BBG-XRA-KGH",
             shopID: 0,
-            itemID: 0
+            itemID: 0,
+            url: ""
         ),JobPayload (
-            codigo: randomCodigo(),
+            codigo: "AUY-MXD-JLB",
             shopID: 0,
-            itemID: 0
+            itemID: 0,
+            url: ""
         ),JobPayload (
-            codigo: randomCodigo(),
+            codigo: "BTL-YPD-JMR",
             shopID: 0,
-            itemID: 0
+            itemID: 0,
+            url: ""
         ),JobPayload (
-            codigo: randomCodigo(),
+            codigo: "AAA-BBB-CCC",
             shopID: 0,
-            itemID: 0
+            itemID: 0,
+            url: ""
         )]
     }
     
