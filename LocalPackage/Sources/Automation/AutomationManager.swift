@@ -13,6 +13,8 @@ import Foundation
     private var flowAgent: FlowAgent?
     private var actionAgent: ActionAgent?
     
+    private var config: NaviConfig = NaviConfig()
+    
     //public var allJobs: [String] = []
     public let actionEvents: AsyncStream<ActionEvent>
     private let continuation: AsyncStream<ActionEvent>.Continuation
@@ -26,26 +28,32 @@ import Foundation
 
     var isRunning = false
 
-    public func start() {
+    public func start(naviConfig: String) {
 
         guard !isRunning else {
             return
         }
+        
+        do {
+            config = try JSONDecoder().decode(NaviConfig.self, from: Data(naviConfig.utf8))
+            
+            monitorAgent = MonitorAgent(
+                store: store,
+                urlMonitor: config.urlMonitor
+            )
 
-        let browser = FakeBrowser()
+            flowAgent = FlowAgent(
+                store: store,
+                urlFlow: config.urlFlow
+            )
 
-        monitorAgent = MonitorAgent(
-            store: store
-        )
-
-        flowAgent = FlowAgent(
-            store: store
-        )
-
-        actionAgent = ActionAgent(
-            store: store,
-            browser: browser
-        )
+            actionAgent = ActionAgent(
+                store: store,
+                urlAction: config.urlAction
+            )
+        } catch {
+            print("Decoding failed: \(error.localizedDescription)")
+        }
 
         monitorAgent?.start()
         flowAgent?.start()
@@ -62,7 +70,7 @@ import Foundation
                 else { continue }
                 
                 print("AutomationManager - enviando pro browser: \(job.payload.codigo)")
-                emit(.openPage(codigo: job.payload.codigo, url: job.payload.url))
+                emit(.openPage(codigo: job.payload.codigo, url: job.payload.url, script: config.script))
             }
             
             //await syncJobs()

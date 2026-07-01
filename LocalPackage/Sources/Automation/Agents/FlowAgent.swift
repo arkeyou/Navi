@@ -7,15 +7,17 @@ import Foundation
 @MainActor
 final class FlowAgent {
 
-    private var URL_SEARCH: String = ""
+    private var URL_SEARCH: String
 
     private let store: JobStore
     private var task: Task<Void, Never>?
 
     init(
-        store: JobStore
+        store: JobStore,
+        urlFlow: String
     ) {
         self.store = store
+        self.URL_SEARCH = urlFlow
     }
 
     func start() {
@@ -89,7 +91,7 @@ final class FlowAgent {
     
     private func fetchApi(codigo: String) async throws -> SearchResponse {
         
-        guard let url = URL(string: String(format: URL_SEARCH, arguments: [codigo])) else { throw URLError(.badURL) }
+        guard let url = URL(string: "\(URL_SEARCH)\(codigo)") else { throw URLError(.badURL) }
         
         let (data, response) = try await URLSession.shared.data(from: url)
         

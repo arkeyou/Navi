@@ -44,7 +44,7 @@ struct NaviPanelView: View {
     @State var am = AutomationManager()
     @State private var processedText: String = ""
     @State private var queue: NaviQueue<String> = NaviQueue<String>()
-    @State private var LIKE_SCRIPT = "const buttons = document.querySelectorAll(\"button[aria-label='Like item']\"); buttons.forEach(button => button.click())"
+    @State private var LIKE_SCRIPT = ""
 
     
     var body: some View {
@@ -77,6 +77,9 @@ struct NaviPanelView: View {
             Task {
                 await store.send(.scriptFileImported(url))
             }
+        }
+        .sheet(isPresented: $store.isPresentedScriptSelection) {
+            ScriptSelectionView(store: store)
         }
         .alert("Salvar script", isPresented: $store.isPresentedScriptSaveDialog) {
             TextField("Nome do arquivo", text: $store.pendingScriptFileName)
@@ -120,13 +123,18 @@ struct NaviPanelView: View {
                     Button {
                         Task {
                             print("script \(store.scriptText)")
-                            am.start()
+                            let config: String = store.scriptText
+                            am.start(naviConfig: config)
                             
                             for await event in am.actionEvents {
                                 switch event {
-                                case .openPage(let codigo, let url):
+                                case .openPage(let codigo, let url, let script):
                                     print("Open page: \(codigo) - \(url)")
                                     processedText.append(contentsOf:  "\n\(codigo)")
+                                    
+                                    if LIKE_SCRIPT.isEmpty {
+                                        LIKE_SCRIPT.append(script)
+                                    }
                                     
                                     await queue.enqueue(url)
                                 }

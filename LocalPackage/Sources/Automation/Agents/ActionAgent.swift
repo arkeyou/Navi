@@ -11,17 +11,14 @@ final class ActionAgent {
 
     private let store: JobStore
     private var task: Task<Void, Never>?
-    
-    private let browser:
-        BrowserEngine
 
     init(
         store: JobStore,
-        browser: BrowserEngine
+        urlAction: String
     ) {
 
         self.store = store
-        self.browser = browser
+        self.URL_ACTION = urlAction
     }
 
     func start() {

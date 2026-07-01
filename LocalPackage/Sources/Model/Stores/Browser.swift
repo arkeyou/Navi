@@ -35,6 +35,8 @@ import WebUI
     public var pendingScriptFileName: String
     public var isPresentedScriptSaveDialog: Bool
     public var isPresentedScriptImporter: Bool
+    public var isPresentedScriptSelection: Bool
+    public var savedScriptURLs: [URL]
     public var logText: String
     public var processedText: String
     public var naviPanelMessage: String?
@@ -70,6 +72,8 @@ import WebUI
         pendingScriptFileName: String = "",
         isPresentedScriptSaveDialog: Bool = false,
         isPresentedScriptImporter: Bool = false,
+        isPresentedScriptSelection: Bool = false,
+        savedScriptURLs: [URL] = [],
         logText: String = "",
         processedText: String = "",
         naviPanelMessage: String? = nil,
@@ -108,6 +112,8 @@ import WebUI
         self.pendingScriptFileName = pendingScriptFileName
         self.isPresentedScriptSaveDialog = isPresentedScriptSaveDialog
         self.isPresentedScriptImporter = isPresentedScriptImporter
+        self.isPresentedScriptSelection = isPresentedScriptSelection
+        self.savedScriptURLs = savedScriptURLs
         self.logText = logText
         self.processedText = processedText
         self.naviPanelMessage = naviPanelMessage
@@ -264,10 +270,25 @@ import WebUI
             saveCurrentScript()
 
         case .scriptLoadButtonTapped:
-            isPresentedScriptImporter = true
+            loadSavedScripts()
+            isPresentedScriptSelection = true
 
         case let .scriptFileImported(url):
             importScript(from: url)
+            isPresentedScriptSelection = false
+
+        case let .scriptSelected(url):
+            importScript(from: url)
+            isPresentedScriptSelection = false
+
+        case let .deleteScript(url):
+            do {
+                try FileManager.default.removeItem(at: url)
+                loadSavedScripts()
+                naviPanelMessage = "Script excluído."
+            } catch {
+                naviPanelMessage = error.localizedDescription
+            }
 
         case .scriptRunButtonTapped:
             do {
@@ -433,16 +454,37 @@ import WebUI
         }
         do {
             try FileManager.default.createDirectory(at: naviScriptsDirectory, withIntermediateDirectories: true)
-            let destinationURL = uniqueScriptDestinationURL(for: url.lastPathComponent)
-            if FileManager.default.fileExists(atPath: destinationURL.path) {
-                try FileManager.default.removeItem(at: destinationURL)
+            
+            let isAlreadyInScriptsDir = url.deletingLastPathComponent().standardizedFileURL == naviScriptsDirectory.standardizedFileURL
+            let finalURL: URL
+            if isAlreadyInScriptsDir {
+                finalURL = url
+            } else {
+                let destinationURL = uniqueScriptDestinationURL(for: url.lastPathComponent)
+                if FileManager.default.fileExists(atPath: destinationURL.path) {
+                    try FileManager.default.removeItem(at: destinationURL)
+                }
+                try FileManager.default.copyItem(at: url, to: destinationURL)
+                finalURL = destinationURL
             }
-            try FileManager.default.copyItem(at: url, to: destinationURL)
-            scriptText = try String(contentsOf: destinationURL, encoding: .utf8)
-            scriptFileName = destinationURL.lastPathComponent
+            
+            scriptText = try String(contentsOf: finalURL, encoding: .utf8)
+            scriptFileName = finalURL.lastPathComponent
             naviPanelMessage = "Script carregado."
         } catch {
             naviPanelMessage = error.localizedDescription
+        }
+    }
+
+    private func loadSavedScripts() {
+        do {
+            try FileManager.default.createDirectory(at: naviScriptsDirectory, withIntermediateDirectories: true)
+            let urls = try FileManager.default.contentsOfDirectory(at: naviScriptsDirectory, includingPropertiesForKeys: nil)
+            savedScriptURLs = urls.filter { $0.pathExtension.lowercased() == "navi" }
+                .sorted(by: { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending })
+        } catch {
+            naviPanelMessage = error.localizedDescription
+            savedScriptURLs = []
         }
     }
 
@@ -564,6 +606,8 @@ import WebUI
         case scriptSaveConfirmed
         case scriptLoadButtonTapped
         case scriptFileImported(URL)
+        case scriptSelected(URL)
+        case deleteScript(URL)
         case scriptRunButtonTapped
         case clearLogButtonTapped
         case clearProcessedButtonTapped

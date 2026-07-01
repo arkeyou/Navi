@@ -409,6 +409,46 @@ struct BrowserTests {
         await sut.send(.bookmarkManagement(.doneButtonTapped))
         #expect(sut.bookmarkManagement == nil)
     }
+
+    @MainActor @Test
+    func send_scriptLoadButtonTapped() async {
+        let sut = Browser(.testDependencies())
+        await sut.send(.scriptLoadButtonTapped)
+        #expect(sut.isPresentedScriptSelection)
+    }
+
+    @MainActor @Test
+    func send_scriptSelected() async {
+        let sut = Browser(.testDependencies())
+        let fm = FileManager.default
+        let tempDir = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try? fm.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        let scriptURL = tempDir.appendingPathComponent("test.navi")
+        try? "test script content".write(to: scriptURL, atomically: true, encoding: .utf8)
+        
+        await sut.send(.scriptSelected(scriptURL))
+        #expect(sut.scriptText == "test script content")
+        #expect(sut.scriptFileName == "test.navi")
+        #expect(!sut.isPresentedScriptSelection)
+        
+        try? fm.removeItem(at: tempDir)
+    }
+
+    @MainActor @Test
+    func send_deleteScript() async {
+        let sut = Browser(.testDependencies())
+        let fm = FileManager.default
+        let tempDir = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try? fm.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        let scriptURL = tempDir.appendingPathComponent("test.navi")
+        try? "test script content".write(to: scriptURL, atomically: true, encoding: .utf8)
+        
+        #expect(fm.fileExists(atPath: scriptURL.path))
+        await sut.send(.deleteScript(scriptURL))
+        #expect(!fm.fileExists(atPath: scriptURL.path))
+        
+        try? fm.removeItem(at: tempDir)
+    }
 }
 
 struct ZoomButtonProperty: Sendable {

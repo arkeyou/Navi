@@ -8,7 +8,7 @@ import Foundation
 @MainActor
 final class MonitorAgent {
 
-    private var URL_MONITOR: String = ""
+    private var URL_MONITOR: String
     private var INTERVAL: Int = 5
     private var TRIGGER: String = "[A-Z]{3}-[A-Z]{3}-[A-Z]{3}"
     
@@ -16,10 +16,12 @@ final class MonitorAgent {
     private var task: Task<Void, Never>?
 
     init(
-        store: JobStore
+        store: JobStore,
+        urlMonitor: String
     ) {
 
         self.store = store
+        self.URL_MONITOR = urlMonitor
     }
 
     func start() {
