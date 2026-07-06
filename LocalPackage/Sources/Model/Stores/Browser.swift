@@ -160,10 +160,7 @@ import WebUI
                 let timestamp = ISO8601DateFormatter().string(from: Date())
                 let urlString = currentURL?.absoluteString ?? "URL desconhecida"
                 let loadEntry = "[\(timestamp)] Página carregada: \(urlString)\n"
-                var updatedLog = readNaviDataFile(.log)
-                updatedLog.append(loadEntry)
-                writeNaviDataFile(.log, content: updatedLog)
-                logText = updatedLog
+                updateLog(with: loadEntry)
                 isPaginaFoiCarregada = true
             }
 
@@ -406,6 +403,13 @@ import WebUI
         case .processed:
             processedText = readNaviDataFile(.processed)
         }
+    }
+    
+    public func updateLog(with message: String) {
+        var updatedLog = readNaviDataFile(.log)
+        updatedLog.append(message)
+        writeNaviDataFile(.log, content: updatedLog)
+        logText = updatedLog
     }
 
     private func readNaviDataFile(_ file: NaviDataFile) -> String {

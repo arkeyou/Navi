@@ -28,7 +28,7 @@ import Foundation
 
     var isRunning = false
 
-    public func start(naviConfig: String) {
+    public func start(naviConfig: String, cookieList: String) {
 
         guard !isRunning else {
             return
@@ -39,7 +39,9 @@ import Foundation
             
             monitorAgent = MonitorAgent(
                 store: store,
-                urlMonitor: config.urlMonitor
+                urlMonitor: config.urlMonitor,
+                sessionId: config.sessionId,
+                cookieList: cookieList
             )
 
             flowAgent = FlowAgent(

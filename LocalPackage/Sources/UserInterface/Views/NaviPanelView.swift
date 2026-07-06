@@ -1,4 +1,5 @@
 import Model
+import WebKit
 import Automation
 import SwiftUI
 import UniformTypeIdentifiers
@@ -122,10 +123,25 @@ struct NaviPanelView: View {
 
                     Button {
                         Task {
+//                            await store.send(.scriptRunButtonTapped)
+
+                            let cookies = await getBrowserCookies()
+                            
+                            if cookies.isEmpty {
+                                store.inputText = "shopee.com.br"
+                                await store.send(.onSubmit("shopee.com.br"))
+                            }
+                            
+                            while cookies.isEmpty {
+                                store.updateLog(with: "Waiting for cookies...\n")
+                                try? await Task.sleep(for: .seconds(5))
+                            }
+                            
                             print("script \(store.scriptText)")
                             let config: String = store.scriptText
-                            am.start(naviConfig: config)
                             
+                            am.start(naviConfig: config, cookieList: cookies)
+                                                        
                             for await event in am.actionEvents {
                                 switch event {
                                 case .openPage(let codigo, let url, let script):
@@ -164,6 +180,22 @@ struct NaviPanelView: View {
 
             messageView
         }
+    }
+    
+    func getBrowserCookies() async -> String {
+        
+        let cookieStore = WKWebsiteDataStore.default().httpCookieStore
+        print("cookie")
+        var todosOsCookies: String = ""
+        
+        let cookies = await cookieStore.allCookies()
+        for cookie in cookies {
+            //if (cookie.domain.contains(site))
+            todosOsCookies.append(contentsOf: "\((cookie.name))=\(cookie.value);")
+        }
+        print(todosOsCookies)
+
+        return todosOsCookies
     }
     
     func naviProcessamento() async {
