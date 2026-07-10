@@ -26,21 +26,29 @@ import Foundation
         self.continuation = continuation
     }
 
-    var isRunning = false
+    public private(set) var isRunning = false
+    private var eventStreamTask: Task<Void, Never>? = nil
 
-    public func start(naviConfig: String, cookieList: String) {
+    public func start(naviConfig: String, sessionId: String = "", cookieList: String) {
 
         guard !isRunning else {
             return
         }
         
+        var sessionIdLocal = sessionId
+        
         do {
+            print(naviConfig.utf8)
             config = try JSONDecoder().decode(NaviConfig.self, from: Data(naviConfig.utf8))
+            
+            if sessionId.isEmpty {
+                sessionIdLocal = sessionId
+            }
             
             monitorAgent = MonitorAgent(
                 store: store,
                 urlMonitor: config.urlMonitor,
-                sessionId: config.sessionId,
+                sessionId: sessionIdLocal,
                 cookieList: cookieList
             )
 
@@ -63,7 +71,7 @@ import Foundation
 
         isRunning = true
         
-        Task {
+        eventStreamTask = Task {
             let stream = await store.events()
             for await job in stream {
                 if Task.isCancelled { break }
@@ -84,6 +92,9 @@ import Foundation
         monitorAgent?.stop()
         flowAgent?.stop()
         actionAgent?.stop()
+
+        eventStreamTask?.cancel()
+        eventStreamTask = nil
 
         isRunning = false
     }

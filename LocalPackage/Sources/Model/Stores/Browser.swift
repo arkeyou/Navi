@@ -37,6 +37,9 @@ import WebUI
     public var isPresentedScriptImporter: Bool
     public var isPresentedScriptSelection: Bool
     public var savedScriptURLs: [URL]
+    public var hasUnreadLogs: Bool
+    public var hasUnreadProcessed: Bool
+    public var qtProcessed: Int
     public var logText: String
     public var processedText: String
     public var naviPanelMessage: String?
@@ -74,6 +77,9 @@ import WebUI
         isPresentedScriptImporter: Bool = false,
         isPresentedScriptSelection: Bool = false,
         savedScriptURLs: [URL] = [],
+        hasUnreadLogs: Bool = false,
+        hasUnreadProcessed: Bool = false,
+        qtProcessed: Int = 0,
         logText: String = "",
         processedText: String = "",
         naviPanelMessage: String? = nil,
@@ -114,6 +120,9 @@ import WebUI
         self.isPresentedScriptImporter = isPresentedScriptImporter
         self.isPresentedScriptSelection = isPresentedScriptSelection
         self.savedScriptURLs = savedScriptURLs
+        self.hasUnreadLogs = hasUnreadLogs
+        self.hasUnreadProcessed = hasUnreadProcessed
+        self.qtProcessed = qtProcessed
         self.logText = logText
         self.processedText = processedText
         self.naviPanelMessage = naviPanelMessage
@@ -253,6 +262,12 @@ import WebUI
         case let .naviPanelSelectionChanged(selection):
             naviPanelSelection = selection
             loadNaviPanelContent(for: selection)
+            if selection == .log {
+                hasUnreadLogs = false
+            }
+            if selection == .processed {
+                hasUnreadProcessed = false
+            }
 
         case .scriptNewButtonTapped:
             scriptText = ""
@@ -287,9 +302,9 @@ import WebUI
                 naviPanelMessage = error.localizedDescription
             }
 
-        case .scriptRunButtonTapped:
+        case let .scriptRunButtonTapped(scriptToExecute):
             do {
-                try await webViewProxyClient.evaluateJavaScript(scriptText)
+                try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
                     naviPanelMessage = "Script executado."
             } catch {
                 naviPanelMessage = error.localizedDescription
@@ -298,6 +313,14 @@ import WebUI
         case .clearLogButtonTapped:
             writeNaviDataFile(.log, content: "")
             logText = ""
+
+        case let .processedUpdated(text):
+            processedText.append(text)
+            writeNaviDataFile(.processed, content: processedText)
+            if naviPanelSelection != .processed {
+                hasUnreadProcessed = true
+                qtProcessed += 1
+            }
 
         case .clearProcessedButtonTapped:
             writeNaviDataFile(.processed, content: "")
@@ -410,6 +433,19 @@ import WebUI
         updatedLog.append(message)
         writeNaviDataFile(.log, content: updatedLog)
         logText = updatedLog
+        naviPanelMessage = message
+        if naviPanelSelection != .log {
+            hasUnreadLogs = true
+        }
+    }
+    
+    public func updateProcessed(with text: String) {
+        processedText.append(text)
+        writeNaviDataFile(.processed, content: processedText)
+        if naviPanelSelection != .processed {
+            hasUnreadProcessed = true
+            qtProcessed += 1
+        }
     }
 
     private func readNaviDataFile(_ file: NaviDataFile) -> String {
@@ -612,7 +648,8 @@ import WebUI
         case scriptFileImported(URL)
         case scriptSelected(URL)
         case deleteScript(URL)
-        case scriptRunButtonTapped
+        case scriptRunButtonTapped(String)
+        case processedUpdated(String)
         case clearLogButtonTapped
         case clearProcessedButtonTapped
         case dialogOKButtonTapped

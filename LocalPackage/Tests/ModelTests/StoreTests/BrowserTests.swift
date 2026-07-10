@@ -449,6 +449,21 @@ struct BrowserTests {
         
         try? fm.removeItem(at: tempDir)
     }
+
+    @MainActor @Test
+    func test_unreadLogs_badge() async {
+        let sut = Browser(.testDependencies(), naviPanelSelection: .script)
+        #expect(!sut.hasUnreadLogs)
+        
+        sut.updateLog(with: "New log entry\n")
+        #expect(sut.hasUnreadLogs)
+        
+        await sut.send(.naviPanelSelectionChanged(.log))
+        #expect(!sut.hasUnreadLogs)
+        
+        sut.updateLog(with: "Another log entry\n")
+        #expect(!sut.hasUnreadLogs)
+    }
 }
 
 struct ZoomButtonProperty: Sendable {

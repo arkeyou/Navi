@@ -109,7 +109,7 @@ struct BrowserView: View {
             NaviPanelView(store: store)
             NaviBottomTabView(store: store)
         }
-        .presentationDetents([.height(96), .medium, .large], selection: $naviPanelDetent)
+        .presentationDetents([.height(1), .height(240), .medium/*, .large*/], selection: $naviPanelDetent)
         .presentationDragIndicator(.visible)
         .presentationBackgroundInteraction(.enabled)
         .interactiveDismissDisabled()
