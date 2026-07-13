@@ -15,6 +15,9 @@ import WebUI
     @ObservationIgnored private var operateWebViewProxy: ((WebViewProxy) -> Void)?
     @ObservationIgnored private var lastDialogClosedDate = Date.distantPast
 
+    public var isPresentedNaviPanel = true
+    public var isButtonPresentOnPage = false
+
     public var inputText: String
     public var isPresentedToolbar: Bool
     public var isPresentedZoomPopover: Bool
@@ -141,6 +144,7 @@ import WebUI
         self.bookmarkManagement = bookmarkManagement
         self.action = action
         weakSelf = self
+        
     }
 
     public func reduce(_ action: Action) async {
@@ -151,6 +155,10 @@ import WebUI
             self.webViewProxyClient.setProxy(webViewProxy)
             prepareNaviFiles()
             loadNaviPanelContent(for: naviPanelSelection)
+            
+            //Lima as listas de Log e Processados
+            await send(.clearLogButtonTapped)
+            await send(.clearProcessedButtonTapped)
 
         case let .onChangeURL(url):
             currentURL = url
@@ -168,8 +176,10 @@ import WebUI
             if wasLoading && !isLoading {
                 let timestamp = ISO8601DateFormatter().string(from: Date())
                 let urlString = currentURL?.absoluteString ?? "URL desconhecida"
-                let loadEntry = "[\(timestamp)] Página carregada: \(urlString)\n"
+                //let loadEntry = "[\(timestamp)] Página carregada: \(urlString)\n"
+                let loadEntry = "\nPágina carregada!\n"
                 updateLog(with: loadEntry)
+                try? await Task.sleep(for: .seconds(1))
                 isPaginaFoiCarregada = true
             }
 
@@ -304,12 +314,23 @@ import WebUI
 
         case let .scriptRunButtonTapped(scriptToExecute):
             do {
-                try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
-                    naviPanelMessage = "Script executado."
+                var result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
+                print(result)
+                naviPanelMessage = "Script executado."
             } catch {
                 naviPanelMessage = error.localizedDescription
         }
 
+        case let .scriptRunVerify(scriptToExecute):
+            do {
+                var result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
+                isButtonPresentOnPage = result as? Bool ?? false
+                print(isButtonPresentOnPage)
+                naviPanelMessage = "Script executado."
+            } catch {
+                naviPanelMessage = error.localizedDescription
+        }
+            
         case .clearLogButtonTapped:
             writeNaviDataFile(.log, content: "")
             logText = ""
@@ -649,6 +670,7 @@ import WebUI
         case scriptSelected(URL)
         case deleteScript(URL)
         case scriptRunButtonTapped(String)
+        case scriptRunVerify(String)
         case processedUpdated(String)
         case clearLogButtonTapped
         case clearProcessedButtonTapped

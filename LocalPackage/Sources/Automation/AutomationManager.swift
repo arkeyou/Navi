@@ -80,7 +80,7 @@ import Foundation
                 else { continue }
                 
                 print("AutomationManager - enviando pro browser: \(job.payload.codigo)")
-                emit(.openPage(codigo: job.payload.codigo, url: job.payload.url, script: config.script))
+                emit(.openPage(codigo: job.payload.codigo, url: job.payload.url, script: config.script, scriptVerify: config.scriptVerify))
             }
             
             //await syncJobs()

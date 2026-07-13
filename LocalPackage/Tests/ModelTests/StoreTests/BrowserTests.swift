@@ -455,13 +455,13 @@ struct BrowserTests {
         let sut = Browser(.testDependencies(), naviPanelSelection: .script)
         #expect(!sut.hasUnreadLogs)
         
-        sut.updateLog(with: "New log entry\n")
+        sut.updateLog(with: "\nNew log entry\n")
         #expect(sut.hasUnreadLogs)
         
         await sut.send(.naviPanelSelectionChanged(.log))
         #expect(!sut.hasUnreadLogs)
         
-        sut.updateLog(with: "Another log entry\n")
+        sut.updateLog(with: "\nAnother log entry\n")
         #expect(!sut.hasUnreadLogs)
     }
 }

@@ -50,7 +50,7 @@ final class FlowAgent {
     ) async {
         var current = job
         
-        print("FlowAgent - validando: \(current.payload.codigo)")
+        //print("FlowAgent - validando: \(current.payload.codigo)")
         
         current.status = .isValidating
         current.updatedAt = .now
@@ -64,7 +64,7 @@ final class FlowAgent {
         )
         
         if isDuplicate {
-            print("FlowAgent - duplicado: \(current.payload.codigo)")
+            //print("FlowAgent - duplicado: \(current.payload.codigo)")
             
             current.status = .dupe
             current.updatedAt = .now

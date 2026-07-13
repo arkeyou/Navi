@@ -49,13 +49,16 @@ struct NaviPanelView: View {
     @State private var processedText: String = ""
     @State private var queue: NaviQueue<String> = NaviQueue<String>()
     @State private var LIKE_SCRIPT = ""
+    @State private var VERIFY_SCRIPT = ""
     @State private var runTask: Task<Void, Never>? = nil
     @State private var processingTask: Task<Void, Never>? = nil
-    private let IDS_WAIT_INTERVAL = Duration.seconds(5)
+    private let IDS_WAIT_INTERVAL = Duration.seconds(1)
     private let LIKE_WAIT_INTERVAL = Duration.seconds(0.5)
     private let COOKIE_WAIT_INTERVAL = Duration.seconds(5)
     private let URL_NPOINT_API = "https://api.npoint.io/"
-    
+    @State private var isLoadingNaviProcess = false
+    @State private var count = 0
+
     var body: some View {
         NavigationStack {
             Group {
@@ -100,7 +103,7 @@ struct NaviPanelView: View {
             }
         }
         .onDisappear {
-            stopAutomation()
+            //stopAutomation()
         }
     }
 
@@ -165,7 +168,7 @@ struct NaviPanelView: View {
     }
     
     private func startAutomation() {
-        stopAutomation()
+        //stopAutomation()
         
         var cookies = ""
         
@@ -181,7 +184,7 @@ struct NaviPanelView: View {
             
             while cookies.isEmpty {
                 if Task.isCancelled { return }
-                store.updateLog(with: "Waiting for cookies...\n")
+                store.updateLog(with: "\nWaiting for cookies...\n")
                 cookies = await getBrowserCookies()
                 try? await Task.sleep(for: COOKIE_WAIT_INTERVAL)
             }
@@ -200,24 +203,27 @@ struct NaviPanelView: View {
                 }
             } catch {
                 print(error)
-                store.updateLog(with: "buscaConfiguracoes: \(error.localizedDescription)")
+                store.updateLog(with: "\nbuscaConfiguracoes: \(error.localizedDescription)\n")
                 stopAutomation()
                 return
             }
             
-            store.updateLog(with: "Iniciou automacao...\n")
+            store.updateLog(with: "\nIniciou automacao\n")
             am.start(naviConfig: config, sessionId: configStruct.sessionId, cookieList: cookies)
                                         
             for await event in am.actionEvents {
                 if Task.isCancelled { break }
                 switch event {
-                case .openPage(let codigo, let url, let script):
+                case .openPage(let codigo, let url, let script, let scriptVerify):
                     print("Open page: \(codigo) - \(url)")
 
                     store.updateProcessed(with: "\n\(codigo)")
                     
                     if LIKE_SCRIPT.isEmpty {
                         LIKE_SCRIPT.append(script)
+                    }
+                    if VERIFY_SCRIPT.isEmpty {
+                        VERIFY_SCRIPT.append(scriptVerify)
                     }
                     
                     await queue.enqueue(url)
@@ -291,7 +297,7 @@ struct NaviPanelView: View {
         queue = NaviQueue<String>()
         LIKE_SCRIPT = ""
         
-        store.updateLog(with: "Parou automacao!\n")
+        store.updateLog(with: "\nParou automacao\n")
 
         print("Automation stopped and cleaned up.")
     }
@@ -315,43 +321,56 @@ struct NaviPanelView: View {
     func naviProcessamentoTela() async {
         print("NAVI: vai")
         
-        var isLoadingPage = false
         while !Task.isCancelled {
-            print("NAVI: esperando")
-            let timestamp = ISO8601DateFormatter().string(from: Date())
-            store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
-
-            try? await Task.sleep(for: IDS_WAIT_INTERVAL)
-            if await !queue.isEmpty && !isLoadingPage {
-                isLoadingPage = true
+            count+=1
+            print("NAVI: esperando \(count)")
+            //let timestamp = ISO8601DateFormatter().string(from: Date())
+            //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
+            store.updateLog(with: ".")
+            
+            try? await Task.sleep(for: LIKE_WAIT_INTERVAL)
+            if await !queue.isEmpty && !isLoadingNaviProcess {
+                isLoadingNaviProcess = true
                 let url = await queue.dequeue()
                 
                 print("NAVI: abrindo pagina: \(url ?? "0")")
-                store.updateLog(with: "Abrindo pagina: \(url ?? "0")!\n")
+                store.updateLog(with: "\nAbrindo pagina!\n")//: \(url ?? "0")!")
 
                 store.inputText = url ?? "0"
                 await store.send(.onSubmit(url ?? "0"))
+                //try? await Task.sleep(for: LIKE_WAIT_INTERVAL)
             }
             
-            if isLoadingPage && store.isPaginaFoiCarregada {
-                try? await Task.sleep(for: LIKE_WAIT_INTERVAL)
-                
-                print("NAVI: rodando script")
-                store.updateLog(with: "Rodando script!\n")
+            if isLoadingNaviProcess && store.isPaginaFoiCarregada {
+                //print("NAVI: esperando botao aparecer...")
+                await store.send(.scriptRunVerify(VERIFY_SCRIPT))
+                store.updateLog(with: "\nBuscando na tela\n")
+                if (store.isButtonPresentOnPage) {
+                    store.isButtonPresentOnPage = false
 
-                //store.scriptText = LIKE_SCRIPT
-                await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
+                    print("NAVI: achou o botao, rodando script")
+                    store.updateLog(with: "\nEncontrou! Executando acao!\n")
+
+                    await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
+                    
+                    try? await Task.sleep(for: LIKE_WAIT_INTERVAL)
+                    store.isPaginaFoiCarregada = false
+                    isLoadingNaviProcess = false
+                }
                 
-                store.isPaginaFoiCarregada = false
-                isLoadingPage = false
             }
             
+            //try? await Task.sleep(for: IDS_WAIT_INTERVAL)
             //am.allJobs.forEach { item in
             //    print("itens na lista: \(item)")
             //}
             //let tempArray = am.allJobs
             //store.processedText = "\(tempArray)"
         }
+    }
+    
+    private func loadedPage() async -> Bool {
+        return false
     }
 
     private func dataView(text: Binding<String>, clearAction: Browser.Action) -> some View {

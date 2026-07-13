@@ -4,12 +4,11 @@ import WebUI
 
 struct BrowserView: View {
     @StateObject var store: Browser
-    @State private var isPresentedNaviPanel = true
     @State private var naviPanelDetent = PresentationDetent.medium
     
     var body: some View {
         mainContent
-            .sheet(isPresented: $isPresentedNaviPanel) {
+            .sheet(isPresented: $store.isPresentedNaviPanel) {
                 naviPanelSheet
             }
             .sheet(item: $store.settings) { store in
@@ -109,7 +108,7 @@ struct BrowserView: View {
             NaviPanelView(store: store)
             NaviBottomTabView(store: store)
         }
-        .presentationDetents([.height(1), .height(240), .medium/*, .large*/], selection: $naviPanelDetent)
+        .presentationDetents([.height(240), .medium, .large], selection: $naviPanelDetent)
         .presentationDragIndicator(.visible)
         .presentationBackgroundInteraction(.enabled)
         .interactiveDismissDisabled()

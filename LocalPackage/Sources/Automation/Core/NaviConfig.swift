@@ -8,4 +8,5 @@ struct NaviConfig: Decodable {
     var urlFlow: String = ""
     var urlAction: String = ""
     var script: String = ""
+    var scriptVerify: String = ""
 }

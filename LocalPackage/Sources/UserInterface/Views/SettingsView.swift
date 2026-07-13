@@ -10,7 +10,7 @@ struct SettingsView: View {
         NavigationStack(path: $store.path) {
             List {
                 Section {
-                    Button {
+                    /*Button {
                         Task {
                             await store.send(.defaultBrowserAppButtonTapped)
                         }
@@ -46,7 +46,7 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    .buttonStyle(.borderless)
+                    .buttonStyle(.borderless)*/
                     LabeledContent {
                         Button(role: .destructive) {
                             Task {
@@ -76,7 +76,7 @@ struct SettingsView: View {
                             Image(systemName: "number")
                         }
                     }
-                    LabeledContent {
+                    /*LabeledContent {
                         Text(store.developer)
                     } label: {
                         Label {
@@ -102,7 +102,7 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    .buttonStyle(.borderless)
+                    .buttonStyle(.borderless)*/
                     Button {
                         Task {
                             await store.send(.licensesButtonTapped(appDependencies))

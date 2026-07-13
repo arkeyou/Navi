@@ -37,7 +37,7 @@ final class MonitorAgent {
         
         task = Task {
 
-            while !Task.isCancelled {
+            //while !Task.isCancelled {
                 print("MonitorAgent - monitorando mensagens")
                 
                 do {
@@ -52,7 +52,7 @@ final class MonitorAgent {
                 } catch {
                     
                 }
-            }
+            //}
         }
     }
     
@@ -67,7 +67,7 @@ final class MonitorAgent {
         //let apiItems = try await fetchApiChangesMock()
 
         for item in apiItems {
-            print("MonitorAgent - detectou codigo "+item.codigo)
+            //print("MonitorAgent - detectou codigo "+item.codigo)
             let job = Job(
                 id: UUID(),
                 payload: JobPayload (
