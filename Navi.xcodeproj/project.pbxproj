@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1C56FC332E2BD03000D92D7B /* UserInterface in Frameworks */ = {isa = PBXBuildFile; productRef = 1C56FC322E2BD03000D92D7B /* UserInterface */; };
-		1C56FCAA2E2C8E6000D92D7B /* TelescopureShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1C56FCA02E2C8E6000D92D7B /* TelescopureShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1C56FCAA2E2C8E6000D92D7B /* NaviShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1C56FCA02E2C8E6000D92D7B /* NaviShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1C56FCB22E2C8F1C00D92D7B /* UserInterface in Frameworks */ = {isa = PBXBuildFile; productRef = 1C56FCB12E2C8F1C00D92D7B /* UserInterface */; };
 /* End PBXBuildFile section */
 
@@ -35,7 +35,7 @@
 			dstPath = "";
 			dstSubfolder = PlugIns;
 			files = (
-				1C56FCAA2E2C8E6000D92D7B /* TelescopureShare.appex in Embed Foundation Extensions */,
+				1C56FCAA2E2C8E6000D92D7B /* NaviShare.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 		};
@@ -43,57 +43,57 @@
 
 /* Begin PBXFileReference section */
 		1C56FB9C2E2A9B5100D92D7B /* LocalPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LocalPackage; sourceTree = "<group>"; };
-		1C56FCA02E2C8E6000D92D7B /* TelescopureShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TelescopureShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		1C67D1242AE02C8F009F4A60 /* Telescopure.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Telescopure.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1C67D13E2AE02C90009F4A60 /* TelescopureUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TelescopureUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		1CE7245E2AF69EE9000B24EC /* Telescopure.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Telescopure.xctestplan; sourceTree = "<group>"; };
+		1C56FCA02E2C8E6000D92D7B /* NaviShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NaviShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C67D1242AE02C8F009F4A60 /* Navi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Navi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C67D13E2AE02C90009F4A60 /* NaviUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NaviUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CE7245E2AF69EE9000B24EC /* Navi.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Navi.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1C56FBAD2E2B6BCA00D92D7B /* Exceptions for "Telescopure" folder in "Telescopure" target */ = {
+		1C56FBAD2E2B6BCA00D92D7B /* Exceptions for "Navi" folder in "Navi" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 1C67D1232AE02C8F009F4A60 /* Telescopure */;
+			target = 1C67D1232AE02C8F009F4A60 /* Navi */;
 		};
-		1C56FCAE2E2C8E6000D92D7B /* Exceptions for "TelescopureShare" folder in "TelescopureShare" target */ = {
+		1C56FCAE2E2C8E6000D92D7B /* Exceptions for "NaviShare" folder in "NaviShare" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 1C56FC9F2E2C8E6000D92D7B /* TelescopureShare */;
+			target = 1C56FC9F2E2C8E6000D92D7B /* NaviShare */;
 		};
-		1CE029632E8BC3720093A76B /* Exceptions for "Telescopure" folder in "TelescopureShare" target */ = {
+		1CE029632E8BC3720093A76B /* Exceptions for "Navi" folder in "NaviShare" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AppIcon.icon,
 			);
-			target = 1C56FC9F2E2C8E6000D92D7B /* TelescopureShare */;
+			target = 1C56FC9F2E2C8E6000D92D7B /* NaviShare */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		1C56FBA72E2B6BCA00D92D7B /* Telescopure */ = {
+		1C56FBA72E2B6BCA00D92D7B /* Navi */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				1C56FBAD2E2B6BCA00D92D7B /* Exceptions for "Telescopure" folder in "Telescopure" target */,
-				1CE029632E8BC3720093A76B /* Exceptions for "Telescopure" folder in "TelescopureShare" target */,
+				1C56FBAD2E2B6BCA00D92D7B /* Exceptions for "Navi" folder in "Navi" target */,
+				1CE029632E8BC3720093A76B /* Exceptions for "Navi" folder in "NaviShare" target */,
 			);
-			path = Telescopure;
+			path = Navi;
 			sourceTree = "<group>";
 		};
-		1C56FBD02E2B6BD500D92D7B /* TelescopureUITests */ = {
+		1C56FBD02E2B6BD500D92D7B /* NaviUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TelescopureUITests;
+			path = NaviUITests;
 			sourceTree = "<group>";
 		};
-		1C56FCA12E2C8E6000D92D7B /* TelescopureShare */ = {
+		1C56FCA12E2C8E6000D92D7B /* NaviShare */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				1C56FCAE2E2C8E6000D92D7B /* Exceptions for "TelescopureShare" folder in "TelescopureShare" target */,
+				1C56FCAE2E2C8E6000D92D7B /* Exceptions for "NaviShare" folder in "NaviShare" target */,
 			);
-			path = TelescopureShare;
+			path = NaviShare;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -129,11 +129,11 @@
 		1C67D11B2AE02C8F009F4A60 = {
 			isa = PBXGroup;
 			children = (
-				1CE7245E2AF69EE9000B24EC /* Telescopure.xctestplan */,
+				1CE7245E2AF69EE9000B24EC /* Navi.xctestplan */,
 				1C56FB9C2E2A9B5100D92D7B /* LocalPackage */,
-				1C56FBA72E2B6BCA00D92D7B /* Telescopure */,
-				1C56FCA12E2C8E6000D92D7B /* TelescopureShare */,
-				1C56FBD02E2B6BD500D92D7B /* TelescopureUITests */,
+				1C56FBA72E2B6BCA00D92D7B /* Navi */,
+				1C56FCA12E2C8E6000D92D7B /* NaviShare */,
+				1C56FBD02E2B6BD500D92D7B /* NaviUITests */,
 				1C56FB9D2E2A9E9900D92D7B /* Frameworks */,
 				1C67D1252AE02C8F009F4A60 /* Products */,
 			);
@@ -142,9 +142,9 @@
 		1C67D1252AE02C8F009F4A60 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1C67D1242AE02C8F009F4A60 /* Telescopure.app */,
-				1C67D13E2AE02C90009F4A60 /* TelescopureUITests.xctest */,
-				1C56FCA02E2C8E6000D92D7B /* TelescopureShare.appex */,
+				1C67D1242AE02C8F009F4A60 /* Navi.app */,
+				1C67D13E2AE02C90009F4A60 /* NaviUITests.xctest */,
+				1C56FCA02E2C8E6000D92D7B /* NaviShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,9 +152,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1C56FC9F2E2C8E6000D92D7B /* TelescopureShare */ = {
+		1C56FC9F2E2C8E6000D92D7B /* NaviShare */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1C56FCAB2E2C8E6000D92D7B /* Build configuration list for PBXNativeTarget "TelescopureShare" */;
+			buildConfigurationList = 1C56FCAB2E2C8E6000D92D7B /* Build configuration list for PBXNativeTarget "NaviShare" */;
 			buildPhases = (
 				1C56FC9C2E2C8E6000D92D7B /* Sources */,
 				1C56FC9D2E2C8E6000D92D7B /* Frameworks */,
@@ -163,19 +163,19 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				1C56FCA12E2C8E6000D92D7B /* TelescopureShare */,
+				1C56FCA12E2C8E6000D92D7B /* NaviShare */,
 			);
-			name = TelescopureShare;
+			name = NaviShare;
 			packageProductDependencies = (
 				1C56FCB12E2C8F1C00D92D7B /* UserInterface */,
 			);
 			productName = TelescopureShare;
-			productReference = 1C56FCA02E2C8E6000D92D7B /* TelescopureShare.appex */;
+			productReference = 1C56FCA02E2C8E6000D92D7B /* NaviShare.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		1C67D1232AE02C8F009F4A60 /* Telescopure */ = {
+		1C67D1232AE02C8F009F4A60 /* Navi */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1C67D1482AE02C90009F4A60 /* Build configuration list for PBXNativeTarget "Telescopure" */;
+			buildConfigurationList = 1C67D1482AE02C90009F4A60 /* Build configuration list for PBXNativeTarget "Navi" */;
 			buildPhases = (
 				1C67D1202AE02C8F009F4A60 /* Sources */,
 				1C67D1212AE02C8F009F4A60 /* Frameworks */,
@@ -188,16 +188,16 @@
 				1C56FCA92E2C8E6000D92D7B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				1C56FBA72E2B6BCA00D92D7B /* Telescopure */,
+				1C56FBA72E2B6BCA00D92D7B /* Navi */,
 			);
-			name = Telescopure;
+			name = Navi;
 			productName = Telescopure;
-			productReference = 1C67D1242AE02C8F009F4A60 /* Telescopure.app */;
+			productReference = 1C67D1242AE02C8F009F4A60 /* Navi.app */;
 			productType = "com.apple.product-type.application";
 		};
-		1C67D13D2AE02C90009F4A60 /* TelescopureUITests */ = {
+		1C67D13D2AE02C90009F4A60 /* NaviUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1C67D14E2AE02C90009F4A60 /* Build configuration list for PBXNativeTarget "TelescopureUITests" */;
+			buildConfigurationList = 1C67D14E2AE02C90009F4A60 /* Build configuration list for PBXNativeTarget "NaviUITests" */;
 			buildPhases = (
 				1C67D13A2AE02C90009F4A60 /* Sources */,
 				1C67D13B2AE02C90009F4A60 /* Frameworks */,
@@ -209,11 +209,11 @@
 				1C67D1402AE02C90009F4A60 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				1C56FBD02E2B6BD500D92D7B /* TelescopureUITests */,
+				1C56FBD02E2B6BD500D92D7B /* NaviUITests */,
 			);
-			name = TelescopureUITests;
+			name = NaviUITests;
 			productName = TelescopureUITests;
-			productReference = 1C67D13E2AE02C90009F4A60 /* TelescopureUITests.xctest */;
+			productReference = 1C67D13E2AE02C90009F4A60 /* NaviUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -238,7 +238,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 1C67D11F2AE02C8F009F4A60 /* Build configuration list for PBXProject "Telescopure" */;
+			buildConfigurationList = 1C67D11F2AE02C8F009F4A60 /* Build configuration list for PBXProject "Navi" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -253,9 +253,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1C67D1232AE02C8F009F4A60 /* Telescopure */,
-				1C56FC9F2E2C8E6000D92D7B /* TelescopureShare */,
-				1C67D13D2AE02C90009F4A60 /* TelescopureUITests */,
+				1C67D1232AE02C8F009F4A60 /* Navi */,
+				1C56FC9F2E2C8E6000D92D7B /* NaviShare */,
+				1C67D13D2AE02C90009F4A60 /* NaviUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -299,25 +299,25 @@
 /* Begin PBXTargetDependency section */
 		1C56FCA92E2C8E6000D92D7B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1C56FC9F2E2C8E6000D92D7B /* TelescopureShare */;
+			target = 1C56FC9F2E2C8E6000D92D7B /* NaviShare */;
 			targetProxy = 1C56FCA82E2C8E6000D92D7B /* PBXContainerItemProxy */;
 		};
 		1C67D1402AE02C90009F4A60 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1C67D1232AE02C8F009F4A60 /* Telescopure */;
+			target = 1C67D1232AE02C8F009F4A60 /* Navi */;
 			targetProxy = 1C67D13F2AE02C90009F4A60 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		1C56FCAC2E2C8E6000D92D7B /* Debug configuration for PBXNativeTarget "TelescopureShare" */ = {
+		1C56FCAC2E2C8E6000D92D7B /* Debug configuration for PBXNativeTarget "NaviShare" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2.5.0;
 				DEVELOPMENT_TEAM = VJ5N2X84K8;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = TelescopureShare/Info.plist;
+				INFOPLIST_FILE = NaviShare/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TelescopureShare;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2023-2025 Takuto Nakamura";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -326,7 +326,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 2.5;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kyome.MinBrowser.TelescopureShare;
+				PRODUCT_BUNDLE_IDENTIFIER = com.magiApps.NaviBrowser.NaviShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -337,14 +337,14 @@
 			};
 			name = Debug;
 		};
-		1C56FCAD2E2C8E6000D92D7B /* Release configuration for PBXNativeTarget "TelescopureShare" */ = {
+		1C56FCAD2E2C8E6000D92D7B /* Release configuration for PBXNativeTarget "NaviShare" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2.5.0;
 				DEVELOPMENT_TEAM = VJ5N2X84K8;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = TelescopureShare/Info.plist;
+				INFOPLIST_FILE = NaviShare/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TelescopureShare;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2023-2025 Takuto Nakamura";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -353,7 +353,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 2.5;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kyome.MinBrowser.TelescopureShare;
+				PRODUCT_BUNDLE_IDENTIFIER = com.magiApps.NaviBrowser.NaviShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -364,7 +364,7 @@
 			};
 			name = Release;
 		};
-		1C67D1462AE02C90009F4A60 /* Debug configuration for PBXProject "Telescopure" */ = {
+		1C67D1462AE02C90009F4A60 /* Debug configuration for PBXProject "Navi" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -432,7 +432,7 @@
 			};
 			name = Debug;
 		};
-		1C67D1472AE02C90009F4A60 /* Release configuration for PBXProject "Telescopure" */ = {
+		1C67D1472AE02C90009F4A60 /* Release configuration for PBXProject "Navi" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -493,20 +493,21 @@
 			};
 			name = Release;
 		};
-		1C67D1492AE02C90009F4A60 /* Debug configuration for PBXNativeTarget "Telescopure" */ = {
+		1C67D1492AE02C90009F4A60 /* Debug configuration for PBXNativeTarget "Navi" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Telescopure/Telescopure.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Navi/Navi.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.5.0;
+				CURRENT_PROJECT_VERSION = 0.9;
 				DEVELOPMENT_TEAM = VJ5N2X84K8;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Telescopure/Info.plist;
+				INFOPLIST_FILE = Navi/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This application needs to access your camera for uploading photos/videos.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This application needs to access your current location.";
@@ -520,8 +521,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kyome.MinBrowser;
+				MARKETING_VERSION = 0.9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.magiApps.NaviBrowser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -532,20 +533,21 @@
 			};
 			name = Debug;
 		};
-		1C67D14A2AE02C90009F4A60 /* Release configuration for PBXNativeTarget "Telescopure" */ = {
+		1C67D14A2AE02C90009F4A60 /* Release configuration for PBXNativeTarget "Navi" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Telescopure/Telescopure.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Navi/Navi.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.5.0;
+				CURRENT_PROJECT_VERSION = 0.9;
 				DEVELOPMENT_TEAM = VJ5N2X84K8;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Telescopure/Info.plist;
+				INFOPLIST_FILE = Navi/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This application needs to access your camera for uploading photos/videos.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This application needs to access your current location.";
@@ -559,8 +561,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kyome.MinBrowser;
+				MARKETING_VERSION = 0.9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.magiApps.NaviBrowser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -571,7 +573,7 @@
 			};
 			name = Release;
 		};
-		1C67D14F2AE02C90009F4A60 /* Debug configuration for PBXNativeTarget "TelescopureUITests" */ = {
+		1C67D14F2AE02C90009F4A60 /* Debug configuration for PBXNativeTarget "NaviUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -579,7 +581,7 @@
 				DEVELOPMENT_TEAM = VJ5N2X84K8;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kyome.TelescopureUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.magiApps.NaviBrowser.NaviUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -590,7 +592,7 @@
 			};
 			name = Debug;
 		};
-		1C67D1502AE02C90009F4A60 /* Release configuration for PBXNativeTarget "TelescopureUITests" */ = {
+		1C67D1502AE02C90009F4A60 /* Release configuration for PBXNativeTarget "NaviUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -598,7 +600,7 @@
 				DEVELOPMENT_TEAM = VJ5N2X84K8;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kyome.TelescopureUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.magiApps.NaviBrowser.NaviUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -612,35 +614,35 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1C56FCAB2E2C8E6000D92D7B /* Build configuration list for PBXNativeTarget "TelescopureShare" */ = {
+		1C56FCAB2E2C8E6000D92D7B /* Build configuration list for PBXNativeTarget "NaviShare" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1C56FCAC2E2C8E6000D92D7B /* Debug configuration for PBXNativeTarget "TelescopureShare" */,
-				1C56FCAD2E2C8E6000D92D7B /* Release configuration for PBXNativeTarget "TelescopureShare" */,
+				1C56FCAC2E2C8E6000D92D7B /* Debug configuration for PBXNativeTarget "NaviShare" */,
+				1C56FCAD2E2C8E6000D92D7B /* Release configuration for PBXNativeTarget "NaviShare" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		1C67D11F2AE02C8F009F4A60 /* Build configuration list for PBXProject "Telescopure" */ = {
+		1C67D11F2AE02C8F009F4A60 /* Build configuration list for PBXProject "Navi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1C67D1462AE02C90009F4A60 /* Debug configuration for PBXProject "Telescopure" */,
-				1C67D1472AE02C90009F4A60 /* Release configuration for PBXProject "Telescopure" */,
+				1C67D1462AE02C90009F4A60 /* Debug configuration for PBXProject "Navi" */,
+				1C67D1472AE02C90009F4A60 /* Release configuration for PBXProject "Navi" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		1C67D1482AE02C90009F4A60 /* Build configuration list for PBXNativeTarget "Telescopure" */ = {
+		1C67D1482AE02C90009F4A60 /* Build configuration list for PBXNativeTarget "Navi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1C67D1492AE02C90009F4A60 /* Debug configuration for PBXNativeTarget "Telescopure" */,
-				1C67D14A2AE02C90009F4A60 /* Release configuration for PBXNativeTarget "Telescopure" */,
+				1C67D1492AE02C90009F4A60 /* Debug configuration for PBXNativeTarget "Navi" */,
+				1C67D14A2AE02C90009F4A60 /* Release configuration for PBXNativeTarget "Navi" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		1C67D14E2AE02C90009F4A60 /* Build configuration list for PBXNativeTarget "TelescopureUITests" */ = {
+		1C67D14E2AE02C90009F4A60 /* Build configuration list for PBXNativeTarget "NaviUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1C67D14F2AE02C90009F4A60 /* Debug configuration for PBXNativeTarget "TelescopureUITests" */,
-				1C67D1502AE02C90009F4A60 /* Release configuration for PBXNativeTarget "TelescopureUITests" */,
+				1C67D14F2AE02C90009F4A60 /* Debug configuration for PBXNativeTarget "NaviUITests" */,
+				1C67D1502AE02C90009F4A60 /* Release configuration for PBXNativeTarget "NaviUITests" */,
 			);
 			defaultConfigurationName = Release;
 		};

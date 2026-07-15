@@ -188,7 +188,7 @@ import WebUI
             switch components.scheme {
             case "http", "https":
                 await webViewProxyClient.load(URLRequest(url: url))
-            case "telescopure":
+            case "navibrowser":
                 guard let queryItem = components.queryItems?.first else { return }
                 if queryItem.name == "link", var link = queryItem.value {
                     if let fragment = url.fragment {

@@ -26,7 +26,7 @@ public struct ShareView: View {
                 }
                 .padding()
                 .background(Color(.systemGroupedBackground))
-                .navigationTitle(Text("telescopure", bundle: .module))
+                .navigationTitle(Text("naviBrowser", bundle: .module))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {

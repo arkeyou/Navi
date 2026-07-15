@@ -58,7 +58,7 @@ struct BrowserTests {
                 }
             }
         ))
-        await sut.send(.onOpenURL(URL(string: "telescopure://?link=https://example.com")!))
+        await sut.send(.onOpenURL(URL(string: "navibrowser://?link=https://example.com")!))
         #expect(request.withLock(\.self)?.url == URL(string: "https://example.com")!)
     }
 
@@ -78,7 +78,7 @@ struct BrowserTests {
                 }
             }
         ))
-        await sut.send(.onOpenURL(URL(string: "telescopure://?plaintext=dummy")!))
+        await sut.send(.onOpenURL(URL(string: "navibrowser://?plaintext=dummy")!))
         #expect(request.withLock(\.self)?.url == URL(string: "https://www.google.com/search?q=dummy")!)
     }
 

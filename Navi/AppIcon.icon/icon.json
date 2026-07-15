@@ -21,7 +21,20 @@
           "fill-specializations" : [
             {
               "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+                "linear-gradient" : [
+                  "display-p3:0.38403,0.64839,1.04685,1.00000",
+                  "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+                ],
+                "orientation" : {
+                  "start" : {
+                    "x" : 0.4557696984435798,
+                    "y" : 0
+                  },
+                  "stop" : {
+                    "x" : 0.5000000000000001,
+                    "y" : 0.49999999999999994
+                  }
+                }
               }
             },
             {
@@ -32,8 +45,16 @@
             }
           ],
           "glass" : true,
-          "image-name" : "Telescopure-icon.png",
-          "name" : "telescopure-icon"
+          "hidden" : false,
+          "image-name" : "accent-icon-dark@3x.png",
+          "name" : "accent-icon-dark@3x",
+          "position" : {
+            "scale" : 1.8,
+            "translation-in-points" : [
+              0,
+              -9
+            ]
+          }
         }
       ],
       "shadow" : {

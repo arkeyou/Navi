@@ -29,7 +29,7 @@ import Foundation
     public private(set) var isRunning = false
     private var eventStreamTask: Task<Void, Never>? = nil
 
-    public func start(naviConfig: String, sessionId: String = "", cookieList: String) {
+    public func start(naviConfig: String, sessionId: String = "", cookieList: String) async {
 
         guard !isRunning else {
             return
@@ -45,9 +45,19 @@ import Foundation
                 sessionIdLocal = sessionId
             }
             
+            //Verifica se a sessao esta ativa
+            if let urlSessionInfo = config.urlSessionInfo {
+                if await !getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList) {
+                    print("Live nao esta aberta")
+                    emit(.sendMsg(message: "Live nao esta aberta"))
+                    return
+                }
+            }
+            
             monitorAgent = MonitorAgent(
                 store: store,
                 urlMonitor: config.urlMonitor,
+                triggerMonitor: config.triggerMonitor,
                 sessionId: sessionIdLocal,
                 cookieList: cookieList
             )
@@ -63,6 +73,8 @@ import Foundation
             )
         } catch {
             print("Decoding failed: \(error.localizedDescription)")
+            emit(.sendMsg(message: "Decoding failed: \(error.localizedDescription)"))
+            return
         }
 
         monitorAgent?.start()
@@ -110,11 +122,56 @@ import Foundation
         }
     }*/
     
+    func getSessionIsOpen(urlSessionInfo: String, sessionId: String, cookies: String) async -> Bool {
+        do {
+            let urlFormatada = String(format: urlSessionInfo, arguments: [sessionId])
+            guard let url = URL(string: urlFormatada) else { throw URLError(.badURL) }
+            var request = URLRequest(url: url)
+            //print(cookies)
+            request.setValue(cookies, forHTTPHeaderField: "Cookie")
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            print(String(data: data, encoding: .utf8) ?? "Nao conseguiu ler o body")
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  200...299 ~= httpResponse.statusCode else {
+                throw URLError(.badServerResponse)
+            }
+            
+            let sessionInfo = try JSONDecoder().decode(SessionInfo.self, from: data)
+            if sessionInfo.data.sessionStatus == 1 {
+                return true
+            }
+            return false
+        } catch {
+            return false
+        }
+    }
+    
     func emit(_ event: ActionEvent) {
         continuation.yield(event)
     }
     func finish() {
         continuation.finish()
     }
+    
+    struct SessionInfo: Codable {
+        //let code: Int
+        //let msg: String?
+        let data: SessionData
+    }
+
+    struct SessionData: Codable {
+        //let sessionId: Int64
+        //let sessionTitle: String
+        //let sessionCoverUrl: String
+        //let sessionStreamingUrl: String
+        //let sessionStreamingUrlExpireTimestamp: Int64
+        let lsEndTime: Int64?
+        let lsStartTime: Int64
+        let sessionStatus: Int
+        //let isFoodSession: Bool
+    }
+
     
 }

@@ -8,19 +8,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Telescopure"
+            "value" : "Navi"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Telescopure"
+            "value" : "Navi"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Telescopure"
+            "value" : "Navi"
           }
         }
       }

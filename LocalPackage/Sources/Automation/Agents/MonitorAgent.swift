@@ -11,7 +11,7 @@ final class MonitorAgent {
     private var URL_MONITOR: String
     private var SESSION_ID: String
     private var INTERVAL: Int = 5
-    private var TRIGGER = /[a-zA-Z]{3}-[a-zA-Z]{3}-[a-zA-Z]{3}+/
+    private var TRIGGER: Regex<Substring>
     private let MONITOR_INTERVAL = Duration.seconds(4)
     
     private let store: JobStore
@@ -21,12 +21,14 @@ final class MonitorAgent {
     init(
         store: JobStore,
         urlMonitor: String,
+        triggerMonitor: String,
         sessionId: String,
         cookieList: String
     ) {
 
         self.store = store
         self.URL_MONITOR = urlMonitor
+        self.TRIGGER = try! Regex(triggerMonitor)
         self.SESSION_ID = sessionId
         self.cookies = cookieList
     }
@@ -37,7 +39,7 @@ final class MonitorAgent {
         
         task = Task {
 
-            //while !Task.isCancelled {
+            while !Task.isCancelled {
                 print("MonitorAgent - monitorando mensagens")
                 
                 do {
@@ -52,7 +54,7 @@ final class MonitorAgent {
                 } catch {
                     
                 }
-            //}
+            }
         }
     }
     

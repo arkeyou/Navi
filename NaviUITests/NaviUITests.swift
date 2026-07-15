@@ -1,6 +1,6 @@
 import XCTest
 
-final class TelescopureUITests: XCTestCase {
+final class NaviUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }

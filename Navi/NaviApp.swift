@@ -9,7 +9,7 @@ import SwiftUI
 import UserInterface
 
 @main
-struct TelescopureApp: App {
+struct NaviApp: App {
         
     var body: some Scene {
         BrowserScene()

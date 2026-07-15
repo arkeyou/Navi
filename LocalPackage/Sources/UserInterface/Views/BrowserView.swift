@@ -55,7 +55,7 @@ struct BrowserView: View {
                             .environment(\.canGoBack, proxy.canGoBack)
                             .environment(\.canGoForward, proxy.canGoForward)
                     }
-                    WebView(configuration: .forTelescopure)
+                    WebView(configuration: .forNavi)
                         .navigationDelegate(store.navigationDelegate)
                         .uiDelegate(store.uiDelegate)
                         .refreshable()

@@ -209,7 +209,7 @@ struct NaviPanelView: View {
             }
             
             store.updateLog(with: "\nIniciou automacao\n")
-            am.start(naviConfig: config, sessionId: configStruct.sessionId, cookieList: cookies)
+            await am.start(naviConfig: config, sessionId: configStruct.sessionId, cookieList: cookies)
                                         
             for await event in am.actionEvents {
                 if Task.isCancelled { break }
@@ -227,6 +227,11 @@ struct NaviPanelView: View {
                     }
                     
                     await queue.enqueue(url)
+                case .sendMsg(let msg):
+                    print(msg)
+                    store.updateLog(with: "\n\(msg)\n")
+                    stopAutomation()
+                    return
                 }
             }
         }
@@ -324,7 +329,7 @@ struct NaviPanelView: View {
         while !Task.isCancelled {
             count+=1
             print("NAVI: esperando \(count)")
-            //let timestamp = ISO8601DateFormatter().string(from: Date())
+            let timestamp = ISO8601DateFormatter().string(from: Date())
             //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
             store.updateLog(with: ".")
             

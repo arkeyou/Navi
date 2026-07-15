@@ -1,3 +1,3 @@
-public enum TelescopureError {
+public enum NaviError {
     case failedToOpenExternalApp
 }

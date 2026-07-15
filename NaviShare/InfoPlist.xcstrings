@@ -32,19 +32,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "TelescopureShare"
+            "value" : "NaviShare"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TelescopureShare"
+            "value" : "NaviShare"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TelescopureShare"
+            "value" : "NaviShare"
           }
         }
       }

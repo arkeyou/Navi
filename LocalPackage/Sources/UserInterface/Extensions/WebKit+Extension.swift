@@ -6,7 +6,7 @@ extension WKWebView {
 
 extension WKWebViewConfiguration {
     @MainActor
-    static var forTelescopure: WKWebViewConfiguration {
+    static var forNavi: WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         configuration.allowsInlinePredictions = true
         configuration.applicationNameForUserAgent = "Safari/604.1"

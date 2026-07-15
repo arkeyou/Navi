@@ -71,7 +71,16 @@ struct SettingsView: View {
                         Text(store.version)
                     } label: {
                         Label {
-                            Text("version", bundle: .module)
+                            Text("Navi version", bundle: .module)
+                        } icon: {
+                            Image(systemName: "number")
+                        }
+                    }
+                    LabeledContent {
+                        Text("2.5.0")
+                    } label: {
+                        Label {
+                            Text("Telescopure version", bundle: .module)
                         } icon: {
                             Image(systemName: "number")
                         }
