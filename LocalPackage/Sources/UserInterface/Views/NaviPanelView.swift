@@ -210,7 +210,9 @@ struct NaviPanelView: View {
             
             store.updateLog(with: "\nIniciou automacao\n")
             await am.start(naviConfig: config, sessionId: configStruct.sessionId, cookieList: cookies)
-                                        
+        }
+        
+        Task {
             for await event in am.actionEvents {
                 if Task.isCancelled { break }
                 switch event {
@@ -229,7 +231,7 @@ struct NaviPanelView: View {
                     await queue.enqueue(url)
                 case .sendMsg(let msg):
                     print(msg)
-                    store.updateLog(with: "\n\(msg)\n")
+                    store.updateLog(with: "\(msg)\n")
                     stopAutomation()
                     return
                 }

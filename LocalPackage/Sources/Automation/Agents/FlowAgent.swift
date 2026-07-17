@@ -10,7 +10,7 @@ final class FlowAgent {
     private var URL_SEARCH: String
 
     private let store: JobStore
-    private var task: Task<Void, Never>?
+    private var task: Task<Void, any Error>?
 
     init(
         store: JobStore,
@@ -35,9 +35,13 @@ final class FlowAgent {
                 guard job.status == .added
                 else { continue }
 
-                await validate(job)
+                try await validate(job)
             }
         }
+    }
+    
+    func wait() async throws {
+        try await task?.value
     }
     
     func stop() {
@@ -45,9 +49,7 @@ final class FlowAgent {
         task = nil
     }
 
-    private func validate(
-        _ job: Job
-    ) async {
+    private func validate (_ job: Job) async throws {
         var current = job
         
         //print("FlowAgent - validando: \(current.payload.codigo)")
@@ -86,6 +88,7 @@ final class FlowAgent {
             await store.update(current)
         } catch {
             print("error fetch")
+            throw AutomationError.flow(error)
         }
     }
     
@@ -108,7 +111,7 @@ final class FlowAgent {
             let searchResult = try JSONDecoder().decode(SearchResponse.self, from: data)
             return searchResult
         } catch {
-            print(error.localizedDescription)
+            print("Flow Agent: \(error.localizedDescription)")
             throw error
         }
         

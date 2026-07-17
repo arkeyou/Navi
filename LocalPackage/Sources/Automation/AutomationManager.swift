@@ -27,7 +27,7 @@ import Foundation
     }
 
     public private(set) var isRunning = false
-    private var eventStreamTask: Task<Void, Never>? = nil
+    private(set) var eventStreamTask: Task<Void, Never>? = nil
 
     public func start(naviConfig: String, sessionId: String = "", cookieList: String) async {
 
@@ -49,7 +49,7 @@ import Foundation
             if let urlSessionInfo = config.urlSessionInfo {
                 if await !getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList) {
                     print("Live nao esta aberta")
-                    emit(.sendMsg(message: "Live nao esta aberta"))
+                    emit(.sendMsg(message: "\nLive nao esta aberta"))
                     return
                 }
             }
@@ -73,14 +73,15 @@ import Foundation
             )
         } catch {
             print("Decoding failed: \(error.localizedDescription)")
-            emit(.sendMsg(message: "Decoding failed: \(error.localizedDescription)"))
+            emit(.sendMsg(message: "\nDecoding failed: \(error.localizedDescription)"))
             return
         }
 
+        
         monitorAgent?.start()
         flowAgent?.start()
         actionAgent?.start()
-
+        
         isRunning = true
         
         eventStreamTask = Task {
@@ -94,9 +95,35 @@ import Foundation
                 print("AutomationManager - enviando pro browser: \(job.payload.codigo)")
                 emit(.openPage(codigo: job.payload.codigo, url: job.payload.url, script: config.script, scriptVerify: config.scriptVerify))
             }
-            
             //await syncJobs()
         }
+        
+        do {
+            try await monitorAgent?.wait()
+            try await flowAgent?.wait()
+            try await actionAgent?.wait()
+        } catch let error as AutomationError {
+            print("\nAutomationManager: \(error.localizedDescription)")
+            
+            var errorMsg = ""
+            switch error {
+                case .monitor(let underlying):
+                    errorMsg.append("Monitor failed: \(underlying.localizedDescription)")
+
+                case .flow(let underlying):
+                    errorMsg.append("Flow failed: \(underlying.localizedDescription)")
+
+                case .action(let underlying):
+                    errorMsg.append("Action failed: \(underlying.localizedDescription)")
+                }
+            emit(.sendMsg(message: "\n\(errorMsg)"))
+            return
+        } catch {
+            print("\nAutomationManager: \(error.localizedDescription)")
+            emit(.sendMsg(message: "\nAutomationManager: \(error.localizedDescription)"))
+            return
+        }
+        
     }
 
     public func stop() {

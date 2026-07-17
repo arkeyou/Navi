@@ -10,7 +10,7 @@ final class ActionAgent {
     private var URL_ACTION: String = ""
 
     private let store: JobStore
-    private var task: Task<Void, Never>?
+    private var task: Task<Void, any Error>?
 
     init(
         store: JobStore,
@@ -49,6 +49,10 @@ final class ActionAgent {
                 //await execute(job)
             }
         }
+    }
+    
+    func wait() async throws {
+        try await task?.value
     }
     
     func stop() {

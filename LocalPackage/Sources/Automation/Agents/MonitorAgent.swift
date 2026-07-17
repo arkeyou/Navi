@@ -15,7 +15,7 @@ final class MonitorAgent {
     private let MONITOR_INTERVAL = Duration.seconds(4)
     
     private let store: JobStore
-    private var task: Task<Void, Never>?
+    private var task: Task<Void, any Error>?
     private let cookies: String
 
     init(
@@ -49,13 +49,19 @@ final class MonitorAgent {
                 } catch {
                     //break
                 }
+                   
                 do {
                     try await scan()
                 } catch {
-                    
+                    throw AutomationError.monitor(error)
                 }
+                
             }
         }
+    }
+    
+    func wait() async throws {
+        try await task?.value
     }
     
     func stop() {
@@ -116,7 +122,7 @@ final class MonitorAgent {
             }
             return listaJobPayload
         } catch {
-            print(error.localizedDescription)
+            print("Monitor Agent: \(error.localizedDescription)")
             throw error
         }
     }
