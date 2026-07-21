@@ -209,6 +209,7 @@ struct NaviPanelView: View {
             }
             
             store.updateLog(with: "\nIniciou automacao\n")
+            store.naviIsRunning = true
             await am.start(naviConfig: config, sessionId: configStruct.sessionId, cookieList: cookies)
         }
         
@@ -303,7 +304,9 @@ struct NaviPanelView: View {
         
         queue = NaviQueue<String>()
         LIKE_SCRIPT = ""
+        VERIFY_SCRIPT = ""
         
+        store.naviIsRunning = false
         store.updateLog(with: "\nParou automacao\n")
 
         print("Automation stopped and cleaned up.")
@@ -324,6 +327,7 @@ struct NaviPanelView: View {
 
         return todosOsCookies
     }
+    
     
     func naviProcessamentoTela() async {
         print("NAVI: vai")

@@ -17,6 +17,7 @@ import WebUI
 
     public var isPresentedNaviPanel = true
     public var isButtonPresentOnPage = false
+    public var naviIsRunning = false
 
     public var inputText: String
     public var isPresentedToolbar: Bool
@@ -314,7 +315,7 @@ import WebUI
 
         case let .scriptRunButtonTapped(scriptToExecute):
             do {
-                var result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
+                let result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
                 print(result)
                 naviPanelMessage = "Script executado."
             } catch {
@@ -323,7 +324,7 @@ import WebUI
 
         case let .scriptRunVerify(scriptToExecute):
             do {
-                var result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
+                let result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
                 isButtonPresentOnPage = result as? Bool ?? false
                 print(isButtonPresentOnPage)
                 naviPanelMessage = "Script executado."
