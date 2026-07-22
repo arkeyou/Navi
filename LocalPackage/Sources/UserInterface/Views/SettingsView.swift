@@ -5,6 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.appDependencies) private var appDependencies
     @State var store: Settings
+    @State private var isPresentedPaywall = false
 
     var body: some View {
         NavigationStack(path: $store.path) {
@@ -65,6 +66,31 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("settings", bundle: .module)
+                }
+
+                Section {
+                    Button {
+                        isPresentedPaywall = true
+                    } label: {
+                        LabeledContent {
+                            HStack {
+                                Text(NaviQueueTracker.shared.isSubscribed ? "Ativa" : "Ver planos")
+                                    .foregroundStyle(NaviQueueTracker.shared.isSubscribed ? Color.green : Color.secondary)
+                                Image(systemName: "chevron.right")
+                            }
+                        } label: {
+                            Label {
+                                Text("Assinatura Navi Premium")
+                                    .foregroundStyle(Color.primary)
+                            } icon: {
+                                Image(systemName: "sparkles")
+                                    .foregroundStyle(Color.purple)
+                            }
+                        }
+                    }
+                    .buttonStyle(.borderless)
+                } header: {
+                    Text("Assinatura & IAP")
                 }
                 Section {
                     LabeledContent {
@@ -156,6 +182,9 @@ struct SettingsView: View {
                     .accessibilityIdentifier("doneSettingsButton")
                 }
             }
+        }
+        .sheet(isPresented: $isPresentedPaywall) {
+            PaywallView()
         }
         .task {
             await store.send(.task(String(describing: Self.self)))

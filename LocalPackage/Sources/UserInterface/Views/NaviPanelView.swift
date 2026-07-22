@@ -1,3 +1,4 @@
+import DataSource
 import Model
 import WebKit
 import Automation
@@ -58,7 +59,7 @@ struct NaviPanelView: View {
     private let URL_NPOINT_API = "https://api.npoint.io/"
     @State private var isLoadingNaviProcess = false
     @State private var count = 0
-
+    
     var body: some View {
         NavigationStack {
             Group {
@@ -92,6 +93,9 @@ struct NaviPanelView: View {
         }
         .sheet(isPresented: $store.isPresentedScriptSelection) {
             ScriptSelectionView(store: store)
+        }
+        .sheet(isPresented: $store.isPresentedPaywall) {
+            PaywallView(store: store)
         }
         .alert("Salvar script", isPresented: $store.isPresentedScriptSaveDialog) {
             TextField("Nome do arquivo", text: $store.pendingScriptFileName)
@@ -135,7 +139,7 @@ struct NaviPanelView: View {
                         Label("Carregar", systemImage: "folder")
                     }
 
-                    if am.isRunning {
+                    if store.naviIsRunning {
                         Button {
                             stopAutomation()
                         } label: {
@@ -168,7 +172,17 @@ struct NaviPanelView: View {
     }
     
     private func startAutomation() {
-        //stopAutomation()
+        //Reseta a lista de ids adicionados hj
+        //NaviQueueTracker.shared.resetEnqueueToday()
+        
+        if NaviQueueTracker.shared.isLimitReached {
+            store.updateLog(with: "\nLimite dee \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A automação não permite nova execução até o próximo dia.\n")
+
+            Task {
+                await store.send(.showPaywallButtonTapped)
+            }
+            return
+        }
         
         var cookies = ""
         
@@ -220,6 +234,14 @@ struct NaviPanelView: View {
                 case .openPage(let codigo, let url, let script, let scriptVerify):
                     print("Open page: \(codigo) - \(url)")
 
+                    let enqueued = await queue.enqueue(url, isSubscribed: store.isSubscribed)
+                    /*if !enqueued {
+                        store.updateLog(with: "\nLimite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.\n")
+                        stopAutomation()
+                        await store.send(.showPaywallButtonTapped)
+                        return
+                    }*/
+
                     store.updateProcessed(with: "\n\(codigo)")
                     
                     if LIKE_SCRIPT.isEmpty {
@@ -228,8 +250,6 @@ struct NaviPanelView: View {
                     if VERIFY_SCRIPT.isEmpty {
                         VERIFY_SCRIPT.append(scriptVerify)
                     }
-                    
-                    await queue.enqueue(url)
                 case .sendMsg(let msg):
                     print(msg)
                     store.updateLog(with: "\(msg)\n")
@@ -310,6 +330,8 @@ struct NaviPanelView: View {
         store.updateLog(with: "\nParou automacao\n")
 
         print("Automation stopped and cleaned up.")
+        
+        HapticManager.shared.trigger(.error)
     }
     
     func getBrowserCookies() async -> String {
@@ -356,6 +378,9 @@ struct NaviPanelView: View {
                 //print("NAVI: esperando botao aparecer...")
                 await store.send(.scriptRunVerify(VERIFY_SCRIPT))
                 store.updateLog(with: "\nBuscando na tela\n")
+                
+                HapticManager.shared.trigger(.warning)
+                
                 if (store.isButtonPresentOnPage) {
                     store.isButtonPresentOnPage = false
 
@@ -367,6 +392,12 @@ struct NaviPanelView: View {
                     try? await Task.sleep(for: LIKE_WAIT_INTERVAL)
                     store.isPaginaFoiCarregada = false
                     isLoadingNaviProcess = false
+                    
+                    if await queue.isEmpty && NaviQueueTracker.shared.isLimitReached {
+                        store.updateLog(with: "\nLimite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.\n")
+                        stopAutomation()
+                        await store.send(.showPaywallButtonTapped)
+                    }
                 }
                 
             }

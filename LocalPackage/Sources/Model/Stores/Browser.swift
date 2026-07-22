@@ -18,6 +18,11 @@ import WebUI
     public var isPresentedNaviPanel = true
     public var isButtonPresentOnPage = false
     public var naviIsRunning = false
+    public var isPresentedPaywall = false
+    public var isSubscribed: Bool {
+        get { NaviQueueTracker.shared.isSubscribed }
+        set { NaviQueueTracker.shared.isSubscribed = newValue }
+    }
 
     public var inputText: String
     public var isPresentedToolbar: Bool
@@ -89,6 +94,7 @@ import WebUI
         naviPanelMessage: String? = nil,
         isPageLoading: Bool = false,
         isPaginaFoiCarregada: Bool = false,
+        isPresentedPaywall: Bool = false,
         browserNavigation: BrowserNavigation? = nil,
         browserUI: BrowserUI? = nil,
         settings: Settings? = nil,
@@ -132,6 +138,7 @@ import WebUI
         self.naviPanelMessage = naviPanelMessage
         self.isPageLoading = isPageLoading
         self.isPaginaFoiCarregada = isPaginaFoiCarregada
+        self.isPresentedPaywall = isPresentedPaywall
         weak var weakSelf: Browser? = nil
         let browserNavigation = browserNavigation ?? .init(appDependencies, action: {
             await weakSelf?.send(.browserNavigation($0))
@@ -424,6 +431,12 @@ import WebUI
 
         case .bookmarkManagement:
             break
+
+        case .showPaywallButtonTapped:
+            isPresentedPaywall = true
+
+        case .paywallDismissed:
+            isPresentedPaywall = false
         }
     }
 
@@ -683,6 +696,8 @@ import WebUI
         case browserUI(BrowserUI.Action)
         case settings(Settings.Action)
         case bookmarkManagement(BookmarkManagement.Action)
+        case showPaywallButtonTapped
+        case paywallDismissed
 
         public struct EventBridge: Sendable {
             public var getResourceURL: (@MainActor @Sendable (String, String) -> URL?)?

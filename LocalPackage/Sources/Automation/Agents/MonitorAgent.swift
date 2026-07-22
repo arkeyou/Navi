@@ -149,8 +149,44 @@ final class MonitorAgent {
             shopID: 0,
             itemID: 0,
             url: ""
-        ),JobPayload (
+        )/*,JobPayload (
             codigo: "AAA-BBB-CCC",
+            shopID: 0,
+            itemID: 0,
+            url: ""
+        
+        )*/,JobPayload (
+            codigo: "BZZ-FGN-LTQ",
+            shopID: 0,
+            itemID: 0,
+            url: ""
+        ),JobPayload (
+            codigo: "CJL-ERN-DSF",
+            shopID: 0,
+            itemID: 0,
+            url: ""
+        ),JobPayload (
+            codigo: "BXR-TRQ-NQG",
+            shopID: 0,
+            itemID: 0,
+            url: ""
+        ),JobPayload (
+            codigo: "BRC-KXY-FNJ",
+            shopID: 0,
+            itemID: 0,
+            url: ""
+        ),JobPayload (
+            codigo: "AYT-VLG-NRT",
+            shopID: 0,
+            itemID: 0,
+            url: ""
+        ),JobPayload (
+            codigo: "AUZ-XWT-UXU",
+            shopID: 0,
+            itemID: 0,
+            url: ""
+        ),JobPayload (
+            codigo: "AVW-ZPA-XYK",
             shopID: 0,
             itemID: 0,
             url: ""

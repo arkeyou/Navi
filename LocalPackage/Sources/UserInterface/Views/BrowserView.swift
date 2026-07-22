@@ -17,6 +17,9 @@ struct BrowserView: View {
             .sheet(item: $store.bookmarkManagement) { store in
                 BookmarkManagementView(store: store)
             }
+            .sheet(isPresented: paywallPresentation) {
+                PaywallView(store: store)
+            }
             .webDialog(
                 isPresented: $store.isPresentedWebDialog,
                 presenting: store.webDialog,
@@ -41,6 +44,14 @@ struct BrowserView: View {
                 }
             }
             .animation(.easeIn(duration: 0.2), value: store.isPresentedToolbar)
+    }
+
+    private var paywallPresentation: Binding<Bool> {
+        Binding {
+            store.isPresentedPaywall && !store.isPresentedNaviPanel
+        } set: { isPresented in
+            store.isPresentedPaywall = isPresented
+        }
     }
 
     private var mainContent: some View {
