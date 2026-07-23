@@ -87,7 +87,6 @@ import Foundation
         //Monitora se a live ainda esta online
         monitorLiveStreamTask = Task {
             while !Task.isCancelled {
-                try await Task.sleep(for: MONITOR_LIVE_ONLINE_INTERVAL)
                 print("Verificando se a live ainda esta online...")
                 if let urlSessionInfo = config.urlSessionInfo {
                     do {
@@ -100,6 +99,7 @@ import Foundation
                         return
                     }
                 }
+                try await Task.sleep(for: MONITOR_LIVE_ONLINE_INTERVAL)
             }
         }
         
