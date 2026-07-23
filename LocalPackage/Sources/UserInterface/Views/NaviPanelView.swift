@@ -53,7 +53,7 @@ struct NaviPanelView: View {
     @State private var VERIFY_SCRIPT = ""
     @State private var runTask: Task<Void, Never>? = nil
     @State private var processingTask: Task<Void, Never>? = nil
-    private let IDS_WAIT_INTERVAL = Duration.seconds(1)
+    private let IDS_WAIT_INTERVAL = Duration.seconds(2)
     private let LIKE_WAIT_INTERVAL = Duration.seconds(0.5)
     private let COOKIE_WAIT_INTERVAL = Duration.seconds(5)
     private let URL_NPOINT_API = "https://api.npoint.io/"
@@ -361,7 +361,7 @@ struct NaviPanelView: View {
             //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
             store.updateLog(with: ".")
             
-            try? await Task.sleep(for: LIKE_WAIT_INTERVAL)
+            try? await Task.sleep(for: IDS_WAIT_INTERVAL)
             if await !queue.isEmpty && !isLoadingNaviProcess {
                 isLoadingNaviProcess = true
                 let url = await queue.dequeue()
@@ -371,7 +371,6 @@ struct NaviPanelView: View {
 
                 store.inputText = url ?? "0"
                 await store.send(.onSubmit(url ?? "0"))
-                //try? await Task.sleep(for: LIKE_WAIT_INTERVAL)
             }
             
             if isLoadingNaviProcess && store.isPaginaFoiCarregada {
@@ -401,13 +400,7 @@ struct NaviPanelView: View {
                 }
                 
             }
-            
-            //try? await Task.sleep(for: IDS_WAIT_INTERVAL)
-            //am.allJobs.forEach { item in
-            //    print("itens na lista: \(item)")
-            //}
-            //let tempArray = am.allJobs
-            //store.processedText = "\(tempArray)"
+
         }
     }
     

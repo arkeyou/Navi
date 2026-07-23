@@ -15,6 +15,8 @@ import Foundation
     
     private var config: NaviConfig = NaviConfig()
     
+    private let MONITOR_LIVE_ONLINE_INTERVAL = Duration.seconds(20)
+    
     //public var allJobs: [String] = []
     public let actionEvents: AsyncStream<ActionEvent>
     private let continuation: AsyncStream<ActionEvent>.Continuation
@@ -28,6 +30,7 @@ import Foundation
 
     public private(set) var isRunning = false
     private(set) var eventStreamTask: Task<Void, Never>? = nil
+    private(set) var monitorLiveStreamTask: Task<Void, any Error>? = nil
 
     public func start(naviConfig: String, sessionId: String = "", cookieList: String) async {
 
@@ -46,12 +49,7 @@ import Foundation
             }
             
             //Verifica se a sessao esta ativa
-            if let urlSessionInfo = config.urlSessionInfo {
-                /*if await !getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList) {
-                    print("Live nao esta aberta")
-                    emit(.sendMsg(message: "\nLive nao esta aberta"))
-                    return
-                }*/
+            /*if let urlSessionInfo = config.urlSessionInfo {
                 do {
                     _ = try await getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList)
                 } catch let error as SessionError {
@@ -61,7 +59,7 @@ import Foundation
                     emit(.sendMsg(message: "\n\(error.localizedDescription)"))
                     return
                 }
-            }
+            }*/
             
             monitorAgent = MonitorAgent(
                 store: store,
@@ -86,6 +84,24 @@ import Foundation
             return
         }
 
+        //Monitora se a live ainda esta online
+        monitorLiveStreamTask = Task {
+            while !Task.isCancelled {
+                try await Task.sleep(for: MONITOR_LIVE_ONLINE_INTERVAL)
+                print("Verificando se a live ainda esta online...")
+                if let urlSessionInfo = config.urlSessionInfo {
+                    do {
+                        _ = try await getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList)
+                    } catch let error as SessionError {
+                        emit(.sendMsg(message: "\nSession Error: \(error.message)"))
+                        return
+                    } catch {
+                        emit(.sendMsg(message: "\n\(error.localizedDescription)"))
+                        return
+                    }
+                }
+            }
+        }
         
         monitorAgent?.start()
         flowAgent?.start()
@@ -143,6 +159,9 @@ import Foundation
 
         eventStreamTask?.cancel()
         eventStreamTask = nil
+        
+        monitorLiveStreamTask?.cancel()
+        monitorLiveStreamTask = nil
 
         isRunning = false
     }
@@ -167,7 +186,7 @@ import Foundation
             request.setValue(cookies, forHTTPHeaderField: "Cookie")
             
             let (data, response) = try await URLSession.shared.data(for: request)
-            print(String(data: data, encoding: .utf8) ?? "Nao conseguiu ler o body")
+            //print(String(data: data, encoding: .utf8) ?? "Nao conseguiu ler o body")
             
             guard let httpResponse = response as? HTTPURLResponse,
                   200...299 ~= httpResponse.statusCode else {
@@ -177,6 +196,7 @@ import Foundation
             let sessionInfo = try JSONDecoder().decode(SessionInfo.self, from: data)
             if (sessionInfo.msg == nil) {
                 if sessionInfo.data?.sessionStatus == 1 {
+                    
                     return true
                 }
                 throw SessionError.live("Esta live não está online!")
