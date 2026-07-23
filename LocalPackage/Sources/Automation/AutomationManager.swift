@@ -47,9 +47,18 @@ import Foundation
             
             //Verifica se a sessao esta ativa
             if let urlSessionInfo = config.urlSessionInfo {
-                if await !getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList) {
+                /*if await !getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList) {
                     print("Live nao esta aberta")
                     emit(.sendMsg(message: "\nLive nao esta aberta"))
+                    return
+                }*/
+                do {
+                    _ = try await getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList)
+                } catch let error as SessionError {
+                    emit(.sendMsg(message: "\nSession Error: \(error.message)"))
+                    return
+                } catch {
+                    emit(.sendMsg(message: "\n\(error.localizedDescription)"))
                     return
                 }
             }
@@ -149,7 +158,7 @@ import Foundation
         }
     }*/
     
-    func getSessionIsOpen(urlSessionInfo: String, sessionId: String, cookies: String) async -> Bool {
+    func getSessionIsOpen(urlSessionInfo: String, sessionId: String, cookies: String) async throws -> Bool {
         do {
             let urlFormatada = String(format: urlSessionInfo, arguments: [sessionId])
             guard let url = URL(string: urlFormatada) else { throw URLError(.badURL) }
@@ -166,12 +175,37 @@ import Foundation
             }
             
             let sessionInfo = try JSONDecoder().decode(SessionInfo.self, from: data)
-            if sessionInfo.data.sessionStatus == 1 {
-                return true
+            if (sessionInfo.msg == nil) {
+                if sessionInfo.data.sessionStatus == 1 {
+                    return true
+                }
+                throw SessionError.live("Esta live não está online!")
             }
-            return false
+
+            throw SessionError.login("Gentileza efetuar o login!")
+        } catch let error as SessionError {
+            throw error
         } catch {
-            return false
+            throw SessionError.error("\(error.localizedDescription)")
+        }
+    }
+    
+    enum SessionError: LocalizedError {
+        case live(String)
+        case login(String)
+        case error(String)
+        
+        var message: String {
+            switch self {
+                case .live(let message),
+                     .login(let message),
+                     .error(let message):
+                    return message
+            }
+        }
+        
+        var errorDescription: String? {
+            message
         }
     }
     
@@ -184,7 +218,7 @@ import Foundation
     
     struct SessionInfo: Codable {
         //let code: Int
-        //let msg: String?
+        let msg: String?
         let data: SessionData
     }
 
