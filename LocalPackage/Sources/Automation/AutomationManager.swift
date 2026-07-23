@@ -176,7 +176,7 @@ import Foundation
             
             let sessionInfo = try JSONDecoder().decode(SessionInfo.self, from: data)
             if (sessionInfo.msg == nil) {
-                if sessionInfo.data.sessionStatus == 1 {
+                if sessionInfo.data?.sessionStatus == 1 {
                     return true
                 }
                 throw SessionError.live("Esta live não está online!")
@@ -219,7 +219,7 @@ import Foundation
     struct SessionInfo: Codable {
         //let code: Int
         let msg: String?
-        let data: SessionData
+        let data: SessionData?
     }
 
     struct SessionData: Codable {
