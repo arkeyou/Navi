@@ -11,6 +11,19 @@ struct SettingsView: View {
         NavigationStack(path: $store.path) {
             List {
                 Section {
+                    Picker(selection: $store.appearance) {
+                        ForEach(Appearance.allCases, id: \.self) { appearance in
+                            Text(appearance.label)
+                                .tag(appearance)
+                        }
+                    } label: {
+                        Label {
+                            Text("Appearance")
+                        } icon: {
+                            Image(systemName: "circle.lefthalf.filled")
+                        }
+                    }
+
                     /*Button {
                         Task {
                             await store.send(.defaultBrowserAppButtonTapped)
@@ -185,9 +198,29 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $isPresentedPaywall) {
             PaywallView()
+                .preferredColorScheme(store.appearance.colorScheme)
         }
+        .preferredColorScheme(store.appearance.colorScheme)
         .task {
             await store.send(.task(String(describing: Self.self)))
+        }
+        .onChange(of: store.appearance) { _, newValue in
+            Task {
+                await store.send(.onChangeAppearance(newValue))
+            }
+        }
+    }
+}
+
+private extension Appearance {
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            nil
+        case .light:
+            .light
+        case .dark:
+            .dark
         }
     }
 }

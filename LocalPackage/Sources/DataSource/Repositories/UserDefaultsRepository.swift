@@ -13,6 +13,16 @@ public struct UserDefaultsRepository: Sendable {
         }
     }
 
+    public var appearance: Appearance? {
+        get {
+            guard let value = userDefaultsClient.string(.appearance) else { return nil }
+            return Appearance(rawValue: value)
+        }
+        nonmutating set {
+            userDefaultsClient.setString(newValue?.rawValue, .appearance)
+        }
+    }
+
     public var bookmarks: [Bookmark] {
         get {
             guard let data = userDefaultsClient.data(.bookmarks) else { return [] }

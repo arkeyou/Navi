@@ -8,6 +8,7 @@ struct Header: View {
     @Environment(\.estimatedProgress) private var estimatedProgress
     @Environment(\.canGoBack) private var canGoBack
     @Environment(\.canGoForward) private var canGoForward
+    @State private var didReceiveNaviRunningUpdate = false
     var store: Browser
 
     var body: some View {
@@ -54,7 +55,7 @@ struct Header: View {
                         //Image(systemName: "square.stack.3d.up")
                         //Image(systemName: "square.3.layers.3d.top.filled")
                             .imageScale(.large)
-                            .foregroundStyle(.blue, .primary)
+                            .foregroundStyle(.blue, naviPanelIconStatusColor)
                             .symbolEffect(.variableColor, options: .repeating, isActive: store.naviIsRunning)
                     }
                     .labelStyle(.iconOnly)
@@ -84,6 +85,14 @@ struct Header: View {
             ProgressView(value: estimatedProgress)
                 .opacity(isLoading ? 1.0 : 0.0)
         }
+        .onChange(of: store.naviIsRunning) { _, _ in
+            didReceiveNaviRunningUpdate = true
+        }
+    }
+
+    private var naviPanelIconStatusColor: Color {
+        guard didReceiveNaviRunningUpdate else { return .primary }
+        return store.naviIsRunning ? .green : .red
     }
 }
 

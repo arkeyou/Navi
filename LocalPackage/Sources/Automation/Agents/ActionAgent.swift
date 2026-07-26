@@ -37,12 +37,15 @@ final class ActionAgent {
                 guard job.status == .valid
                 else { continue }
 
-                print("ActionAgent - validando : \(job.payload.codigo) - \(type(of:job.payload.itemID)) - \(job.payload.shopID)")
+                print("ActionAgent - validando : \(job.payload.codigo) - \(type(of:job.payload.param2)) - \(job.payload.param1)")
                 
                 var current = job
                 current.status = .ok
-                current.payload.url = "\(URL_ACTION)\(current.payload.shopID).\(current.payload.itemID)"
-
+                if (current.payload.param1 != 0) && (current.payload.param2 != 0) {
+                    current.payload.url = "\(URL_ACTION)\(current.payload.param1).\(current.payload.param2)"
+                } else {
+                    current.payload.url = "\(URL_ACTION)\(current.payload.codigo)"
+                }
                 
                 current.updatedAt = .now
                 await store.update(current)

@@ -41,25 +41,12 @@ import Foundation
         var sessionIdLocal = sessionId
         
         do {
-            print(naviConfig.utf8)
+            //print(naviConfig.utf8)
             config = try JSONDecoder().decode(NaviConfig.self, from: Data(naviConfig.utf8))
             
             if sessionId.isEmpty {
                 sessionIdLocal = sessionId
             }
-            
-            //Verifica se a sessao esta ativa
-            /*if let urlSessionInfo = config.urlSessionInfo {
-                do {
-                    _ = try await getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList)
-                } catch let error as SessionError {
-                    emit(.sendMsg(message: "\nSession Error: \(error.message)"))
-                    return
-                } catch {
-                    emit(.sendMsg(message: "\n\(error.localizedDescription)"))
-                    return
-                }
-            }*/
             
             monitorAgent = MonitorAgent(
                 store: store,
@@ -71,7 +58,7 @@ import Foundation
 
             flowAgent = FlowAgent(
                 store: store,
-                urlFlow: config.urlFlow
+                urlFlow: config.urlFlow ?? ""
             )
 
             actionAgent = ActionAgent(
@@ -85,21 +72,21 @@ import Foundation
         }
 
         //Monitora se a live ainda esta online
-        monitorLiveStreamTask = Task {
-            while !Task.isCancelled {
-                print("Verificando se a live ainda esta online...")
-                if let urlSessionInfo = config.urlSessionInfo {
+        if let urlSessionInfo = config.urlSessionInfo {
+            monitorLiveStreamTask = Task {
+                while !Task.isCancelled {
+                    print("Verificando se a live ainda esta online...")
                     do {
                         _ = try await getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList)
                     } catch let error as SessionError {
-                        emit(.sendMsg(message: "\nSession Error: \(error.message)"))
+                        emit(.sendMsg(message: "Session Error: \(error.message)"))
                         return
                     } catch {
-                        emit(.sendMsg(message: "\n\(error.localizedDescription)"))
+                        emit(.sendMsg(message: error.localizedDescription))
                         return
                     }
+                    try await Task.sleep(for: MONITOR_LIVE_ONLINE_INTERVAL)
                 }
-                try await Task.sleep(for: MONITOR_LIVE_ONLINE_INTERVAL)
             }
         }
         
@@ -141,11 +128,11 @@ import Foundation
                 case .action(let underlying):
                     errorMsg.append("Action failed: \(underlying.localizedDescription)")
                 }
-            emit(.sendMsg(message: "\n\(errorMsg)"))
+            emit(.sendMsg(message: errorMsg))
             return
         } catch {
             print("\nAutomationManager: \(error.localizedDescription)")
-            emit(.sendMsg(message: "\nAutomationManager: \(error.localizedDescription)"))
+            emit(.sendMsg(message: "AutomationManager: \(error.localizedDescription)"))
             return
         }
         
@@ -162,7 +149,7 @@ import Foundation
         
         monitorLiveStreamTask?.cancel()
         monitorLiveStreamTask = nil
-
+        
         isRunning = false
     }
     
@@ -234,6 +221,7 @@ import Foundation
     }
     func finish() {
         continuation.finish()
+        
     }
     
     struct SessionInfo: Codable {

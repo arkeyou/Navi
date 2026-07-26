@@ -7,8 +7,8 @@
 struct JobPayload: Codable {
 
     let codigo: String
-    var shopID: Int64
-    var itemID: Int64
+    var param1: Int64 //shopID
+    var param2: Int64 //itemID
     var url: String
     
 }

@@ -53,6 +53,7 @@ struct NaviPanelView: View {
     @State private var VERIFY_SCRIPT = ""
     @State private var runTask: Task<Void, Never>? = nil
     @State private var processingTask: Task<Void, Never>? = nil
+    @State private var enqueuingTask: Task<Void, Never>? = nil
     private let IDS_WAIT_INTERVAL = Duration.seconds(2)
     private let LIKE_WAIT_INTERVAL = Duration.seconds(0.5)
     private let COOKIE_WAIT_INTERVAL = Duration.seconds(5)
@@ -176,7 +177,7 @@ struct NaviPanelView: View {
         //NaviQueueTracker.shared.resetEnqueueToday()
         
         if NaviQueueTracker.shared.isLimitReached {
-            store.updateLog(with: "\nLimite dee \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A automação não permite nova execução até o próximo dia.\n")
+            store.updateLog(with: "Limite dee \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A automação não permite nova execução até o próximo dia.")
 
             Task {
                 await store.send(.showPaywallButtonTapped)
@@ -198,7 +199,7 @@ struct NaviPanelView: View {
             
             while cookies.isEmpty {
                 if Task.isCancelled { return }
-                store.updateLog(with: "\nWaiting for cookies...\n")
+                store.updateLog(with: "Waiting for cookies...")
                 cookies = await getBrowserCookies()
                 try? await Task.sleep(for: COOKIE_WAIT_INTERVAL)
             }
@@ -217,46 +218,18 @@ struct NaviPanelView: View {
                 }
             } catch {
                 print(error)
-                store.updateLog(with: "\nbuscaConfiguracoes: \(error.localizedDescription)\n")
+                store.updateLog(with: "buscaConfiguracoes: \(error.localizedDescription)")
                 stopAutomation()
                 return
             }
             
-            store.updateLog(with: "\nIniciou automacao\n")
+            store.updateLog(with: "Iniciou automacao")
             store.naviIsRunning = true
-            await am.start(naviConfig: config, sessionId: configStruct.sessionId, cookieList: cookies)
+            await am.start(naviConfig: config, sessionId: configStruct.sessionId ?? "", cookieList: cookies)
         }
         
-        Task {
-            for await event in am.actionEvents {
-                if Task.isCancelled { break }
-                switch event {
-                case .openPage(let codigo, let url, let script, let scriptVerify):
-                    print("Open page: \(codigo) - \(url)")
-
-                    let enqueued = await queue.enqueue(url, isSubscribed: store.isSubscribed)
-                    /*if !enqueued {
-                        store.updateLog(with: "\nLimite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.\n")
-                        stopAutomation()
-                        await store.send(.showPaywallButtonTapped)
-                        return
-                    }*/
-
-                    store.updateProcessed(with: "\n\(codigo)")
-                    
-                    if LIKE_SCRIPT.isEmpty {
-                        LIKE_SCRIPT.append(script)
-                    }
-                    if VERIFY_SCRIPT.isEmpty {
-                        VERIFY_SCRIPT.append(scriptVerify)
-                    }
-                case .sendMsg(let msg):
-                    print(msg)
-                    store.updateLog(with: "\(msg)\n")
-                    stopAutomation()
-                    return
-                }
-            }
+        enqueuingTask = Task {
+            await naviEnfileiramentoParaProcessamento()
         }
         
         processingTask = Task {
@@ -320,6 +293,9 @@ struct NaviPanelView: View {
         processingTask?.cancel()
         processingTask = nil
         
+        enqueuingTask?.cancel()
+        enqueuingTask = nil
+        
         am.stop()
         
         queue = NaviQueue<String>()
@@ -327,7 +303,9 @@ struct NaviPanelView: View {
         VERIFY_SCRIPT = ""
         
         store.naviIsRunning = false
-        store.updateLog(with: "\nParou automacao\n")
+        isLoadingNaviProcess = false
+        store.isPaginaFoiCarregada = false
+        store.updateLog(with: "Parou automacao. Verifique o log")
 
         print("Automation stopped and cleaned up.")
         
@@ -350,6 +328,37 @@ struct NaviPanelView: View {
         return todosOsCookies
     }
     
+    func naviEnfileiramentoParaProcessamento() async {
+        for await event in am.actionEvents {
+            if Task.isCancelled { break }
+            switch event {
+            case .openPage(let codigo, let url, let script, let scriptVerify):
+                print("Open page: \(codigo) - \(url)")
+                
+                _ = await queue.enqueue(url, isSubscribed: store.isSubscribed)
+                /*if !enqueued {
+                 store.updateLog(with: "\nLimite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.\n")
+                 stopAutomation()
+                 await store.send(.showPaywallButtonTapped)
+                 return
+                 }*/
+                
+                store.updateProcessed(with: "\n\(codigo)")
+                
+                if LIKE_SCRIPT.isEmpty {
+                    LIKE_SCRIPT.append(script)
+                }
+                if VERIFY_SCRIPT.isEmpty {
+                    VERIFY_SCRIPT.append(scriptVerify)
+                }
+            case .sendMsg(let msg):
+                print(msg)
+                store.updateLog(with: msg)
+                stopAutomation()
+                return
+            }
+        }
+    }
     
     func naviProcessamentoTela() async {
         print("NAVI: vai")
@@ -359,24 +368,25 @@ struct NaviPanelView: View {
             print("NAVI: esperando \(count)")
             let timestamp = ISO8601DateFormatter().string(from: Date())
             //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
-            store.updateLog(with: ".")
             
             try? await Task.sleep(for: IDS_WAIT_INTERVAL)
+            if Task.isCancelled { break }
             if await !queue.isEmpty && !isLoadingNaviProcess {
                 isLoadingNaviProcess = true
                 let url = await queue.dequeue()
                 
                 print("NAVI: abrindo pagina: \(url ?? "0")")
-                store.updateLog(with: "\nAbrindo pagina!\n")//: \(url ?? "0")!")
+                store.updateLog(with: "Abrindo pagina!")//: \(url ?? "0")!")
 
                 store.inputText = url ?? "0"
                 await store.send(.onSubmit(url ?? "0"))
+                continue
             }
             
             if isLoadingNaviProcess && store.isPaginaFoiCarregada {
                 //print("NAVI: esperando botao aparecer...")
                 await store.send(.scriptRunVerify(VERIFY_SCRIPT))
-                store.updateLog(with: "\nBuscando na tela\n")
+                store.updateLog(with: "Buscando na tela")
                 
                 HapticManager.shared.trigger(.warning)
                 
@@ -384,7 +394,7 @@ struct NaviPanelView: View {
                     store.isButtonPresentOnPage = false
 
                     print("NAVI: achou o botao, rodando script")
-                    store.updateLog(with: "\nEncontrou! Executando acao!\n")
+                    store.updateLog(with: "Encontrou! Executando acao!")
 
                     await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
                     
@@ -393,14 +403,14 @@ struct NaviPanelView: View {
                     isLoadingNaviProcess = false
                     
                     if await queue.isEmpty && NaviQueueTracker.shared.isLimitReached {
-                        store.updateLog(with: "\nLimite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.\n")
+                        store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.")
                         stopAutomation()
                         await store.send(.showPaywallButtonTapped)
                     }
                 }
-                
+                continue
             }
-
+            store.updateLog(with: ".", lineBreak: false)
         }
     }
     
@@ -461,7 +471,7 @@ struct NaviPanelView: View {
             Text(message)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
-                .lineLimit(2)
+                .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
@@ -483,7 +493,7 @@ struct NaviPanelView: View {
 
 struct ConfigStruct: Decodable {
     var newVersion: Bool = true
-    var sessionId: String = ""
+    var sessionId: String? = ""
     var npoint: String? = ""
     var secret: String? = ""
 }

@@ -77,15 +77,21 @@ final class FlowAgent {
         }
         
         do {
-            let searchResult = try await fetchApi(codigo: current.payload.codigo)
-            print("FlowAgent - processado: \(current.payload.codigo) - itemID: \(Int64(searchResult.directSearchResult.item.itemID)) - shopID: \(Int64(searchResult.directSearchResult.item.shopID))")
+            if let searchResult = try? await fetchApi(codigo: current.payload.codigo) {
+                print("FlowAgent - processado: \(current.payload.codigo) - itemID: \(Int64(searchResult.directSearchResult.item.itemID)) - shopID: \(Int64(searchResult.directSearchResult.item.shopID))")
 
-            current.status = .valid
-            current.updatedAt = .now
-            current.payload.itemID = Int64(searchResult.directSearchResult.item.itemID)
-            current.payload.shopID = Int64(searchResult.directSearchResult.item.shopID)
+                current.status = .valid
+                current.updatedAt = .now
+                current.payload.param2 = Int64(searchResult.directSearchResult.item.itemID)
+                current.payload.param1 = Int64(searchResult.directSearchResult.item.shopID)
 
-            await store.update(current)
+                await store.update(current)
+            } else {
+                current.status = .valid
+                current.updatedAt = .now
+                await store.update(current)
+            }
+            
         } catch {
             print("error fetch")
             throw AutomationError.flow(error)

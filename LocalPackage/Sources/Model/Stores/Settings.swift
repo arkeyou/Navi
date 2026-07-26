@@ -12,6 +12,7 @@ import UIKit
     public let id: UUID
     public var path: [Path]
     public var searchEngine: SearchEngine
+    public var appearance: Appearance
     public var version: String
     public let developer = "Takuto Nakamura"
     public let action: (Action) async -> Void
@@ -21,6 +22,7 @@ import UIKit
         id: UUID,
         path: [Path] = [],
         searchEngine: SearchEngine? = nil,
+        appearance: Appearance? = nil,
         version: String? = nil,
         action: @escaping (Action) async -> Void
     ) {
@@ -36,6 +38,13 @@ import UIKit
             searchEngine
         } else {
             .google
+        }
+        self.appearance = if let appearance {
+            appearance
+        } else if let appearance = userDefaultsRepository.appearance {
+            appearance
+        } else {
+            .dark
         }
         self.version = version ?? Bundle.main.bundleVersion
         self.action = action
@@ -78,6 +87,10 @@ import UIKit
             self.searchEngine = searchEngine
             userDefaultsRepository.searchEngine = searchEngine
 
+        case let .onChangeAppearance(appearance):
+            self.appearance = appearance
+            userDefaultsRepository.appearance = appearance
+
         case .searchEngineSetting:
             break
         }
@@ -91,6 +104,7 @@ import UIKit
         case openRepositoryButtonTapped
         case licensesButtonTapped(AppDependencies)
         case doneButtonTapped
+        case onChangeAppearance(Appearance)
         case searchEngineSetting(SearchEngineSetting.Action)
     }
 

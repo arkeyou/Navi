@@ -80,8 +80,8 @@ final class MonitorAgent {
                 id: UUID(),
                 payload: JobPayload (
                     codigo: item.codigo,
-                    shopID: item.shopID,
-                    itemID: item.itemID,
+                    param1: item.param1,
+                    param2: item.param2,
                     url: item.url
                 ),
                 status: .added,
@@ -106,20 +106,26 @@ final class MonitorAgent {
         
         guard let httpResponse = response as? HTTPURLResponse,
               200...299 ~= httpResponse.statusCode else {
-            throw URLError(.badServerResponse)
+            let responseBody = String(data: data, encoding: .utf8) ?? "Unable to read response body"
+            throw URLError(.badServerResponse, userInfo: [NSLocalizedDescriptionKey: responseBody])
         }
         
         do {
-            let commentsResult = try JSONDecoder().decode(CommentsResponse.self, from: data)
-            
             var listaJobPayload: [JobPayload] = []
-            for item in commentsResult.data.comments {
-                let codigos = item.content.matches(of: TRIGGER).map { String($0.output) }
-                
-                for codigo in codigos {
-                    listaJobPayload.append(JobPayload (codigo: codigo, shopID: 0, itemID: 0, url: ""))
+            var codigos = [] as [String]
+            
+            if let commentsResult = try? JSONDecoder().decode(CommentsResponse.self, from: data) {
+                for item in commentsResult.data.comments {
+                    codigos = item.content.matches(of: TRIGGER).map { String($0.output) }
                 }
+            } else {
+                codigos = (String(data: data, encoding: .utf8)?.matches(of: TRIGGER).map { String($0.output) })!
             }
+            
+            for codigo in codigos {
+                listaJobPayload.append(JobPayload (codigo: codigo, param1: 0, param2: 0, url: ""))
+            }
+            
             return listaJobPayload
         } catch {
             print("Monitor Agent: \(error.localizedDescription)")
@@ -131,23 +137,23 @@ final class MonitorAgent {
         
         return [JobPayload (
             codigo: "BLL-ATM-RVH",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "BBG-XRA-KGH",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "AUY-MXD-JLB",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "BTL-YPD-JMR",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         )/*,JobPayload (
             codigo: "AAA-BBB-CCC",
@@ -155,42 +161,42 @@ final class MonitorAgent {
             itemID: 0,
             url: ""
         
-        )*/,JobPayload (
+        ),JobPayload (
             codigo: "BZZ-FGN-LTQ",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "CJL-ERN-DSF",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "BXR-TRQ-NQG",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "BRC-KXY-FNJ",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "AYT-VLG-NRT",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "AUZ-XWT-UXU",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
         ),JobPayload (
             codigo: "AVW-ZPA-XYK",
-            shopID: 0,
-            itemID: 0,
+            param1: 0,
+            param2: 0,
             url: ""
-        )]
+        )*/]
     }
     
     private func randomCodigo() -> String {

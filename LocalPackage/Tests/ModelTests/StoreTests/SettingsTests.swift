@@ -84,4 +84,24 @@ struct SettingsTests {
         #expect(sut.searchEngine == searchEngine)
         #expect(setSearchEngine.withLock(\.self) == [searchEngine.rawValue])
     }
+
+    @MainActor @Test(arguments: Appearance.allCases)
+    func send_onChangeAppearance(_ appearance: Appearance) async {
+        let setAppearance = OSAllocatedUnfairLock<[String?]>(initialState: [])
+        let sut = Settings(
+            .testDependencies(
+                userDefaultsClient: testDependency(of: UserDefaultsClient.self) {
+                    $0.setString = { value, key in
+                        guard key == "appearance" else { return }
+                        setAppearance.withLock { $0.append(value) }
+                    }
+                }
+            ),
+            id: UUID(),
+            action: { _ in }
+        )
+        await sut.send(.onChangeAppearance(appearance))
+        #expect(sut.appearance == appearance)
+        #expect(setAppearance.withLock(\.self) == [appearance.rawValue])
+    }
 }

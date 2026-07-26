@@ -185,8 +185,7 @@ import WebUI
                 let timestamp = ISO8601DateFormatter().string(from: Date())
                 let urlString = currentURL?.absoluteString ?? "URL desconhecida"
                 //let loadEntry = "[\(timestamp)] Página carregada: \(urlString)\n"
-                let loadEntry = "\nPágina carregada!\n"
-                updateLog(with: loadEntry)
+                updateLog(with: "Página carregada!")
                 try? await Task.sleep(for: .seconds(1))
                 isPaginaFoiCarregada = true
             }
@@ -285,6 +284,7 @@ import WebUI
             }
             if selection == .processed {
                 hasUnreadProcessed = false
+                qtProcessed = 0
             }
 
         case .scriptNewButtonTapped:
@@ -463,9 +463,9 @@ import WebUI
         }
     }
     
-    public func updateLog(with message: String) {
+    public func updateLog(with message: String, lineBreak: Bool = true) {
         var updatedLog = readNaviDataFile(.log)
-        updatedLog.append(message)
+        updatedLog.append(lineBreak ? "\n\(message)" : message)
         writeNaviDataFile(.log, content: updatedLog)
         logText = updatedLog
         naviPanelMessage = message

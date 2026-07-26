@@ -1,3 +1,4 @@
+import DataSource
 import Model
 import SwiftUI
 import WebUI
@@ -5,20 +6,26 @@ import WebUI
 struct BrowserView: View {
     @StateObject var store: Browser
     @State private var naviPanelDetent = PresentationDetent.medium
+    @AppStorage(.appearance) private var appearance = Appearance.dark.rawValue
     
     var body: some View {
         mainContent
+            .preferredColorScheme(preferredColorScheme)
             .sheet(isPresented: $store.isPresentedNaviPanel) {
                 naviPanelSheet
+                    .preferredColorScheme(preferredColorScheme)
             }
             .sheet(item: $store.settings) { store in
                 SettingsView(store: store)
+                    .preferredColorScheme(store.appearance.colorScheme)
             }
             .sheet(item: $store.bookmarkManagement) { store in
                 BookmarkManagementView(store: store)
+                    .preferredColorScheme(preferredColorScheme)
             }
             .sheet(isPresented: paywallPresentation) {
                 PaywallView(store: store)
+                    .preferredColorScheme(preferredColorScheme)
             }
             .webDialog(
                 isPresented: $store.isPresentedWebDialog,
@@ -44,6 +51,10 @@ struct BrowserView: View {
                 }
             }
             .animation(.easeIn(duration: 0.2), value: store.isPresentedToolbar)
+    }
+
+    private var preferredColorScheme: ColorScheme? {
+        Appearance(rawValue: appearance)?.colorScheme
     }
 
     private var paywallPresentation: Binding<Bool> {
@@ -131,6 +142,19 @@ struct BrowserView: View {
 extension Browser: ObservableObject {}
 extension BrowserNavigation: ObservableObject {}
 extension BrowserUI: ObservableObject {}
+
+private extension Appearance {
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            nil
+        case .light:
+            .light
+        case .dark:
+            .dark
+        }
+    }
+}
 
 #Preview(traits: .landscapeRight) {
     BrowserView(store: .init(.testDependencies()))
