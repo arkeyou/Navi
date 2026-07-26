@@ -468,7 +468,8 @@ import WebUI
         updatedLog.append(lineBreak ? "\n\(message)" : message)
         writeNaviDataFile(.log, content: updatedLog)
         logText = updatedLog
-        naviPanelMessage = message
+        let time = Date().formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute().second())
+        naviPanelMessage = "[\(time)] \(message)"
         if naviPanelSelection != .log {
             hasUnreadLogs = true
         }

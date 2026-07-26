@@ -142,6 +142,7 @@ struct NaviPanelView: View {
 
                     if store.naviIsRunning {
                         Button {
+                            store.updateLog(with: "Interrompido pelo usuario")
                             stopAutomation()
                         } label: {
                             Label("Parar", systemImage: "square.fill")
@@ -223,7 +224,7 @@ struct NaviPanelView: View {
                 return
             }
             
-            store.updateLog(with: "Iniciou automacao")
+            store.updateLog(with: "\nIniciou automacao")
             store.naviIsRunning = true
             await am.start(naviConfig: config, sessionId: configStruct.sessionId ?? "", cookieList: cookies)
         }
