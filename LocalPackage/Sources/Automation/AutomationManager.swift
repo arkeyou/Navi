@@ -15,8 +15,6 @@ import Foundation
     
     private var config: NaviConfig = NaviConfig()
     
-    private let MONITOR_LIVE_ONLINE_INTERVAL = Duration.seconds(20)
-    
     //public var allJobs: [String] = []
     public let actionEvents: AsyncStream<ActionEvent>
     private let continuation: AsyncStream<ActionEvent>.Continuation
@@ -26,13 +24,23 @@ import Foundation
         
         self.actionEvents = stream
         self.continuation = continuation
+        
+        continuation.onTermination = { @Sendable reason in
+            print("AsyncStream terminou:", reason)
+        }
     }
 
     public private(set) var isRunning = false
     private(set) var eventStreamTask: Task<Void, Never>? = nil
     private(set) var monitorLiveStreamTask: Task<Void, any Error>? = nil
 
-    public func start(naviConfig: String, sessionId: String = "", cookieList: String) async {
+    public func start(
+        naviConfig: String,
+        sessionId: String = "",
+        cookieList: String,
+        monitorInterval: Double = 4,
+        monitorLiveOnlineInterval: Double = 20
+    ) async {
 
         guard !isRunning else {
             return
@@ -53,7 +61,8 @@ import Foundation
                 urlMonitor: config.urlMonitor,
                 triggerMonitor: config.triggerMonitor,
                 sessionId: sessionIdLocal,
-                cookieList: cookieList
+                cookieList: cookieList,
+                monitorInterval: Duration.seconds(monitorInterval)
             )
 
             flowAgent = FlowAgent(
@@ -85,7 +94,7 @@ import Foundation
                         emit(.sendMsg(message: error.localizedDescription))
                         return
                     }
-                    try await Task.sleep(for: MONITOR_LIVE_ONLINE_INTERVAL)
+                    try await Task.sleep(for: Duration.seconds(monitorLiveOnlineInterval))
                 }
             }
         }
@@ -217,9 +226,13 @@ import Foundation
     }
     
     func emit(_ event: ActionEvent) {
+        print("yield inicio")
         continuation.yield(event)
+        print("yield fim")
+
     }
     func finish() {
+        print("continuation finish")
         continuation.finish()
         
     }

@@ -54,9 +54,9 @@ struct NaviPanelView: View {
     @State private var runTask: Task<Void, Never>? = nil
     @State private var processingTask: Task<Void, Never>? = nil
     @State private var enqueuingTask: Task<Void, Never>? = nil
-    private let IDS_WAIT_INTERVAL = Duration.seconds(2)
-    private let LIKE_WAIT_INTERVAL = Duration.seconds(0.5)
-    private let COOKIE_WAIT_INTERVAL = Duration.seconds(5)
+    private let IDS_WAIT_INTERVAL: Double = 2
+    private let LIKE_WAIT_INTERVAL: Double = 0.5
+    private let COOKIE_WAIT_INTERVAL: Double = 5
     private let URL_NPOINT_API = "https://api.npoint.io/"
     @State private var isLoadingNaviProcess = false
     @State private var count = 0
@@ -202,7 +202,7 @@ struct NaviPanelView: View {
                 if Task.isCancelled { return }
                 store.updateLog(with: "Waiting for cookies...")
                 cookies = await getBrowserCookies()
-                try? await Task.sleep(for: COOKIE_WAIT_INTERVAL)
+                try? await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.cookieWaitInterval))
             }
             
             if Task.isCancelled { return }
@@ -226,7 +226,7 @@ struct NaviPanelView: View {
             
             store.updateLog(with: "\nIniciou automacao")
             store.naviIsRunning = true
-            await am.start(naviConfig: config, sessionId: configStruct.sessionId ?? "", cookieList: cookies)
+            await am.start(naviConfig: config, sessionId: configStruct.sessionId ?? "", cookieList: cookies, monitorInterval: store.userDefaultsRepository.monitorInterval, monitorLiveOnlineInterval: store.userDefaultsRepository.monitorLiveOnlineInterval)
         }
         
         enqueuingTask = Task {
@@ -294,8 +294,10 @@ struct NaviPanelView: View {
         processingTask?.cancel()
         processingTask = nil
         
-        enqueuingTask?.cancel()
-        enqueuingTask = nil
+        //Nao e necessario finalizar essa tarefa.
+        //Quando isso e feito, ao o AsyncStream e cancelado e nao recebe mais emits
+        //enqueuingTask?.cancel()
+        //enqueuingTask = nil
         
         am.stop()
         
@@ -329,9 +331,31 @@ struct NaviPanelView: View {
         return todosOsCookies
     }
     
+    func verificaCookies(cookiesStr: String) async {
+        var cookies = cookiesStr
+        if cookies.isEmpty {
+            cookies = await getBrowserCookies()
+            if cookies.isEmpty {
+                store.inputText = "shopee.com.br"
+                await store.send(.onSubmit("shopee.com.br"))
+            }
+        }
+        do {
+            while cookies.isEmpty {
+                if Task.isCancelled { return }
+                store.updateLog(with: "Waiting for cookies...")
+                cookies = await getBrowserCookies()
+                try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.cookieWaitInterval))
+            }
+        } catch {
+            print("Parou espera por cookies")
+        }
+    }
+    
     func naviEnfileiramentoParaProcessamento() async {
+        print("naviEnfileiramentoParaProcessamento: vai")
         for await event in am.actionEvents {
-            if Task.isCancelled { break }
+            //if Task.isCancelled { break }
             switch event {
             case .openPage(let codigo, let url, let script, let scriptVerify):
                 print("Open page: \(codigo) - \(url)")
@@ -362,56 +386,60 @@ struct NaviPanelView: View {
     }
     
     func naviProcessamentoTela() async {
-        print("NAVI: vai")
+        print("naviProcessamentoTela: vai")
         
-        while !Task.isCancelled {
-            count+=1
-            print("NAVI: esperando \(count)")
-            let timestamp = ISO8601DateFormatter().string(from: Date())
-            //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
-            
-            try? await Task.sleep(for: IDS_WAIT_INTERVAL)
-            if Task.isCancelled { break }
-            if await !queue.isEmpty && !isLoadingNaviProcess {
-                isLoadingNaviProcess = true
-                let url = await queue.dequeue()
+        do {
+            while !Task.isCancelled {
+                count+=1
+                print("NAVI: esperando \(count)")
+                let timestamp = ISO8601DateFormatter().string(from: Date())
+                //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
                 
-                print("NAVI: abrindo pagina: \(url ?? "0")")
-                store.updateLog(with: "Abrindo pagina!")//: \(url ?? "0")!")
-
-                store.inputText = url ?? "0"
-                await store.send(.onSubmit(url ?? "0"))
-                continue
-            }
-            
-            if isLoadingNaviProcess && store.isPaginaFoiCarregada {
-                //print("NAVI: esperando botao aparecer...")
-                await store.send(.scriptRunVerify(VERIFY_SCRIPT))
-                store.updateLog(with: "Buscando na tela")
-                
-                HapticManager.shared.trigger(.warning)
-                
-                if (store.isButtonPresentOnPage) {
-                    store.isButtonPresentOnPage = false
-
-                    print("NAVI: achou o botao, rodando script")
-                    store.updateLog(with: "Encontrou! Executando acao!")
-
-                    await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
+                try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.idsWaitInterval))
+                if Task.isCancelled { break }
+                if await !queue.isEmpty && !isLoadingNaviProcess {
+                    isLoadingNaviProcess = true
+                    let url = await queue.dequeue()
                     
-                    try? await Task.sleep(for: LIKE_WAIT_INTERVAL)
-                    store.isPaginaFoiCarregada = false
-                    isLoadingNaviProcess = false
+                    print("NAVI: abrindo pagina: \(url ?? "0")")
+                    store.updateLog(with: "Abrindo pagina!")//: \(url ?? "0")!")
                     
-                    if await queue.isEmpty && NaviQueueTracker.shared.isLimitReached {
-                        store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.")
-                        stopAutomation()
-                        await store.send(.showPaywallButtonTapped)
-                    }
+                    store.inputText = url ?? "0"
+                    await store.send(.onSubmit(url ?? "0"))
+                    continue
                 }
-                continue
+                
+                if isLoadingNaviProcess && store.isPaginaFoiCarregada {
+                    //print("NAVI: esperando botao aparecer...")
+                    await store.send(.scriptRunVerify(VERIFY_SCRIPT))
+                    store.updateLog(with: "Buscando na tela")
+                    
+                    HapticManager.shared.trigger(.warning)
+                    
+                    if (store.isButtonPresentOnPage) {
+                        store.isButtonPresentOnPage = false
+                        
+                        print("NAVI: achou o botao, rodando script")
+                        store.updateLog(with: "Encontrou! Executando acao! ")
+                        
+                        await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
+                        
+                        try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.likeWaitInterval))
+                        store.isPaginaFoiCarregada = false
+                        isLoadingNaviProcess = false
+                        
+                        if await queue.isEmpty && NaviQueueTracker.shared.isLimitReached {
+                            store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.")
+                            stopAutomation()
+                            await store.send(.showPaywallButtonTapped)
+                        }
+                    }
+                    continue
+                }
+                store.updateLog(with: ".", lineBreak: false)
             }
-            store.updateLog(with: ".", lineBreak: false)
+        } catch {
+            print("Parou processamento na tela")
         }
     }
     

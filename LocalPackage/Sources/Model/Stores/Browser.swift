@@ -8,7 +8,7 @@ import WebUI
     private let uiApplicationClient: UIApplicationClient
     private let uuidClient: UUIDClient
     private let webViewProxyClient: WebViewProxyClient
-    private let userDefaultsRepository: UserDefaultsRepository
+    public let userDefaultsRepository: UserDefaultsRepository
     private let logService: LogService
 
     @ObservationIgnored private var eventBridge: Action.EventBridge?
@@ -284,7 +284,8 @@ import WebUI
             }
             if selection == .processed {
                 hasUnreadProcessed = false
-                qtProcessed = 0
+                // Zera contador ao tocar na aba processados
+                //qtProcessed = 0
             }
 
         case .scriptNewButtonTapped:

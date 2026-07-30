@@ -34,6 +34,31 @@ public struct UserDefaultsRepository: Sendable {
         }
     }
 
+    public var monitorInterval: Double {
+        get { userDefaultsClient.double(.monitorInterval) ?? 4.0 }
+        nonmutating set { userDefaultsClient.setDouble(newValue, .monitorInterval) }
+    }
+
+    public var monitorLiveOnlineInterval: Double {
+        get { userDefaultsClient.double(.monitorLiveOnlineInterval) ?? 20.0 }
+        nonmutating set { userDefaultsClient.setDouble(newValue, .monitorLiveOnlineInterval) }
+    }
+
+    public var idsWaitInterval: Double {
+        get { userDefaultsClient.double(.idsWaitInterval) ?? 2.0 }
+        nonmutating set { userDefaultsClient.setDouble(newValue, .idsWaitInterval) }
+    }
+
+    public var likeWaitInterval: Double {
+        get { userDefaultsClient.double(.likeWaitInterval) ?? 0.5 }
+        nonmutating set { userDefaultsClient.setDouble(newValue, .likeWaitInterval) }
+    }
+
+    public var cookieWaitInterval: Double {
+        get { userDefaultsClient.double(.cookieWaitInterval) ?? 5.0 }
+        nonmutating set { userDefaultsClient.setDouble(newValue, .cookieWaitInterval) }
+    }
+
     public init(_ userDefaultsClient: UserDefaultsClient) {
         self.userDefaultsClient = userDefaultsClient
 

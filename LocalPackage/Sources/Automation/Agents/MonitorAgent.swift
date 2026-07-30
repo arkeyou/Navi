@@ -10,9 +10,8 @@ final class MonitorAgent {
 
     private var URL_MONITOR: String
     private var SESSION_ID: String
-    private var INTERVAL: Int = 5
     private var TRIGGER: Regex<Substring>
-    private let MONITOR_INTERVAL = Duration.seconds(4)
+    private let monitorInterval: Duration
     
     private let store: JobStore
     private var task: Task<Void, any Error>?
@@ -23,7 +22,8 @@ final class MonitorAgent {
         urlMonitor: String,
         triggerMonitor: String,
         sessionId: String,
-        cookieList: String
+        cookieList: String,
+        monitorInterval: Duration = .seconds(4)
     ) {
 
         self.store = store
@@ -31,6 +31,7 @@ final class MonitorAgent {
         self.TRIGGER = try! Regex(triggerMonitor)
         self.SESSION_ID = sessionId
         self.cookies = cookieList
+        self.monitorInterval = monitorInterval
     }
 
     func start() {
@@ -38,24 +39,17 @@ final class MonitorAgent {
         guard task == nil else { return }
         
         task = Task {
-
-            while !Task.isCancelled {
-                print("MonitorAgent - monitorando mensagens")
-                
-                do {
-                    try await Task.sleep(
-                        for: MONITOR_INTERVAL
-                    )
-                } catch {
-                    //break
-                }
-                   
-                do {
+            do {
+                while !Task.isCancelled {
+                    print("MonitorAgent - monitorando mensagens")
+                    try await Task.sleep(for: monitorInterval)
                     try await scan()
-                } catch {
-                    throw AutomationError.monitor(error)
                 }
+            } catch is CancellationError {
                 
+            } catch {
+                print("Parou Monitor")
+                throw AutomationError.monitor(error)
             }
         }
     }
@@ -136,11 +130,11 @@ final class MonitorAgent {
     private func fetchApiChangesMock() async throws -> [JobPayload] {
         
         return [JobPayload (
-            codigo: "BLL-ATM-RVH",
+            codigo: randomCodigo(),//"BLL-ATM-RVH",
             param1: 0,
             param2: 0,
             url: ""
-        ),JobPayload (
+        )/*,JobPayload (
             codigo: "BBG-XRA-KGH",
             param1: 0,
             param2: 0,
@@ -155,7 +149,7 @@ final class MonitorAgent {
             param1: 0,
             param2: 0,
             url: ""
-        )/*,JobPayload (
+        )*//*,JobPayload (
             codigo: "AAA-BBB-CCC",
             shopID: 0,
             itemID: 0,

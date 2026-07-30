@@ -14,6 +14,13 @@ import UIKit
     public var searchEngine: SearchEngine
     public var appearance: Appearance
     public var version: String
+    
+    public var monitorInterval: Double
+    public var monitorLiveOnlineInterval: Double
+    public var idsWaitInterval: Double
+    public var likeWaitInterval: Double
+    public var cookieWaitInterval: Double
+    
     public let developer = "Takuto Nakamura"
     public let action: (Action) async -> Void
 
@@ -24,29 +31,40 @@ import UIKit
         searchEngine: SearchEngine? = nil,
         appearance: Appearance? = nil,
         version: String? = nil,
+        monitorInterval: Double? = nil,
+        monitorLiveOnlineInterval: Double? = nil,
+        idsWaitInterval: Double? = nil,
+        likeWaitInterval: Double? = nil,
+        cookieWaitInterval: Double? = nil,
         action: @escaping (Action) async -> Void
     ) {
         self.uiApplicationClient = appDependencies.uiApplicationClient
         self.wkWebsiteDataStoreClient = appDependencies.wkWebsiteDataStoreClient
-        self.userDefaultsRepository = .init(appDependencies.userDefaultsClient)
+        let repository = UserDefaultsRepository(appDependencies.userDefaultsClient)
+        self.userDefaultsRepository = repository
         self.logService = .init(appDependencies)
         self.id = id
         self.path = path
         self.searchEngine = if let searchEngine {
             searchEngine
-        } else if let searchEngine = userDefaultsRepository.searchEngine {
+        } else if let searchEngine = repository.searchEngine {
             searchEngine
         } else {
             .google
         }
         self.appearance = if let appearance {
             appearance
-        } else if let appearance = userDefaultsRepository.appearance {
+        } else if let appearance = repository.appearance {
             appearance
         } else {
             .dark
         }
         self.version = version ?? Bundle.main.bundleVersion
+        self.monitorInterval = monitorInterval ?? repository.monitorInterval
+        self.monitorLiveOnlineInterval = monitorLiveOnlineInterval ?? repository.monitorLiveOnlineInterval
+        self.idsWaitInterval = idsWaitInterval ?? repository.idsWaitInterval
+        self.likeWaitInterval = likeWaitInterval ?? repository.likeWaitInterval
+        self.cookieWaitInterval = cookieWaitInterval ?? repository.cookieWaitInterval
         self.action = action
     }
 
@@ -91,6 +109,26 @@ import UIKit
             self.appearance = appearance
             userDefaultsRepository.appearance = appearance
 
+        case let .onChangeMonitorInterval(interval):
+            self.monitorInterval = interval
+            userDefaultsRepository.monitorInterval = interval
+
+        case let .onChangeMonitorLiveOnlineInterval(interval):
+            self.monitorLiveOnlineInterval = interval
+            userDefaultsRepository.monitorLiveOnlineInterval = interval
+
+        case let .onChangeIdsWaitInterval(interval):
+            self.idsWaitInterval = interval
+            userDefaultsRepository.idsWaitInterval = interval
+
+        case let .onChangeLikeWaitInterval(interval):
+            self.likeWaitInterval = interval
+            userDefaultsRepository.likeWaitInterval = interval
+
+        case let .onChangeCookieWaitInterval(interval):
+            self.cookieWaitInterval = interval
+            userDefaultsRepository.cookieWaitInterval = interval
+
         case .searchEngineSetting:
             break
         }
@@ -105,6 +143,11 @@ import UIKit
         case licensesButtonTapped(AppDependencies)
         case doneButtonTapped
         case onChangeAppearance(Appearance)
+        case onChangeMonitorInterval(Double)
+        case onChangeMonitorLiveOnlineInterval(Double)
+        case onChangeIdsWaitInterval(Double)
+        case onChangeLikeWaitInterval(Double)
+        case onChangeCookieWaitInterval(Double)
         case searchEngineSetting(SearchEngineSetting.Action)
     }
 

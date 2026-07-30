@@ -82,6 +82,46 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    intervalRow(
+                        title: "Monitoramento",
+                        value: $store.monitorInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeMonitorInterval(newValue)) }
+                        }
+                    )
+                    intervalRow(
+                        title: "Verifica Live Online",
+                        value: $store.monitorLiveOnlineInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeMonitorLiveOnlineInterval(newValue)) }
+                        }
+                    )
+                    intervalRow(
+                        title: "Espera Codigos",
+                        value: $store.idsWaitInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeIdsWaitInterval(newValue)) }
+                        }
+                    )
+                    intervalRow(
+                        title: "Verifica Tela",
+                        value: $store.likeWaitInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeLikeWaitInterval(newValue)) }
+                        }
+                    )
+                    intervalRow(
+                        title: "Espera Cookie",
+                        value: $store.cookieWaitInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeCookieWaitInterval(newValue)) }
+                        }
+                    )
+                } header: {
+                    Text("Intervalos de Automação (s)")
+                }
+
+                Section {
                     Button {
                         isPresentedPaywall = true
                     } label: {
@@ -208,6 +248,23 @@ struct SettingsView: View {
             Task {
                 await store.send(.onChangeAppearance(newValue))
             }
+        }
+    }
+
+    @ViewBuilder
+    private func intervalRow(
+        title: String,
+        value: Binding<Double>,
+        onChange: @escaping (Double) -> Void
+    ) -> some View {
+        LabeledContent(title) {
+            TextField("", value: value, format: .number)
+                .multilineTextAlignment(.trailing)
+                .keyboardType(.decimalPad)
+                .frame(width: 80)
+                .onChange(of: value.wrappedValue) { _, newValue in
+                    onChange(newValue)
+                }
         }
     }
 }

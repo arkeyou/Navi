@@ -9,9 +9,7 @@
 final class FakeBrowser:
     BrowserEngine {
 
-    func open(
-        url: String
-    ) async throws {
+    func open(url: String) async throws {
 
         print(
             "Opening \(url)"
