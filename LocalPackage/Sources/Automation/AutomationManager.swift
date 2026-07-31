@@ -74,6 +74,10 @@ import Foundation
                 store: store,
                 urlAction: config.urlAction
             )
+            
+            if (((config.urlInicial?.isEmpty) != nil)) {
+                emit(.openPage(url: config.urlInicial!))
+            }
         } catch {
             print("Decoding failed: \(error.localizedDescription)")
             emit(.sendMsg(message: "\nDecoding failed: \(error.localizedDescription)"))
@@ -114,7 +118,7 @@ import Foundation
                 else { continue }
                 
                 print("AutomationManager - enviando pro browser: \(job.payload.codigo)")
-                emit(.openPage(codigo: job.payload.codigo, url: job.payload.url, script: config.script, scriptVerify: config.scriptVerify))
+                emit(.enqueuePage(codigo: job.payload.codigo, url: job.payload.url, script: config.script, scriptVerify: config.scriptVerify))
             }
             //await syncJobs()
         }
@@ -164,7 +168,7 @@ import Foundation
     
     /*func syncJobs() async {
         await store.all().map(Set.init).forEach(\.ok) {
-            emit(.openPage(item.payload.codigo))
+            emit(.enqueuePage(item.payload.codigo))
             
             var current = item
             current.status = .ok

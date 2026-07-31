@@ -384,8 +384,8 @@ struct NaviPanelView: View {
             if Task.isCancelled { break }
 
             switch event {
-            case .openPage(let codigo, let url, let script, let scriptVerify):
-                print("Open page: \(codigo) - \(url)")
+            case .enqueuePage(let codigo, let url, let script, let scriptVerify):
+                print("Enqueue page: \(codigo) - \(url)")
                 
                 _ = await queue.enqueue(url, isSubscribed: store.isSubscribed)
                 /*if !enqueued {
@@ -408,6 +408,9 @@ struct NaviPanelView: View {
                 store.updateLog(with: msg)
                 stopAutomation()
                 return
+            case .openPage(let url):
+                store.inputText = url
+                await store.send(.onSubmit(url))
             }
         }
     }

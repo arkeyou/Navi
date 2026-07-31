@@ -6,6 +6,7 @@
 import Foundation
 
 public enum ActionEvent: Sendable {
-    case openPage(codigo: String, url: String, script: String, scriptVerify: String)
+    case enqueuePage(codigo: String, url: String, script: String, scriptVerify: String)
     case sendMsg(message: String)
+    case openPage(url: String)
 }
