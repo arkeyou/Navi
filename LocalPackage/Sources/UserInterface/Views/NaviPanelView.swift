@@ -61,6 +61,8 @@ struct NaviPanelView: View {
     @State private var isLoadingNaviProcess = false
     @State private var count = 0
     
+    private let uuid = UUID()
+    
     var body: some View {
         NavigationStack {
             Group {
@@ -107,8 +109,19 @@ struct NaviPanelView: View {
                 }
             }
         }
+        .task {
+            enqueuingTask = Task {
+                defer {
+                    print("-------> finalizou a task")
+                }
+                await naviEnfileiramentoParaProcessamento()
+            }
+        }
         .onDisappear {
             //stopAutomation()
+            if (store.ultimoNaviPanelView == nil && store.naviIsRunning) {
+                store.ultimoNaviPanelView = self
+            }
         }
     }
 
@@ -224,14 +237,16 @@ struct NaviPanelView: View {
                 return
             }
             
-            store.updateLog(with: "\nIniciou automacao")
+            store.updateLog(with: "\nIniciou automacao ")
             store.naviIsRunning = true
             await am.start(naviConfig: config, sessionId: configStruct.sessionId ?? "", cookieList: cookies, monitorInterval: store.userDefaultsRepository.monitorInterval, monitorLiveOnlineInterval: store.userDefaultsRepository.monitorLiveOnlineInterval)
         }
         
+        /*let taskID = UUID()
+
         enqueuingTask = Task {
-            await naviEnfileiramentoParaProcessamento()
-        }
+            await naviEnfileiramentoParaProcessamento(mytaskID: taskID)
+        }*/
         
         processingTask = Task {
             await naviProcessamentoTela()
@@ -287,7 +302,18 @@ struct NaviPanelView: View {
         return String(decoding: decryptedData, as: UTF8.self)
     }
     
-    private func stopAutomation() {
+    public func stopAutomation() {
+        //o dismiss do sheet esta mantendo uma instancia da view em memoria executando as tasks e quando o sheet e exibido novamente, e criada uma nova view, q nao consegue parar as tasks da view inicial. Esta logica guarda as ultimas views e para as tasks rodando nelas
+        if (store.ultimoNaviPanelView != nil) {
+            if ((self as NaviPanelView).uuid != (store.ultimoNaviPanelView as? NaviPanelView)?.uuid) {
+                (store.ultimoNaviPanelView as? NaviPanelView)?.stopAutomation()
+                store.ultimoNaviPanelView = nil
+                
+                (store.ultimoNaviPanelView as? NaviPanelView)?.enqueuingTask?.cancel()
+                (store.ultimoNaviPanelView as? NaviPanelView)?.enqueuingTask = nil
+            }
+        }
+        
         runTask?.cancel()
         runTask = nil
         
@@ -355,7 +381,8 @@ struct NaviPanelView: View {
     func naviEnfileiramentoParaProcessamento() async {
         print("naviEnfileiramentoParaProcessamento: vai")
         for await event in am.actionEvents {
-            //if Task.isCancelled { break }
+            if Task.isCancelled { break }
+
             switch event {
             case .openPage(let codigo, let url, let script, let scriptVerify):
                 print("Open page: \(codigo) - \(url)")

@@ -60,6 +60,8 @@ import WebUI
     public var bookmarkManagement: BookmarkManagement?
 
     public let action: (Action) async -> Void
+    
+    public var ultimoNaviPanelView: (any View)? = nil
 
     public init(
         _ appDependencies: AppDependencies,
