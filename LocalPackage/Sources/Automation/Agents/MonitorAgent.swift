@@ -75,8 +75,8 @@ final class MonitorAgent {
 
     private func scan() async throws {
 
-        //let apiItems = try await fetchApiChanges()
-        let apiItems = try await fetchApiChangesMock()
+        let apiItems = try await fetchApiChanges()
+        //let apiItems = try await fetchApiChangesMock()
 
         for item in apiItems {
             //print("MonitorAgent - detectou codigo "+item.codigo)
