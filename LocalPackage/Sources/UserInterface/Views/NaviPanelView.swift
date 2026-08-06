@@ -110,7 +110,7 @@ struct NaviPanelView: View {
             }
         }
         /*.task {
-            /*enqueuingTask = Task {
+            enqueuingTask = Task {
                 defer {
                     print("-------> finalizou a task")
                 }
