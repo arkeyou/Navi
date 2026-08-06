@@ -40,6 +40,10 @@ actor JobStore {
         }
     }
 
+    func clear() {
+        jobs.removeAll()
+    }
+
     func jobs(
         status: JobStatus
     ) -> [Job] {

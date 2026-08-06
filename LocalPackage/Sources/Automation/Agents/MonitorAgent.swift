@@ -44,6 +44,16 @@ final class MonitorAgent {
                     print("MonitorAgent - monitorando mensagens")
                     try await Task.sleep(for: monitorInterval)
                     try await scan()
+                    
+                    
+                    var i = 0;
+                    print("------------")
+                    await store.all().filter{ $0.status != JobStatus.dupe }.forEach {
+                        i += 1
+                        print("\(i): \($0.payload.codigo) - \($0.status)")
+                    }
+                    print("------------")
+                    //await dump(store.all())
                 }
             } catch is CancellationError {
                 
@@ -65,8 +75,8 @@ final class MonitorAgent {
 
     private func scan() async throws {
 
-        let apiItems = try await fetchApiChanges()
-        //let apiItems = try await fetchApiChangesMock()
+        //let apiItems = try await fetchApiChanges()
+        let apiItems = try await fetchApiChangesMock()
 
         for item in apiItems {
             //print("MonitorAgent - detectou codigo "+item.codigo)
@@ -89,7 +99,7 @@ final class MonitorAgent {
     
     private func fetchApiChanges() async throws -> [JobPayload] {
         
-        let urlFormatada = String(format: URL_MONITOR, arguments: [SESSION_ID])
+        let urlFormatada = String(format: URL_MONITOR, arguments: [(SESSION_ID.isEmpty ? "0" : SESSION_ID) ])
         guard let url = URL(string: urlFormatada) else { throw URLError(.badURL) }
         var request = URLRequest(url: url)
         //print(cookies)
@@ -109,8 +119,10 @@ final class MonitorAgent {
             var codigos = [] as [String]
             
             if let commentsResult = try? JSONDecoder().decode(CommentsResponse.self, from: data) {
-                for item in commentsResult.data.comments {
-                    codigos = item.content.matches(of: TRIGGER).map { String($0.output) }
+                for comment in commentsResult.data.comments {
+                    codigos = comment.content.matches(of: TRIGGER).map { String($0.output) }
+                    print("------> Comentario: \(comment.content)")
+                    print("------> REGEX: \(codigos)")
                 }
             } else {
                 codigos = (String(data: data, encoding: .utf8)?.matches(of: TRIGGER).map { String($0.output) })!
@@ -134,28 +146,28 @@ final class MonitorAgent {
             param1: 0,
             param2: 0,
             url: ""
-        )/*,JobPayload (
-            codigo: "BBG-XRA-KGH",
+        ),JobPayload (
+            codigo: "CFE-QDM-TBT",
             param1: 0,
             param2: 0,
             url: ""
         ),JobPayload (
-            codigo: "AUY-MXD-JLB",
+            codigo: "ATE-AMS-FZC",
             param1: 0,
             param2: 0,
             url: ""
         ),JobPayload (
-            codigo: "BTL-YPD-JMR",
+            codigo: "FGS-RWT-ZDF",
             param1: 0,
             param2: 0,
             url: ""
-        )*//*,JobPayload (
-            codigo: "AAA-BBB-CCC",
-            shopID: 0,
-            itemID: 0,
+        ),JobPayload (
+            codigo: "DGR-JEV-QSN",
+            param1: 0,
+            param2: 0,
             url: ""
         
-        ),JobPayload (
+        )/*,JobPayload (
             codigo: "BZZ-FGN-LTQ",
             param1: 0,
             param2: 0,

@@ -19,6 +19,8 @@ import Foundation
     public let actionEvents: AsyncStream<ActionEvent>
     private let continuation: AsyncStream<ActionEvent>.Continuation
     
+    private let uuid = UUID()
+
     public init(){
         let (stream, continuation) = AsyncStream.makeStream(of: ActionEvent.self)
         
@@ -52,10 +54,6 @@ import Foundation
             //print(naviConfig.utf8)
             config = try JSONDecoder().decode(NaviConfig.self, from: Data(naviConfig.utf8))
             
-            if sessionId.isEmpty {
-                sessionIdLocal = sessionId
-            }
-            
             monitorAgent = MonitorAgent(
                 store: store,
                 urlMonitor: config.urlMonitor,
@@ -74,10 +72,6 @@ import Foundation
                 store: store,
                 urlAction: config.urlAction
             )
-            
-            if (((config.urlInicial?.isEmpty) != nil)) {
-                emit(.openPage(url: config.urlInicial!))
-            }
         } catch {
             print("Decoding failed: \(error.localizedDescription)")
             emit(.sendMsg(message: "\nDecoding failed: \(error.localizedDescription)"))
@@ -85,7 +79,7 @@ import Foundation
         }
 
         //Monitora se a live ainda esta online
-        if let urlSessionInfo = config.urlSessionInfo {
+        if let urlSessionInfo = config.urlSessionInfo, !sessionId.isEmpty {
             monitorLiveStreamTask = Task {
                 while !Task.isCancelled {
                     print("Verificando se a live ainda esta online...")
@@ -157,6 +151,10 @@ import Foundation
         flowAgent?.stop()
         actionAgent?.stop()
 
+        /*Task {
+            await store.clear()
+        }*/
+        
         eventStreamTask?.cancel()
         eventStreamTask = nil
         
@@ -231,10 +229,10 @@ import Foundation
     
     func emit(_ event: ActionEvent) {
         print("yield inicio")
-        continuation.yield(event)
-        print("yield fim")
-
+        let result = continuation.yield(event)
+        print("yield fim: \(result)")
     }
+    
     func finish() {
         print("continuation finish")
         continuation.finish()

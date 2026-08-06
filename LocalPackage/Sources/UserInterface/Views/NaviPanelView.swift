@@ -109,14 +109,14 @@ struct NaviPanelView: View {
                 }
             }
         }
-        .task {
-            enqueuingTask = Task {
+        /*.task {
+            /*enqueuingTask = Task {
                 defer {
                     print("-------> finalizou a task")
                 }
                 await naviEnfileiramentoParaProcessamento()
             }
-        }
+        }*/
         .onDisappear {
             //stopAutomation()
             if (store.ultimoNaviPanelView == nil && store.naviIsRunning) {
@@ -163,6 +163,13 @@ struct NaviPanelView: View {
                     } else {
                         Button {
                             startAutomation()
+                            
+                            enqueuingTask = Task {
+                                defer {
+                                    print("-------> finalizou a enqueuingTask")
+                                }
+                                await naviEnfileiramentoParaProcessamento()
+                            }
                         } label: {
                             Label("Rodar", systemImage: "play.fill")
                         }
@@ -237,6 +244,14 @@ struct NaviPanelView: View {
                 return
             }
             
+            /*if (configStruct.sessionId?.isEmpty == true && configStruct.urlInicial?.isEmpty == false) {
+                store.inputText = configStruct.urlInicial!
+                await store.send(.onSubmit(configStruct.urlInicial!))
+                store.updateLog(with: "Sem sessionID.. Abrindo pagina inicial. ")
+                stopAutomation()
+                return
+            }*/
+            
             store.updateLog(with: "\nIniciou automacao ")
             store.naviIsRunning = true
             await am.start(naviConfig: config, sessionId: configStruct.sessionId ?? "", cookieList: cookies, monitorInterval: store.userDefaultsRepository.monitorInterval, monitorLiveOnlineInterval: store.userDefaultsRepository.monitorLiveOnlineInterval)
@@ -308,9 +323,6 @@ struct NaviPanelView: View {
             if ((self as NaviPanelView).uuid != (store.ultimoNaviPanelView as? NaviPanelView)?.uuid) {
                 (store.ultimoNaviPanelView as? NaviPanelView)?.stopAutomation()
                 store.ultimoNaviPanelView = nil
-                
-                (store.ultimoNaviPanelView as? NaviPanelView)?.enqueuingTask?.cancel()
-                (store.ultimoNaviPanelView as? NaviPanelView)?.enqueuingTask = nil
             }
         }
         
@@ -555,6 +567,7 @@ struct ConfigStruct: Decodable {
     var sessionId: String? = ""
     var npoint: String? = ""
     var secret: String? = ""
+    var urlInicial: String?
 }
 
 private extension UTType {

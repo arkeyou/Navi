@@ -187,7 +187,7 @@ import WebUI
                 let timestamp = ISO8601DateFormatter().string(from: Date())
                 let urlString = currentURL?.absoluteString ?? "URL desconhecida"
                 //let loadEntry = "[\(timestamp)] Página carregada: \(urlString)\n"
-                updateLog(with: "Página carregada!")
+                updateLog(with: "Página carregada! ")
                 try? await Task.sleep(for: .seconds(1))
                 isPaginaFoiCarregada = true
             }
