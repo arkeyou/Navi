@@ -83,7 +83,7 @@ struct SettingsView: View {
 
                 Section {
                     intervalRow(
-                        title: "Monitoramento",
+                        title: "Monitora Mensagens",
                         value: $store.monitorInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeMonitorInterval(newValue)) }
@@ -97,7 +97,7 @@ struct SettingsView: View {
                         }
                     )
                     intervalRow(
-                        title: "Espera Codigos",
+                        title: "Processa Codigos Validos",
                         value: $store.idsWaitInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeIdsWaitInterval(newValue)) }

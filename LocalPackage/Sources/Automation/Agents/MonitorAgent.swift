@@ -116,16 +116,20 @@ final class MonitorAgent {
         
         do {
             var listaJobPayload: [JobPayload] = []
-            var codigos = [] as [String]
+            var codigos: Set<String> = []
             
             if let commentsResult = try? JSONDecoder().decode(CommentsResponse.self, from: data) {
                 for comment in commentsResult.data.comments {
-                    codigos = comment.content.matches(of: TRIGGER).map { String($0.output) }
+                    let codigosComment = comment.content.matches(of: TRIGGER).map { String($0.output) }
                     print("------> Comentario: \(comment.content)")
-                    print("------> REGEX: \(codigos)")
+                    print("------> REGEX: \(codigosComment)")
+                    codigos.formUnion(codigosComment)
                 }
             } else {
-                codigos = (String(data: data, encoding: .utf8)?.matches(of: TRIGGER).map { String($0.output) })!
+                codigos = Set(
+                    String(data: data, encoding: .utf8)?
+                        .matches(of: TRIGGER)
+                        .map { String($0.output) } ?? [])
             }
             
             for codigo in codigos {
