@@ -54,6 +54,14 @@ import Foundation
             //print(naviConfig.utf8)
             config = try JSONDecoder().decode(NaviConfig.self, from: Data(naviConfig.utf8))
             
+            if let urlSessionIdentifier = config.urlSessionIdentifier, sessionId.isEmpty {
+                do {
+                    sessionIdLocal = try await getSessionIdentifier(urlSessionIdentifier: urlSessionIdentifier, cookies: cookieList)
+                } catch {
+                    print("Nao encontrou id da sessao: \(error.localizedDescription)")
+                }
+            }
+            
             monitorAgent = MonitorAgent(
                 store: store,
                 urlMonitor: config.urlMonitor,
@@ -79,7 +87,7 @@ import Foundation
         }
 
         //Monitora se a live ainda esta online
-        if let urlSessionInfo = config.urlSessionInfo, !sessionId.isEmpty {
+        if let urlSessionInfo = config.urlSessionInfo, !sessionIdLocal.isEmpty {
             monitorLiveStreamTask = Task {
                 while !Task.isCancelled {
                     print("Verificando se a live ainda esta online...")
@@ -174,6 +182,45 @@ import Foundation
             //store.update(item)
         }
     }*/
+    
+    func getSessionIdentifier(urlSessionIdentifier: String, cookies: String) async throws -> String {
+            
+        let urlFormatada = String(format: urlSessionIdentifier)
+        guard let url = URL(string: urlFormatada) else { throw URLError(.badURL) }
+        var request = URLRequest(url: url)
+        //print(cookies)
+        request.setValue(cookies, forHTTPHeaderField: "Cookie")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        //print(String(data: data, encoding: .utf8) ?? "Nao conseguiu ler o body")
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw URLError(.badServerResponse)
+        }
+        do {
+
+            let sessionIdentifier = try JSONDecoder().decode(LiveHistoryResponse.self, from: data)
+            if (sessionIdentifier.msg == nil) {
+                for sessionListItem in sessionIdentifier.data.list {
+                    if sessionListItem.status == 1 {
+                        emit(.sendMsg(message: "Encontrou live online ", stop: false))
+                        return String(sessionListItem.sessionId)
+                    }
+                }
+            }
+            throw SessionError.error("Nao encontrou id")
+        } catch {
+            do {
+                let errorResponse = try JSONDecoder().decode(LiveHistoryErrorResponse.self, from: data)
+                // Erro retornado pela API
+                throw SessionError.error("SessionIdentifier Error: \(errorResponse.errcode): \(errorResponse.message)")
+
+            } catch {
+                throw SessionError.error("Resposta desconhecida: \(error)")
+            }
+        }
+    }
     
     func getSessionIsOpen(urlSessionInfo: String, sessionId: String, cookies: String) async throws -> Bool {
         do {

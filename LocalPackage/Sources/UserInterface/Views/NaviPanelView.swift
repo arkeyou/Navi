@@ -54,9 +54,6 @@ struct NaviPanelView: View {
     @State private var runTask: Task<Void, Never>? = nil
     @State private var processingTask: Task<Void, Never>? = nil
     @State private var enqueuingTask: Task<Void, Never>? = nil
-    private let IDS_WAIT_INTERVAL: Double = 2
-    private let LIKE_WAIT_INTERVAL: Double = 0.5
-    private let COOKIE_WAIT_INTERVAL: Double = 5
     private let URL_NPOINT_API = "https://api.npoint.io/"
     @State private var isLoadingNaviProcess = false
     @State private var count = 0
@@ -197,6 +194,10 @@ struct NaviPanelView: View {
         //Reseta a lista de ids adicionados hj
         //NaviQueueTracker.shared.resetEnqueueToday()
         
+        //Desabiita o bloqueio de tela por inatividade
+        UIApplication.shared.isIdleTimerDisabled = true
+        print("Bloqueio de tela desativado")
+        
         if NaviQueueTracker.shared.isLimitReached {
             store.updateLog(with: "Limite dee \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A automação não permite nova execução até o próximo dia.")
 
@@ -318,6 +319,10 @@ struct NaviPanelView: View {
     }
     
     public func stopAutomation() {
+        //Habilita novamente o bloqueio de tela
+        UIApplication.shared.isIdleTimerDisabled = false
+        print("Bloqueio de tela reativado")
+        
         //o dismiss do sheet esta mantendo uma instancia da view em memoria executando as tasks e quando o sheet e exibido novamente, e criada uma nova view, q nao consegue parar as tasks da view inicial. Esta logica guarda as ultimas views e para as tasks rodando nelas
         if (store.ultimoNaviPanelView != nil) {
             if ((self as NaviPanelView).uuid != (store.ultimoNaviPanelView as? NaviPanelView)?.uuid) {
@@ -393,7 +398,9 @@ struct NaviPanelView: View {
     func naviEnfileiramentoParaProcessamento() async {
         print("naviEnfileiramentoParaProcessamento: vai")
         for await event in am.actionEvents {
-            if Task.isCancelled { break }
+            if Task.isCancelled {
+                break
+            }
 
             switch event {
             case .enqueuePage(let codigo, let url, let script, let scriptVerify):
@@ -415,11 +422,13 @@ struct NaviPanelView: View {
                 if VERIFY_SCRIPT.isEmpty {
                     VERIFY_SCRIPT.append(scriptVerify)
                 }
-            case .sendMsg(let msg):
+            case .sendMsg(let msg, let stop):
                 print(msg)
                 store.updateLog(with: msg)
-                stopAutomation()
-                return
+                if stop {
+                    stopAutomation()
+                    return
+                }
             case .openPage(let url):
                 store.inputText = url
                 await store.send(.onSubmit(url))

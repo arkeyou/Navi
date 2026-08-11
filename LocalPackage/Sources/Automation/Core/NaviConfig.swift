@@ -11,4 +11,5 @@ struct NaviConfig: Decodable {
     var script: String = ""
     var scriptVerify: String = ""
     var urlSessionInfo: String?
+    var urlSessionIdentifier: String?
 }
