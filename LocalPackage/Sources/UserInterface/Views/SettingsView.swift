@@ -84,6 +84,7 @@ struct SettingsView: View {
                 Section {
                     intervalRow(
                         title: "Verifica Live Online",
+                        subtitle: "Tempo entre verificações para confirmar se a live está online.",
                         value: $store.monitorLiveOnlineInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeMonitorLiveOnlineInterval(newValue)) }
@@ -91,6 +92,7 @@ struct SettingsView: View {
                     )
                     intervalRow(
                         title: "Monitora Mensagens",
+                        subtitle: "Tempo entre leituras de novas mensagens durante a automação.",
                         value: $store.monitorInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeMonitorInterval(newValue)) }
@@ -98,6 +100,7 @@ struct SettingsView: View {
                     )
                     intervalRow(
                         title: "Processa Codigos Validados",
+                        subtitle: "Espera antes de processar códigos que já foram validados.",
                         value: $store.idsWaitInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeIdsWaitInterval(newValue)) }
@@ -105,6 +108,7 @@ struct SettingsView: View {
                     )
                     intervalRow(
                         title: "Verifica Tela",
+                        subtitle: "Intervalo usado para aguardar e conferir mudanças na tela.",
                         value: $store.likeWaitInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeLikeWaitInterval(newValue)) }
@@ -112,6 +116,7 @@ struct SettingsView: View {
                     )
                     intervalRow(
                         title: "Espera Cookie",
+                        subtitle: "Tempo máximo de espera para carregar ou detectar cookies necessários.",
                         value: $store.cookieWaitInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeCookieWaitInterval(newValue)) }
@@ -254,10 +259,19 @@ struct SettingsView: View {
     @ViewBuilder
     private func intervalRow(
         title: String,
+        subtitle: String,
         value: Binding<Double>,
         onChange: @escaping (Double) -> Void
     ) -> some View {
-        LabeledContent(title) {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
             TextField("", value: value, format: .number)
                 .multilineTextAlignment(.trailing)
                 .keyboardType(.decimalPad)

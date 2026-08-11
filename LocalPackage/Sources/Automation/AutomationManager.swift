@@ -58,7 +58,7 @@ import Foundation
                 do {
                     sessionIdLocal = try await getSessionIdentifier(urlSessionIdentifier: urlSessionIdentifier, cookies: cookieList)
                 } catch {
-                    print("Nao encontrou id da sessao: \(error.localizedDescription)")
+                    print("\(error.localizedDescription)")
                 }
             }
             
@@ -192,7 +192,7 @@ import Foundation
         request.setValue(cookies, forHTTPHeaderField: "Cookie")
         
         let (data, response) = try await URLSession.shared.data(for: request)
-        //print(String(data: data, encoding: .utf8) ?? "Nao conseguiu ler o body")
+        print(String(data: data, encoding: .utf8) ?? "Nao conseguiu ler o body")
         
         guard let httpResponse = response as? HTTPURLResponse,
               200...299 ~= httpResponse.statusCode else {
@@ -209,7 +209,9 @@ import Foundation
                     }
                 }
             }
-            throw SessionError.error("Nao encontrou id")
+            throw SessionError.error("Nao encontrou live online")
+        } catch let error as SessionError {
+            throw error
         } catch {
             do {
                 let errorResponse = try JSONDecoder().decode(LiveHistoryErrorResponse.self, from: data)
@@ -217,7 +219,7 @@ import Foundation
                 throw SessionError.error("SessionIdentifier Error: \(errorResponse.errcode): \(errorResponse.message)")
 
             } catch {
-                throw SessionError.error("Resposta desconhecida: \(error)")
+                throw SessionError.error("Resposta desconhecida: \(error.localizedDescription)")
             }
         }
     }
