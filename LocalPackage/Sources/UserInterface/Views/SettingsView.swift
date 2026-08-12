@@ -1,6 +1,7 @@
 import DataSource
 import Model
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @Environment(\.appDependencies) private var appDependencies
@@ -272,13 +273,82 @@ struct SettingsView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            TextField("", value: value, format: .number)
-                .multilineTextAlignment(.trailing)
-                .keyboardType(.decimalPad)
+            SelectAllNumberTextField(value: value, onChange: onChange)
                 .frame(width: 80)
-                .onChange(of: value.wrappedValue) { _, newValue in
-                    onChange(newValue)
-                }
+        }
+    }
+
+}
+
+private struct SelectAllNumberTextField: UIViewRepresentable {
+    @Binding var value: Double
+    let onChange: (Double) -> Void
+
+    func makeUIView(context: Context) -> UITextField {
+        let textField = UITextField()
+        textField.delegate = context.coordinator
+        textField.keyboardType = .decimalPad
+        textField.textAlignment = .right
+        textField.addTarget(
+            context.coordinator,
+            action: #selector(Coordinator.textDidChange(_:)),
+            for: .editingChanged
+        )
+        return textField
+    }
+
+    func updateUIView(_ textField: UITextField, context: Context) {
+        context.coordinator.parent = self
+
+        guard !textField.isFirstResponder else { return }
+        textField.text = formattedValue
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    private var formattedValue: String {
+        Self.formatter.string(from: NSNumber(value: value)) ?? String(value)
+    }
+
+    private static let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.locale = .current
+        formatter.maximumFractionDigits = 6
+        return formatter
+    }()
+
+    final class Coordinator: NSObject, UITextFieldDelegate {
+        var parent: SelectAllNumberTextField
+
+        init(parent: SelectAllNumberTextField) {
+            self.parent = parent
+        }
+
+        func textFieldDidBeginEditing(_ textField: UITextField) {
+            DispatchQueue.main.async {
+                textField.selectAll(nil)
+            }
+        }
+
+        @objc func textDidChange(_ textField: UITextField) {
+            guard let text = textField.text,
+                  let newValue = parseValue(text),
+                  newValue != parent.value
+            else { return }
+
+            parent.value = newValue
+            parent.onChange(newValue)
+        }
+
+        private func parseValue(_ text: String) -> Double? {
+            if let number = SelectAllNumberTextField.formatter.number(from: text) {
+                return number.doubleValue
+            }
+
+            return Double(text.replacingOccurrences(of: ",", with: "."))
         }
     }
 }

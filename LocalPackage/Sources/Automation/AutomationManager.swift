@@ -58,7 +58,7 @@ import Foundation
                 do {
                     sessionIdLocal = try await getSessionIdentifier(urlSessionIdentifier: urlSessionIdentifier, cookies: cookieList)
                 } catch {
-                    emit(.sendMsg(message: "\(error.localizedDescription)! ", stop: false))
+                    emit(.sendMsg(message: "Session Error: \(error.localizedDescription)! ", stop: false))
                     print("\(error.localizedDescription)")
                 }
             }

@@ -27,21 +27,21 @@ struct LiveSession: Codable {
     let duration: Int64
     let status: Int
 
-    let conversionRate: Double
-    let views: Int
-    let likes: Int
-    let followersGrowth: Int
-    let productClicks: Int
-    let viewers: Int
-    let peakViewers: Int
-    let avgViewsDuration: Double
-    let comments: Int
-    let atc: Int
+    let conversionRate: Double?
+    let views: Int?
+    let likes: Int?
+    let followersGrowth: Int?
+    let productClicks: Int?
+    let viewers: Int?
+    let peakViewers: Int?
+    let avgViewsDuration: Double?
+    let comments: Int?
+    let atc: Int?
 
-    let placedOrders: Int
-    let placedSales: Double
-    let confirmedOrders: Int
-    let confirmedSales: Double
+    let placedOrders: Int?
+    let placedSales: Double?
+    let confirmedOrders: Int?
+    let confirmedSales: Double?
 }
 
 struct RowBounds: Codable {

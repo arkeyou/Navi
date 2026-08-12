@@ -15,7 +15,9 @@ struct BrowserView: View {
                 naviPanelSheet
                     .preferredColorScheme(preferredColorScheme)
             }
-            .sheet(item: $store.settings) { store in
+            .sheet(item: $store.settings, onDismiss: {
+                store.isPresentedNaviPanel = true
+            }) { store in
                 SettingsView(store: store)
                     .preferredColorScheme(store.appearance.colorScheme)
             }
