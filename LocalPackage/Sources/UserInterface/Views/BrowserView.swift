@@ -21,7 +21,9 @@ struct BrowserView: View {
                 SettingsView(store: store)
                     .preferredColorScheme(store.appearance.colorScheme)
             }
-            .sheet(item: $store.bookmarkManagement) { store in
+            .sheet(item: $store.bookmarkManagement, onDismiss: {
+                store.isPresentedNaviPanel = true
+            }) { store in
                 BookmarkManagementView(store: store)
                     .preferredColorScheme(preferredColorScheme)
             }

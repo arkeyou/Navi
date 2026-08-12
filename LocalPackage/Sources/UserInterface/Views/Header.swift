@@ -16,6 +16,20 @@ struct Header: View {
             HStack(spacing: 8) {
                 Button {
                     Task {
+                        store.isPresentedNaviPanel = false
+                        await store.send(.bookmarkButtonTapped(appDependencies))
+                    }
+                } label: {
+                    Label {
+                        Text("openBookmarks", bundle: .module)
+                    } icon: {
+                        Image(systemName: "book")
+                    }
+                }
+                .buttonStyle(.toolbar)
+                .accessibilityIdentifier("openBookmarksButton")
+                Button {
+                    Task {
                         await store.send(.goBackButtonTapped)
                     }
                 } label: {
@@ -28,7 +42,7 @@ struct Header: View {
                 .buttonStyle(.toolbar)
                 .disabled(!canGoBack)
                 .accessibilityIdentifier("goBackButton")
-                Button {
+                /*Button {
                     Task {
                         await store.send(.goForwardButtonTapped)
                     }
@@ -41,7 +55,7 @@ struct Header: View {
                 }
                 .buttonStyle(.toolbar)
                 .disabled(!canGoForward)
-                .accessibilityIdentifier("goForwardButton")
+                .accessibilityIdentifier("goForwardButton")*/
                 SearchBar(store: store)
                 Button {
                     Task {
