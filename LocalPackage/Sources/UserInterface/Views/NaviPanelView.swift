@@ -152,7 +152,7 @@ struct NaviPanelView: View {
 
                     if store.naviIsRunning {
                         Button {
-                            store.updateLog(with: "Interrompido pelo usuario")
+                            store.updateLog(with: "Interrompido pelo usuario!")
                             stopAutomation()
                         } label: {
                             Label("Parar", systemImage: "square.fill")
@@ -199,7 +199,7 @@ struct NaviPanelView: View {
         print("Bloqueio de tela desativado")
         
         if NaviQueueTracker.shared.isLimitReached {
-            store.updateLog(with: "Limite dee \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A automação não permite nova execução até o próximo dia.")
+            store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A automação não permite nova execução até o próximo dia!")
 
             Task {
                 await store.send(.showPaywallButtonTapped)
@@ -253,7 +253,7 @@ struct NaviPanelView: View {
                 return
             }*/
             
-            store.updateLog(with: "\nIniciou automacao ")
+            store.updateLog(with: "\nIniciou automacao! ")
             store.naviIsRunning = true
             await am.start(naviConfig: config, sessionId: configStruct.sessionId ?? "", cookieList: cookies, monitorInterval: store.userDefaultsRepository.monitorInterval, monitorLiveOnlineInterval: store.userDefaultsRepository.monitorLiveOnlineInterval)
         }
@@ -351,7 +351,7 @@ struct NaviPanelView: View {
         store.naviIsRunning = false
         isLoadingNaviProcess = false
         store.isPaginaFoiCarregada = false
-        store.updateLog(with: "Parou automacao. Verifique o log")
+        store.updateLog(with: "Parou automacao. Verifique o log!")
 
         print("Automation stopped and cleaned up.")
         
@@ -386,7 +386,7 @@ struct NaviPanelView: View {
         do {
             while cookies.isEmpty {
                 if Task.isCancelled { return }
-                store.updateLog(with: "Waiting for cookies...")
+                store.updateLog(with: "Esperando os cookies...")
                 cookies = await getBrowserCookies()
                 try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.cookieWaitInterval))
             }
@@ -471,7 +471,7 @@ struct NaviPanelView: View {
                         store.isButtonPresentOnPage = false
                         
                         print("NAVI: achou o botao, rodando script")
-                        store.updateLog(with: "Encontrou! Executando acao! ")
+                        store.updateLog(with: "Encontrou! Executou acao! ")
                         
                         await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
                         

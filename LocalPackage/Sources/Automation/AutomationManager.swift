@@ -58,6 +58,7 @@ import Foundation
                 do {
                     sessionIdLocal = try await getSessionIdentifier(urlSessionIdentifier: urlSessionIdentifier, cookies: cookieList)
                 } catch {
+                    emit(.sendMsg(message: "\(error.localizedDescription)! ", stop: false))
                     print("\(error.localizedDescription)")
                 }
             }
@@ -82,7 +83,7 @@ import Foundation
             )
         } catch {
             print("Decoding failed: \(error.localizedDescription)")
-            emit(.sendMsg(message: "\nDecoding failed: \(error.localizedDescription)"))
+            emit(.sendMsg(message: "\nDecoding failed: \(error.localizedDescription)!"))
             return
         }
 
@@ -94,7 +95,7 @@ import Foundation
                     do {
                         _ = try await getSessionIsOpen(urlSessionInfo: urlSessionInfo, sessionId: sessionIdLocal, cookies: cookieList)
                     } catch let error as SessionError {
-                        emit(.sendMsg(message: "Session Error: \(error.message)"))
+                        emit(.sendMsg(message: "Session Error: \(error.message)!"))
                         return
                     } catch {
                         emit(.sendMsg(message: error.localizedDescription))
@@ -147,7 +148,7 @@ import Foundation
             return
         } catch {
             print("\nAutomationManager: \(error.localizedDescription)")
-            emit(.sendMsg(message: "AutomationManager: \(error.localizedDescription)"))
+            emit(.sendMsg(message: "AutomationManager: \(error.localizedDescription)!"))
             return
         }
         
@@ -204,7 +205,7 @@ import Foundation
             if (sessionIdentifier.msg == nil) {
                 for sessionListItem in sessionIdentifier.data.list {
                     if sessionListItem.status == 1 {
-                        emit(.sendMsg(message: "Encontrou live online ", stop: false))
+                        emit(.sendMsg(message: "Encontrou live online! ", stop: false))
                         return String(sessionListItem.sessionId)
                     }
                 }
