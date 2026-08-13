@@ -86,7 +86,8 @@ final class MonitorAgent {
                     codigo: item.codigo,
                     param1: item.param1,
                     param2: item.param2,
-                    url: item.url
+                    url: item.url,
+                    username: item.username
                 ),
                 status: .added,
                 createdAt: .now,
@@ -117,13 +118,16 @@ final class MonitorAgent {
         do {
             var listaJobPayload: [JobPayload] = []
             var codigos: Set<String> = []
+            var username: String = ""
             
             if let commentsResult = try? JSONDecoder().decode(CommentsResponse.self, from: data) {
                 for comment in commentsResult.data.comments {
                     let codigosComment = comment.content.matches(of: TRIGGER).map { String($0.output) }
                     print("------> Comentario: \(comment.content)")
                     print("------> REGEX: \(codigosComment)")
+                    print("------> Username: \(comment.username)")
                     codigos.formUnion(codigosComment)
+                    username = comment.username
                 }
             } else {
                 codigos = Set(
@@ -133,7 +137,7 @@ final class MonitorAgent {
             }
             
             for codigo in codigos {
-                listaJobPayload.append(JobPayload (codigo: codigo, param1: 0, param2: 0, url: ""))
+                listaJobPayload.append(JobPayload (codigo: codigo, param1: 0, param2: 0, url: "", username: username))
             }
             
             return listaJobPayload
@@ -149,63 +153,75 @@ final class MonitorAgent {
             codigo: randomCodigo(),//"BLL-ATM-RVH",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+            username: ""
         ),JobPayload (
             codigo: "CFE-QDM-TBT",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+            username: ""
         ),JobPayload (
             codigo: "ATE-AMS-FZC",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+            username: ""
         ),JobPayload (
             codigo: "FGS-RWT-ZDF",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+            username: ""
         ),JobPayload (
             codigo: "DGR-JEV-QSN",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+            username: ""
         
         )/*,JobPayload (
             codigo: "BZZ-FGN-LTQ",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+          username: ""
         ),JobPayload (
             codigo: "CJL-ERN-DSF",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+          username: ""
         ),JobPayload (
             codigo: "BXR-TRQ-NQG",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+          username: ""
         ),JobPayload (
             codigo: "BRC-KXY-FNJ",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+          username: ""
         ),JobPayload (
             codigo: "AYT-VLG-NRT",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+          username: ""
         ),JobPayload (
             codigo: "AUZ-XWT-UXU",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+          username: ""
         ),JobPayload (
             codigo: "AVW-ZPA-XYK",
             param1: 0,
             param2: 0,
-            url: ""
+            url: "",
+          username: ""
         )*/]
     }
     

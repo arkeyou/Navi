@@ -403,10 +403,10 @@ struct NaviPanelView: View {
             }
 
             switch event {
-            case .enqueuePage(let codigo, let url, let script, let scriptVerify):
-                print("Enqueue page: \(codigo) - \(url)")
+            case .enqueuePage(let codigo, let url, let username, let script, let scriptVerify):
+                print("Enqueue page: \(codigo) - \(username) - \(url)")
                 
-                _ = await queue.enqueue(url, isSubscribed: store.isSubscribed)
+                _ = await queue.enqueue(url, info: username, isSubscribed: store.isSubscribed)
                 /*if !enqueued {
                  store.updateLog(with: "\nLimite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.\n")
                  stopAutomation()
@@ -414,7 +414,7 @@ struct NaviPanelView: View {
                  return
                  }*/
                 
-                store.updateProcessed(with: "\n\(codigo)")
+                store.updateProcessed(with: "\n\(codigo) - \(username)")
                 
                 if LIKE_SCRIPT.isEmpty {
                     LIKE_SCRIPT.append(script)
@@ -450,10 +450,10 @@ struct NaviPanelView: View {
                 if Task.isCancelled { break }
                 if await !queue.isEmpty && !isLoadingNaviProcess {
                     isLoadingNaviProcess = true
-                    let url = await queue.dequeue()
+                    let (url, info) = await queue.dequeue()
                     
                     print("NAVI: abrindo pagina: \(url ?? "0")")
-                    store.updateLog(with: "Abrindo pagina!")//: \(url ?? "0")!")
+                    store.updateLog(with: "Abrindo pagina (\(info ?? "sem username"))!")//: \(url ?? "0")!")
                     
                     store.inputText = url ?? "0"
                     await store.send(.onSubmit(url ?? "0"))

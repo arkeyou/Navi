@@ -10,5 +10,6 @@ struct JobPayload: Codable {
     var param1: Int64 //shopID
     var param2: Int64 //itemID
     var url: String
+    var username: String
     
 }

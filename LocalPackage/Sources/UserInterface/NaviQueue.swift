@@ -7,12 +7,13 @@ import DataSource
 
 actor NaviQueue<T> {
     private var items: [T] = []
+    private var infos: [String] = []
     private var head = 0
 
     /// Enqueues an item if daily limit has not been reached or if user is subscribed.
     /// Returns true if item was enqueued successfully, false if daily limit was reached.
     @discardableResult
-    func enqueue(_ item: T, isSubscribed: Bool = false) -> Bool {
+    func enqueue(_ item: T, info: String = "", isSubscribed: Bool = false) -> Bool {
         guard NaviQueueTracker.shared.canEnqueue(isSubscribed: isSubscribed) else {
             return false
         }
@@ -23,22 +24,25 @@ actor NaviQueue<T> {
         }
 
         items.append(item)
+        infos.append(info)
         return true
     }
 
-    func dequeue() -> T? {
-        guard head < items.count else { return nil }
+    func dequeue() -> (T?, String?) {
+        guard head < items.count else { return (nil, nil) }
 
         let item = items[head]
+        let info = infos[head]
         head += 1
 
         // Compactação periódica
         if head > 100 && head > items.count / 2 {
             items.removeFirst(head)
+            infos.removeFirst(head)
             head = 0
         }
 
-        return item
+        return (item, info)
     }
 
     var isEmpty: Bool {
