@@ -117,7 +117,8 @@ final class MonitorAgent {
         
         do {
             var listaJobPayload: [JobPayload] = []
-            var codigos: Set<String> = []
+            //var codigos: Set<String> = []
+            var codigos: [String: String] = [:]
             var username: String = ""
             
             if let commentsResult = try? JSONDecoder().decode(CommentsResponse.self, from: data) {
@@ -126,18 +127,22 @@ final class MonitorAgent {
                     print("------> Comentario: \(comment.content)")
                     print("------> REGEX: \(codigosComment)")
                     print("------> Username: \(comment.username)")
-                    codigos.formUnion(codigosComment)
+                    //codigos.formUnion(codigosComment)
+                    codigos = codigosComment.reduce(into: codigos) { resultado, codigo in
+                        resultado[codigo] = comment.username
+                    }
                     username = comment.username
                 }
             } else {
-                codigos = Set(
-                    String(data: data, encoding: .utf8)?
-                        .matches(of: TRIGGER)
-                        .map { String($0.output) } ?? [])
+                codigos = String(data: data, encoding: .utf8)?
+                    .matches(of: TRIGGER)
+                    .reduce(into: [String: String]()) { result, match in
+                        result[String(match.output)] = "pending"
+                    } ?? [:]
             }
             
             for codigo in codigos {
-                listaJobPayload.append(JobPayload (codigo: codigo, param1: 0, param2: 0, url: "", username: username))
+                listaJobPayload.append(JobPayload (codigo: codigo.key, param1: 0, param2: 0, url: "", username: codigo.value))
             }
             
             return listaJobPayload
