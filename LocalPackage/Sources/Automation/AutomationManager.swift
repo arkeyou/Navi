@@ -197,7 +197,8 @@ import Foundation
         
         guard let httpResponse = response as? HTTPURLResponse,
               200...299 ~= httpResponse.statusCode else {
-            throw URLError(.badServerResponse)
+            //throw URLError(.badServerResponse)
+            throw SessionError.error("Session HTTPResponse Error: \(String(describing: String(data: data, encoding: .utf8)))")
         }
         do {
 
