@@ -13,6 +13,7 @@ enum JobStatus: String, Codable {
     case isValidating
     case dupe
     case valid
+    case notFound
 
     // ActionAgent
     case isRunning

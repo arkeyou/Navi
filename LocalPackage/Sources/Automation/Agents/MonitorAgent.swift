@@ -23,7 +23,7 @@ final class MonitorAgent {
         triggerMonitor: String,
         sessionId: String,
         cookieList: String,
-        monitorInterval: Duration = .seconds(4)
+        monitorInterval: Duration
     ) {
 
         self.store = store
@@ -119,7 +119,6 @@ final class MonitorAgent {
             var listaJobPayload: [JobPayload] = []
             //var codigos: Set<String> = []
             var codigos: [String: String] = [:]
-            var username: String = ""
             
             if let commentsResult = try? JSONDecoder().decode(CommentsResponse.self, from: data) {
                 for comment in commentsResult.data.comments {
@@ -131,7 +130,6 @@ final class MonitorAgent {
                     codigos = codigosComment.reduce(into: codigos) { resultado, codigo in
                         resultado[codigo] = comment.username
                     }
-                    username = comment.username
                 }
             } else {
                 codigos = String(data: data, encoding: .utf8)?

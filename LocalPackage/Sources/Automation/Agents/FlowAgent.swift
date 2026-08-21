@@ -88,7 +88,7 @@ final class FlowAgent {
                 await store.update(current)
             } else {
                 //TODO lancar erro ja q nao foi possivel encontrar o codigo na api
-                current.status = .valid
+                current.status = .notFound
                 current.updatedAt = .now
                 await store.update(current)
             }

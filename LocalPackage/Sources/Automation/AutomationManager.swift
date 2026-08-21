@@ -40,8 +40,8 @@ import Foundation
         naviConfig: String,
         sessionId: String = "",
         cookieList: String,
-        monitorInterval: Double = 4,
-        monitorLiveOnlineInterval: Double = 20
+        monitorInterval: Double,
+        monitorLiveOnlineInterval: Double
     ) async {
 
         guard !isRunning else {
@@ -117,8 +117,15 @@ import Foundation
             for await job in stream {
                 if Task.isCancelled { break }
                 
-                guard job.status == .ok
-                else { continue }
+                switch job.status {
+                case .notFound:
+                    emit(.sendMsg(message: "Codigo nao encontrado: \(job.payload.codigo) (\(job.payload.username)) ", stop: false))
+                    continue
+                case .ok:
+                    break
+                default:
+                    continue
+                }
                 
                 print("AutomationManager - enviando pro browser: \(job.payload.codigo)")
                 emit(.enqueuePage(codigo: job.payload.codigo, url: job.payload.url, username: job.payload.username, script: config.script, scriptVerify: config.scriptVerify))
