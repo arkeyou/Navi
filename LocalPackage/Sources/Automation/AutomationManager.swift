@@ -128,7 +128,7 @@ import Foundation
                 }
                 
                 print("AutomationManager - enviando pro browser: \(job.payload.codigo)")
-                emit(.enqueuePage(codigo: job.payload.codigo, url: job.payload.url, username: job.payload.username, script: config.script, scriptVerify: config.scriptVerify))
+                emit(.enqueuePage(codigo: job.payload.codigo, url: job.payload.url, username: job.payload.username, script: config.script, scriptVerify: config.scriptVerify, script2: config.script2, scriptVerify2: config.scriptVerify2))
             }
             //await syncJobs()
         }

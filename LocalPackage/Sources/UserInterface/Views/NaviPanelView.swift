@@ -50,7 +50,9 @@ struct NaviPanelView: View {
     @State private var processedText: String = ""
     @State private var queue: NaviQueue<String> = NaviQueue<String>()
     @State private var LIKE_SCRIPT = ""
+    @State private var UNLIKE_SCRIPT = ""
     @State private var VERIFY_SCRIPT = ""
+    @State private var VERIFY_SCRIPT2 = ""
     @State private var runTask: Task<Void, Never>? = nil
     @State private var processingTask: Task<Void, Never>? = nil
     @State private var enqueuingTask: Task<Void, Never>? = nil
@@ -403,7 +405,7 @@ struct NaviPanelView: View {
             }
 
             switch event {
-            case .enqueuePage(let codigo, let url, let username, let script, let scriptVerify):
+            case .enqueuePage(let codigo, let url, let username, let script, let scriptVerify, let script2, let scriptVerify2):
                 print("Enqueue page: \(codigo) - \(username) - \(url)")
                 
                 _ = await queue.enqueue(url, info: username, isSubscribed: store.isSubscribed)
@@ -421,6 +423,13 @@ struct NaviPanelView: View {
                 }
                 if VERIFY_SCRIPT.isEmpty {
                     VERIFY_SCRIPT.append(scriptVerify)
+                }
+                
+                if UNLIKE_SCRIPT.isEmpty {
+                    UNLIKE_SCRIPT.append(script2)
+                }
+                if VERIFY_SCRIPT2.isEmpty {
+                    VERIFY_SCRIPT2.append(scriptVerify2)
                 }
             case .sendMsg(let msg, let stop):
                 print(msg)
@@ -463,7 +472,7 @@ struct NaviPanelView: View {
                 if isLoadingNaviProcess && store.isPaginaFoiCarregada {
                     //print("NAVI: esperando botao aparecer...")
                     await store.send(.scriptRunVerify(VERIFY_SCRIPT))
-                    store.updateLog(with: "Buscando na tela")
+                    store.updateLog(with: "Buscando like na tela")
                     
                     HapticManager.shared.trigger(.warning)
                     
@@ -471,7 +480,7 @@ struct NaviPanelView: View {
                         store.isButtonPresentOnPage = false
                         
                         print("NAVI: achou o botao, rodando script")
-                        store.updateLog(with: "Encontrou! Executou acao! ")
+                        store.updateLog(with: "Encontrou! Executou like! ")
                         
                         await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
                         
@@ -483,6 +492,22 @@ struct NaviPanelView: View {
                             store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.")
                             stopAutomation()
                             await store.send(.showPaywallButtonTapped)
+                        }
+                    } else {
+                        await store.send(.scriptRunVerify(VERIFY_SCRIPT2))
+                        store.updateLog(with: "Buscando unlike na tela")
+                        
+                        HapticManager.shared.trigger(.warning)
+                        
+                        if (store.isButtonPresentOnPage) {
+                            store.isButtonPresentOnPage = false
+                            
+                            store.updateLog(with: "Encontrou! Executou unlike! ")
+                            
+                            await store.send(.scriptRunButtonTapped(UNLIKE_SCRIPT))
+                            
+                            try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.likeWaitInterval))
+                            
                         }
                     }
                     continue

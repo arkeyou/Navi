@@ -10,6 +10,8 @@ struct NaviConfig: Decodable {
     var urlAction: String = ""
     var script: String = ""
     var scriptVerify: String = ""
+    var script2: String = ""
+    var scriptVerify2: String = ""
     var urlSessionInfo: String?
     var urlSessionIdentifier: String?
 }
