@@ -462,7 +462,7 @@ struct NaviPanelView: View {
                     let (url, info) = await queue.dequeue()
                     
                     print("NAVI: abrindo pagina: \(url ?? "0")")
-                    store.updateLog(with: "Abrindo pagina (\(info ?? "sem username"))!")//: \(url ?? "0")!")
+                    store.updateLog(with: "Abrindo pagina (\(info ?? "sem username"))! ")//: \(url ?? "0")!")
                     
                     store.inputText = url ?? "0"
                     await store.send(.onSubmit(url ?? "0"))
