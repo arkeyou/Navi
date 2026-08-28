@@ -12,6 +12,76 @@ struct SettingsView: View {
         NavigationStack(path: $store.path) {
             List {
                 Section {
+                    Button {
+                        isPresentedPaywall = true
+                    } label: {
+                        LabeledContent {
+                            HStack {
+                                Text(NaviQueueTracker.shared.isSubscribed ? "Ativa" : "Ver planos")
+                                    .foregroundStyle(NaviQueueTracker.shared.isSubscribed ? Color.green : Color.secondary)
+                                Image(systemName: "chevron.right")
+                            }
+                        } label: {
+                            Label {
+                                Text("Assinatura Navi Premium")
+                                    .foregroundStyle(Color.primary)
+                            } icon: {
+                                Image(systemName: "sparkles")
+                                    .foregroundStyle(Color.purple)
+                            }
+                        }
+                    }
+                    .buttonStyle(.borderless)
+                } header: {
+                    Text("Assinatura & IAP")
+                }
+
+                Section {
+                    intervalRow(
+                        title: "Verifica Live Online",
+                        subtitle: "Tempo entre verificações para confirmar se a live está online.",
+                        value: $store.monitorLiveOnlineInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeMonitorLiveOnlineInterval(newValue)) }
+                        }
+                    )
+                    intervalRow(
+                        title: "Monitora Mensagens",
+                        subtitle: "Tempo entre leituras de novas mensagens durante a automação.",
+                        value: $store.monitorInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeMonitorInterval(newValue)) }
+                        }
+                    )
+                    intervalRow(
+                        title: "Processa Codigos Validados",
+                        subtitle: "Espera antes de processar códigos que já foram validados.",
+                        value: $store.idsWaitInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeIdsWaitInterval(newValue)) }
+                        }
+                    )
+                    intervalRow(
+                        title: "Verifica Tela",
+                        subtitle: "Intervalo usado para aguardar e conferir mudanças na tela.",
+                        value: $store.likeWaitInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeLikeWaitInterval(newValue)) }
+                        }
+                    )
+                    intervalRow(
+                        title: "Espera Cookie",
+                        subtitle: "Tempo máximo de espera para carregar ou detectar cookies necessários.",
+                        value: $store.cookieWaitInterval,
+                        onChange: { newValue in
+                            Task { await store.send(.onChangeCookieWaitInterval(newValue)) }
+                        }
+                    )
+                } header: {
+                    Text("Intervalos de Automação (segundos)")
+                }
+                
+                Section {
                     Picker(selection: $store.appearance) {
                         ForEach(Appearance.allCases, id: \.self) { appearance in
                             Text(appearance.label)
@@ -82,75 +152,7 @@ struct SettingsView: View {
                     Text("settings", bundle: .module)
                 }
 
-                Section {
-                    intervalRow(
-                        title: "Verifica Live Online",
-                        subtitle: "Tempo entre verificações para confirmar se a live está online.",
-                        value: $store.monitorLiveOnlineInterval,
-                        onChange: { newValue in
-                            Task { await store.send(.onChangeMonitorLiveOnlineInterval(newValue)) }
-                        }
-                    )
-                    intervalRow(
-                        title: "Monitora Mensagens",
-                        subtitle: "Tempo entre leituras de novas mensagens durante a automação.",
-                        value: $store.monitorInterval,
-                        onChange: { newValue in
-                            Task { await store.send(.onChangeMonitorInterval(newValue)) }
-                        }
-                    )
-                    intervalRow(
-                        title: "Processa Codigos Validados",
-                        subtitle: "Espera antes de processar códigos que já foram validados.",
-                        value: $store.idsWaitInterval,
-                        onChange: { newValue in
-                            Task { await store.send(.onChangeIdsWaitInterval(newValue)) }
-                        }
-                    )
-                    intervalRow(
-                        title: "Verifica Tela",
-                        subtitle: "Intervalo usado para aguardar e conferir mudanças na tela.",
-                        value: $store.likeWaitInterval,
-                        onChange: { newValue in
-                            Task { await store.send(.onChangeLikeWaitInterval(newValue)) }
-                        }
-                    )
-                    intervalRow(
-                        title: "Espera Cookie",
-                        subtitle: "Tempo máximo de espera para carregar ou detectar cookies necessários.",
-                        value: $store.cookieWaitInterval,
-                        onChange: { newValue in
-                            Task { await store.send(.onChangeCookieWaitInterval(newValue)) }
-                        }
-                    )
-                } header: {
-                    Text("Intervalos de Automação (s)")
-                }
-
-                Section {
-                    Button {
-                        isPresentedPaywall = true
-                    } label: {
-                        LabeledContent {
-                            HStack {
-                                Text(NaviQueueTracker.shared.isSubscribed ? "Ativa" : "Ver planos")
-                                    .foregroundStyle(NaviQueueTracker.shared.isSubscribed ? Color.green : Color.secondary)
-                                Image(systemName: "chevron.right")
-                            }
-                        } label: {
-                            Label {
-                                Text("Assinatura Navi Premium")
-                                    .foregroundStyle(Color.primary)
-                            } icon: {
-                                Image(systemName: "sparkles")
-                                    .foregroundStyle(Color.purple)
-                            }
-                        }
-                    }
-                    .buttonStyle(.borderless)
-                } header: {
-                    Text("Assinatura & IAP")
-                }
+                
                 Section {
                     LabeledContent {
                         Text(store.version)

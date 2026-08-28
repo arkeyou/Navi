@@ -50,6 +50,14 @@ public final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate, Ob
         preferences: WKWebpagePreferences
     ) async -> (WKNavigationActionPolicy, WKWebpagePreferences) {
         preferences.preferredContentMode = .mobile
+
+        if navigationAction.navigationType == .linkActivated,
+           let url = navigationAction.request.url,
+           ["http", "https"].contains(url.scheme?.lowercased()) {
+            webView.load(navigationAction.request)
+            return (.cancel, preferences)
+        }
+
         let actionPolicy = await store.decidePolicy(for: navigationAction.request)
         return (actionPolicy, preferences)
     }
