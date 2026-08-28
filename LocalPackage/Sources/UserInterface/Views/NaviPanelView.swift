@@ -512,7 +512,7 @@ struct NaviPanelView: View {
                     }
                     continue
                 }
-                store.updateLog(with: "·", lineBreak: false)
+                store.updateLog(with: "·", lineBreak: false)//era "."
             }
         } catch {
             print("Parou processamento na tela")
