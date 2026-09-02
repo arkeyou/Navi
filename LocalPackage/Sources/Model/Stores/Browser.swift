@@ -81,7 +81,7 @@ import WebUI
         isPresentedConfirmationDialog: Bool = false,
         isPresentedAlert: Bool = false,
         naviPanelSelection: NaviPanelSelection = .script,
-        scriptText: String = "",
+        scriptText: String = "alert(\"Escreva seus scripts aqui\")",
         scriptFileName: String = "Sem titulo",
         pendingScriptFileName: String = "",
         isPresentedScriptSaveDialog: Bool = false,
@@ -330,6 +330,16 @@ import WebUI
                 naviPanelMessage = "Script executado."
             } catch {
                 naviPanelMessage = error.localizedDescription
+                let details = """
+                    Ocorreu um erro ao executar o JavaScript.
+                    
+                    Mensagem: \((error as NSError).userInfo["NSLocalizedDescription"] ?? "-")
+                    Linha: \((error as NSError).userInfo["WKJavaScriptExceptionLineNumber"] ?? "-")
+                    Coluna: \((error as NSError).userInfo["WKJavaScriptExceptionColumnNumber"] ?? "-")
+                    Detalhes: \((error as NSError).userInfo["WKJavaScriptExceptionMessage"] ?? "Erro desconhecido")
+                    """
+                updateLog(with: details)
+                print(details)
         }
 
         case let .scriptRunVerify(scriptToExecute):

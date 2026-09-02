@@ -241,6 +241,11 @@ struct NaviPanelView: View {
                     config = try await buscaConfiguracoes(npoint: configStruct.npoint ?? "", secret: configStruct.secret ?? "")
                 }
             } catch {
+                if (!store.scriptText.starts(with: "{")) {
+                    await store.send(.scriptRunButtonTapped(store.scriptText))
+                    stopAutomation()
+                    return
+                }
                 print(error)
                 store.updateLog(with: "buscaConfiguracoes: \(error.localizedDescription)")
                 stopAutomation()

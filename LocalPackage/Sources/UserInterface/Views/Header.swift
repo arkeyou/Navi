@@ -91,7 +91,7 @@ struct Header: View {
                     .labelStyle(.iconOnly)
                 }
                 .buttonStyle(.borderless)
-                .tint(Color(.systemGray))
+                //.tint(Color(.systemGray))
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 16)
