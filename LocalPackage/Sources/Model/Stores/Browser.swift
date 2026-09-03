@@ -52,6 +52,7 @@ import WebUI
     public var logText: String
     public var processedText: String
     public var naviPanelMessage: String?
+    public var scriptHasError: Bool
     public var isPageLoading: Bool
     public var isPaginaFoiCarregada: Bool
     public let navigationDelegate: BrowserNavigationDelegate
@@ -94,6 +95,7 @@ import WebUI
         logText: String = "",
         processedText: String = "",
         naviPanelMessage: String? = nil,
+        scriptHasError: Bool = false,
         isPageLoading: Bool = false,
         isPaginaFoiCarregada: Bool = false,
         isPresentedPaywall: Bool = false,
@@ -138,6 +140,7 @@ import WebUI
         self.logText = logText
         self.processedText = processedText
         self.naviPanelMessage = naviPanelMessage
+        self.scriptHasError = scriptHasError
         self.isPageLoading = isPageLoading
         self.isPaginaFoiCarregada = isPaginaFoiCarregada
         self.isPresentedPaywall = isPresentedPaywall
@@ -322,11 +325,12 @@ import WebUI
             } catch {
                 naviPanelMessage = error.localizedDescription
             }
-
-        case let .scriptRunButtonTapped(scriptToExecute):
+        
+        case let .scriptRunJavascriptButtonTapped(scriptToExecute):
             do {
                 let result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
                 print(result)
+                updateProcessed(with: "\(result.map { String(describing: $0) } ?? "-")\n")
                 naviPanelMessage = "Script executado."
             } catch {
                 naviPanelMessage = error.localizedDescription
@@ -339,7 +343,17 @@ import WebUI
                     Detalhes: \((error as NSError).userInfo["WKJavaScriptExceptionMessage"] ?? "Erro desconhecido")
                     """
                 updateLog(with: details)
-                print(details)
+                scriptHasError = true
+        }
+        
+        case let .scriptRunButtonTapped(scriptToExecute):
+            do {
+                let result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
+                print(result)
+                naviPanelMessage = "Script executado."
+            } catch {
+                naviPanelMessage = error.localizedDescription
+                updateLog(with: error.localizedDescription)
         }
 
         case let .scriptRunVerify(scriptToExecute):
@@ -698,6 +712,7 @@ import WebUI
         case scriptSelected(URL)
         case deleteScript(URL)
         case scriptRunButtonTapped(String)
+        case scriptRunJavascriptButtonTapped(String)
         case scriptRunVerify(String)
         case processedUpdated(String)
         case clearLogButtonTapped

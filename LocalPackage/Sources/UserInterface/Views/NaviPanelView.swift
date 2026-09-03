@@ -242,8 +242,18 @@ struct NaviPanelView: View {
                 }
             } catch {
                 if (!store.scriptText.starts(with: "{")) {
-                    await store.send(.scriptRunButtonTapped(store.scriptText))
-                    stopAutomation()
+                    store.updateLog(with: "\nIniciou automacao! ")
+                    store.naviIsRunning = true
+                    store.scriptHasError = false
+                    while !Task.isCancelled {
+                        await store.send(.scriptRunJavascriptButtonTapped(store.scriptText))
+                        if store.scriptHasError {
+                            stopAutomation()
+                            break
+                        }
+                        try? await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.idsWaitInterval))
+                    }
+                    //stopAutomation()
                     return
                 }
                 print(error)
