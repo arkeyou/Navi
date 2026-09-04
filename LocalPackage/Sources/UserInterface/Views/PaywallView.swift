@@ -120,7 +120,7 @@ public struct PaywallView: View {
                         .font(.headline)
                         .foregroundStyle(.primary)
 
-                    Text("\(queueTracker.countToday) de \(NaviQueueConfig.dailyLimit) envios na NaviQueue utilizados")
+                    Text("\(queueTracker.countToday) de \(NaviQueueConfig.dailyLimit) processamentos utilizados")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -135,7 +135,7 @@ public struct PaywallView: View {
                     .font(.subheadline)
                     .foregroundStyle(.blue)
 
-                Text("O seu limite diário será zerado amanhã e permitirá novos envios, ou assine um plano abaixo para liberar o envio ilimitado agora mesmo.")
+                Text("O seu limite diário será zerado amanhã e permitirá novos processamentos, ou assine um plano abaixo para liberar agora mesmo.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -185,7 +185,7 @@ public struct PaywallView: View {
                                 }
                             }
 
-                            Text("Envios ilimitados na NaviQueue")
+                            Text("Processamentos ilimitados")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -293,7 +293,7 @@ public struct PaywallView: View {
                     }
                 }
             } label: {
-                Text("Restaurar IAP")
+                Text("Restaurar Compras")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)

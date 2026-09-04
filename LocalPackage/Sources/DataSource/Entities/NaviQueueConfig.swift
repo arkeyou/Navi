@@ -9,5 +9,5 @@ import Foundation
 public struct NaviQueueConfig: Sendable {
     /// Maximum number of IDs added to `NaviQueue` per day for free users.
     /// Parameterized and fixed in internal application settings (requires new deploy to change).
-    public static let dailyLimit: Int = 2
+    public static let dailyLimit: Int = 10
 }

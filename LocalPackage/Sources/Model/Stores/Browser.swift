@@ -331,7 +331,7 @@ import WebUI
                 let result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
                 print(result)
                 updateProcessed(with: "\(result.map { String(describing: $0) } ?? "-")\n")
-                naviPanelMessage = "Script executado."
+                //naviPanelMessage = "Script executado."
             } catch {
                 naviPanelMessage = error.localizedDescription
                 let details = """

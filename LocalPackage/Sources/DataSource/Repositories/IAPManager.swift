@@ -66,7 +66,7 @@ public final class IAPManager {
             IAPPlan(
                 id: Self.monthlyProductID,
                 title: "Plano Mensal",
-                priceText: "R$ 100",
+                priceText: "R$ 99,90",
                 periodText: "/ mês",
                 rawPrice: 100.0,
                 savingsBadge: nil
@@ -74,7 +74,7 @@ public final class IAPManager {
             IAPPlan(
                 id: Self.annualProductID,
                 title: "Plano Anual",
-                priceText: "R$ 1.000",
+                priceText: "R$ 999,90",
                 periodText: "/ ano",
                 rawPrice: 1000.0,
                 savingsBadge: "Economize 16%"

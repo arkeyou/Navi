@@ -201,7 +201,7 @@ struct NaviPanelView: View {
         print("Bloqueio de tela desativado")
         
         if NaviQueueTracker.shared.isLimitReached {
-            store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A automação não permite nova execução até o próximo dia!")
+            store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) processamentos atingido para hoje. A automação não permite nova execução até o próximo dia!")
 
             Task {
                 await store.send(.showPaywallButtonTapped)
@@ -258,8 +258,8 @@ struct NaviPanelView: View {
                 }
                 print(error)
                 store.updateLog(with: "buscaConfiguracoes: \(error.localizedDescription)")
-                stopAutomation()
-                return
+                //stopAutomation()
+                //return
             }
             
             /*if (configStruct.sessionId?.isEmpty == true && configStruct.urlInicial?.isEmpty == false) {
@@ -504,7 +504,7 @@ struct NaviPanelView: View {
                         isLoadingNaviProcess = false
                         
                         if await queue.isEmpty && NaviQueueTracker.shared.isLimitReached {
-                            store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) envios atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.")
+                            store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) processamentos atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.")
                             stopAutomation()
                             await store.send(.showPaywallButtonTapped)
                         }
