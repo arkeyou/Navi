@@ -215,10 +215,10 @@ struct NaviPanelView: View {
                         
             if cookies.isEmpty {
                 cookies = await getBrowserCookies()
-                if cookies.isEmpty {
+                /*if cookies.isEmpty {
                     store.inputText = "shopee.com.br"
                     await store.send(.onSubmit("shopee.com.br"))
-                }
+                }*/
             }
             
             while cookies.isEmpty {
@@ -361,9 +361,13 @@ struct NaviPanelView: View {
         
         am.stop()
         
-        queue = NaviQueue<String>()
-        LIKE_SCRIPT = ""
-        VERIFY_SCRIPT = ""
+        //TODO Verificar uma melhor forma de zerar o script quando a rotina parar
+        // Esse trecho comentado e importante para stop e resume da lista processados
+        //queue = NaviQueue<String>()
+        //LIKE_SCRIPT = ""
+        //VERIFY_SCRIPT = ""
+        //UNLIKE_SCRIPT = ""
+        //VERIFY_SCRIPT2 = ""
         
         store.naviIsRunning = false
         isLoadingNaviProcess = false
@@ -487,7 +491,7 @@ struct NaviPanelView: View {
                 if isLoadingNaviProcess && store.isPaginaFoiCarregada {
                     //print("NAVI: esperando botao aparecer...")
                     await store.send(.scriptRunVerify(VERIFY_SCRIPT))
-                    store.updateLog(with: "Buscando like na tela")
+                    store.updateLog(with: "Verificando 1o na tela")
                     
                     HapticManager.shared.trigger(.warning)
                     
@@ -495,9 +499,14 @@ struct NaviPanelView: View {
                         store.isButtonPresentOnPage = false
                         
                         print("NAVI: achou o botao, rodando script")
-                        store.updateLog(with: "Encontrou! Executou like! ")
+                        store.updateLog(with: "Encontrou! Executou 1a acao! ")
                         
                         await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
+                        
+                        print(store.isButtonPressed)
+                        if (!store.isButtonPressed!) {
+                            stopAutomation()
+                        }
                         
                         try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.likeWaitInterval))
                         store.isPaginaFoiCarregada = false
@@ -510,14 +519,14 @@ struct NaviPanelView: View {
                         }
                     } else {
                         await store.send(.scriptRunVerify(VERIFY_SCRIPT2))
-                        store.updateLog(with: "Buscando unlike na tela")
+                        store.updateLog(with: "Verifiando 2o na tela")
                         
                         HapticManager.shared.trigger(.warning)
                         
                         if (store.isButtonPresentOnPage) {
                             store.isButtonPresentOnPage = false
                             
-                            store.updateLog(with: "Encontrou! Executou unlike! ")
+                            store.updateLog(with: "Encontrou! Executou 2a acao! ")
                             
                             await store.send(.scriptRunButtonTapped(UNLIKE_SCRIPT))
                             
@@ -545,6 +554,7 @@ struct NaviPanelView: View {
                 Button(role: .destructive) {
                     Task {
                         await store.send(clearAction)
+                        queue = NaviQueue<String>()
                     }
                 } label: {
                     Label("Limpar", systemImage: "trash")

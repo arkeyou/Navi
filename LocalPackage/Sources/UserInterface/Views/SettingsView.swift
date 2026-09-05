@@ -38,14 +38,6 @@ struct SettingsView: View {
 
                 Section {
                     intervalRow(
-                        title: "Executa Script",
-                        subtitle: "Espera antes de executar o script.",
-                        value: $store.idsWaitInterval,
-                        onChange: { newValue in
-                            Task { await store.send(.onChangeIdsWaitInterval(newValue)) }
-                        }
-                    )
-                    /*intervalRow(
                         title: "Verifica Live Online",
                         subtitle: "Tempo entre verificações para confirmar se a live está online.",
                         value: $store.monitorLiveOnlineInterval,
@@ -54,7 +46,7 @@ struct SettingsView: View {
                         }
                     )
                     intervalRow(
-                        title: "Monitora Mensagens",
+                        title: "Monitora Mensagens (MONITOR)",
                         subtitle: "Tempo entre leituras de novas mensagens durante a automação.",
                         value: $store.monitorInterval,
                         onChange: { newValue in
@@ -62,15 +54,15 @@ struct SettingsView: View {
                         }
                     )
                     intervalRow(
-                        title: "Processa Codigos Validados",
+                        title: "Processa Codigos Validados (FLOW)",
                         subtitle: "Espera antes de processar códigos que já foram validados.",
                         value: $store.idsWaitInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeIdsWaitInterval(newValue)) }
                         }
-                    )*/
-                    /*intervalRow(
-                        title: "Verifica Tela",
+                    )
+                    intervalRow(
+                        title: "Verifica Tela (ACTION)",
                         subtitle: "Intervalo usado para aguardar e conferir mudanças na tela.",
                         value: $store.likeWaitInterval,
                         onChange: { newValue in
@@ -84,7 +76,7 @@ struct SettingsView: View {
                         onChange: { newValue in
                             Task { await store.send(.onChangeCookieWaitInterval(newValue)) }
                         }
-                    )*/
+                    )
                 } header: {
                     Text("Intervalos de Automação (segundos)")
                 }

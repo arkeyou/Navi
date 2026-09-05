@@ -10,7 +10,7 @@ final class MonitorAgent {
 
     private var URL_MONITOR: String
     private var SESSION_ID: String
-    private var TRIGGER: Regex<Substring>
+    private var TRIGGER_MONITOR: Regex<Substring>
     private let monitorInterval: Duration
     
     private let store: JobStore
@@ -28,7 +28,7 @@ final class MonitorAgent {
 
         self.store = store
         self.URL_MONITOR = urlMonitor
-        self.TRIGGER = try! Regex(triggerMonitor)
+        self.TRIGGER_MONITOR = try! Regex(triggerMonitor)
         self.SESSION_ID = sessionId
         self.cookies = cookieList
         self.monitorInterval = monitorInterval
@@ -122,7 +122,7 @@ final class MonitorAgent {
             
             if let commentsResult = try? JSONDecoder().decode(CommentsResponse.self, from: data) {
                 for comment in commentsResult.data.comments {
-                    let codigosComment = comment.content.matches(of: TRIGGER).map { String($0.output) }
+                    let codigosComment = comment.content.matches(of: TRIGGER_MONITOR).map { String($0.output) }
                     print("------> Comentario: \(comment.content)")
                     print("------> REGEX: \(codigosComment)")
                     print("------> Username: \(comment.username)")
@@ -133,7 +133,7 @@ final class MonitorAgent {
                 }
             } else {
                 codigos = String(data: data, encoding: .utf8)?
-                    .matches(of: TRIGGER)
+                    .matches(of: TRIGGER_MONITOR)
                     .reduce(into: [String: String]()) { result, match in
                         result[String(match.output)] = "pending"
                     } ?? [:]
@@ -152,38 +152,63 @@ final class MonitorAgent {
     
     private func fetchApiChangesMock() async throws -> [JobPayload] {
         
-        return [JobPayload (
+        return [/*JobPayload (
             codigo: randomCodigo(),//"BLL-ATM-RVH",
             param1: 0,
             param2: 0,
             url: "",
             username: ""
-        ),JobPayload (
+        ),*/JobPayload (
             codigo: "CFE-QDM-TBT",
             param1: 0,
             param2: 0,
             url: "",
-            username: ""
+            username: "CFE-QDM-TBT"
         ),JobPayload (
             codigo: "ATE-AMS-FZC",
             param1: 0,
             param2: 0,
             url: "",
-            username: ""
+            username: "CFE-QDM-TBT"
         ),JobPayload (
             codigo: "FGS-RWT-ZDF",
             param1: 0,
             param2: 0,
             url: "",
-            username: ""
+            username: "CFE-QDM-TBT"
         ),JobPayload (
             codigo: "DGR-JEV-QSN",
             param1: 0,
             param2: 0,
             url: "",
-            username: ""
-        
-        )/*,JobPayload (
+            username: "CFE-QDM-TBT"
+        )
+            /*JobPayload (
+                codigo: "TAM3330",
+                param1: 0,
+                param2: 0,
+                url: "",
+                username: "TAM3330"
+            ),JobPayload (
+                codigo: "AZU2658",
+                param1: 0,
+                param2: 0,
+                url: "",
+                username: "AZU2658"
+            ),JobPayload (
+                codigo: "GLO2059",
+                param1: 0,
+                param2: 0,
+                url: "",
+                username: "GLO2059"
+            ),JobPayload (
+                codigo: "TAM3672",
+                param1: 0,
+                param2: 0,
+                url: "",
+                username: "TAM3672"
+            )*/
+            /*,JobPayload (
             codigo: "BZZ-FGN-LTQ",
             param1: 0,
             param2: 0,
