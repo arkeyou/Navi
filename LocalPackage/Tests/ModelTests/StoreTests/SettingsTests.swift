@@ -42,7 +42,7 @@ struct SettingsTests {
             id: UUID(),
             action: { _ in }
         )
-        await sut.send(.crearCacheButtonTapped)
+        await sut.send(.clearCacheButtonTapped)
         #expect(removedData.withLock(\.self) == [WKWebsiteDataTypeCookies])
     }
 

@@ -47,12 +47,12 @@ final class MonitorAgent {
                     
                     
                     var i = 0;
-                    print("------------")
+                    print("automation ------------")
                     await store.all().filter{ $0.status != JobStatus.dupe }.forEach {
                         i += 1
                         print("\(i): \($0.payload.codigo) - \($0.status)")
                     }
-                    print("------------")
+                    print("automation ------------")
                     //await dump(store.all())
                 }
             } catch is CancellationError {
@@ -135,7 +135,7 @@ final class MonitorAgent {
                 codigos = String(data: data, encoding: .utf8)?
                     .matches(of: TRIGGER_MONITOR)
                     .reduce(into: [String: String]()) { result, match in
-                        result[String(match.output)] = "pending"
+                        result[String(match.output)] = ""
                     } ?? [:]
             }
             
@@ -158,7 +158,7 @@ final class MonitorAgent {
             param2: 0,
             url: "",
             username: ""
-        ),*/JobPayload (
+        ),JobPayload (
             codigo: "CFE-QDM-TBT",
             param1: 0,
             param2: 0,
@@ -182,8 +182,8 @@ final class MonitorAgent {
             param2: 0,
             url: "",
             username: "CFE-QDM-TBT"
-        )
-            /*JobPayload (
+        )*/
+            JobPayload (
                 codigo: "TAM3330",
                 param1: 0,
                 param2: 0,
@@ -207,7 +207,7 @@ final class MonitorAgent {
                 param2: 0,
                 url: "",
                 username: "TAM3672"
-            )*/
+            )
             /*,JobPayload (
             codigo: "BZZ-FGN-LTQ",
             param1: 0,

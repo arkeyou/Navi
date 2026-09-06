@@ -135,7 +135,7 @@ struct SettingsView: View {
                     LabeledContent {
                         Button(role: .destructive) {
                             Task {
-                                await store.send(.crearCacheButtonTapped)
+                                await store.send(.clearCacheButtonTapped)
                             }
                         } label: {
                             Text("clear", bundle: .module)

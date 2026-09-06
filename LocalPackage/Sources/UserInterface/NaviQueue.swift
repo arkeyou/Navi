@@ -52,4 +52,13 @@ actor NaviQueue<T> {
     var count: Int {
         items.count - head
     }
+    
+    func list() {
+        var i: Int = 0
+        print("head: \(head)")
+        items.forEach {
+            i += 1
+            print("\(i): \($0)")
+        }
+    }
 }

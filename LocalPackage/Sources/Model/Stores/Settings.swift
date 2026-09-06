@@ -86,7 +86,7 @@ import UIKit
                 }
             )))
 
-        case .crearCacheButtonTapped:
+        case .clearCacheButtonTapped:
             let dataTypes = wkWebsiteDataStoreClient.allWebsiteDataTypes()
             let records = await wkWebsiteDataStoreClient.dataRecords(dataTypes)
             await wkWebsiteDataStoreClient.removeData(dataTypes, records)
@@ -138,7 +138,7 @@ import UIKit
         case task(String)
         case defaultBrowserAppButtonTapped
         case searchEngineSettingButtonTapped(AppDependencies)
-        case crearCacheButtonTapped
+        case clearCacheButtonTapped
         case openRepositoryButtonTapped
         case licensesButtonTapped(AppDependencies)
         case doneButtonTapped

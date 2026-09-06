@@ -76,7 +76,8 @@ struct NaviPanelView: View {
                 case .processed:
                     dataView(
                         text: $store.processedText,
-                        clearAction: .clearProcessedButtonTapped
+                        clearAction: .clearProcessedButtonTapped,
+                        resetsQueueOnClear: true
                     )
                 }
             }
@@ -128,6 +129,27 @@ struct NaviPanelView: View {
         VStack(spacing: 0) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
+                    if store.naviIsRunning {
+                        Button {
+                            store.updateLog(with: "Interrompido pelo usuario!")
+                            stopAutomation()
+                        } label: {
+                            Label("Parar", systemImage: "square.fill")
+                        }
+                    } else {
+                        Button {
+                            startAutomation()
+                            
+                            enqueuingTask = Task {
+                                defer {
+                                    print("-------> finalizou a enqueuingTask")
+                                }
+                                await naviEnfileiramentoParaProcessamento()
+                            }
+                        } label: {
+                            Label("Rodar", systemImage: "play.fill")
+                        }
+                    }
                     Button {
                         Task {
                             await store.send(.scriptNewButtonTapped)
@@ -150,28 +172,6 @@ struct NaviPanelView: View {
                         }
                     } label: {
                         Label("Carregar", systemImage: "folder")
-                    }
-
-                    if store.naviIsRunning {
-                        Button {
-                            store.updateLog(with: "Interrompido pelo usuario!")
-                            stopAutomation()
-                        } label: {
-                            Label("Parar", systemImage: "square.fill")
-                        }
-                    } else {
-                        Button {
-                            startAutomation()
-                            
-                            enqueuingTask = Task {
-                                defer {
-                                    print("-------> finalizou a enqueuingTask")
-                                }
-                                await naviEnfileiramentoParaProcessamento()
-                            }
-                        } label: {
-                            Label("Rodar", systemImage: "play.fill")
-                        }
                     }
                 }
                 .buttonStyle(.bordered)
@@ -257,7 +257,7 @@ struct NaviPanelView: View {
                     return
                 }
                 print(error)
-                store.updateLog(with: "buscaConfiguracoes: \(error.localizedDescription)")
+                //store.updateLog(with: "buscaConfiguracoes: \(error.localizedDescription)")
                 //stopAutomation()
                 //return
             }
@@ -344,6 +344,7 @@ struct NaviPanelView: View {
         if (store.ultimoNaviPanelView != nil) {
             if ((self as NaviPanelView).uuid != (store.ultimoNaviPanelView as? NaviPanelView)?.uuid) {
                 (store.ultimoNaviPanelView as? NaviPanelView)?.stopAutomation()
+                (self as NaviPanelView).queue = (store.ultimoNaviPanelView as? NaviPanelView)?.queue ?? NaviQueue<String>()
                 store.ultimoNaviPanelView = nil
             }
         }
@@ -435,7 +436,7 @@ struct NaviPanelView: View {
                  return
                  }*/
                 
-                store.updateProcessed(with: "\n\(codigo) - \(username)")
+                store.updateProcessed(with: "- \n\(codigo) - \(username)")
                 
                 if LIKE_SCRIPT.isEmpty {
                     LIKE_SCRIPT.append(script)
@@ -473,6 +474,10 @@ struct NaviPanelView: View {
                 print("NAVI: esperando \(count)")
                 let timestamp = ISO8601DateFormatter().string(from: Date())
                 //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
+                
+                print("queue -------")
+                await queue.list()
+                print("queue -------")
                 
                 try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.idsWaitInterval))
                 if Task.isCancelled { break }
@@ -547,14 +552,37 @@ struct NaviPanelView: View {
         return false
     }
 
-    private func dataView(text: Binding<String>, clearAction: Browser.Action) -> some View {
+    private func dataView(text: Binding<String>, clearAction: Browser.Action, resetsQueueOnClear: Bool = false) -> some View {
         VStack(spacing: 0) {
             HStack {
+                if store.naviIsRunning {
+                    Button {
+                        store.updateLog(with: "Interrompido pelo usuario!")
+                        stopAutomation()
+                    } label: {
+                        Label("Parar", systemImage: "square.fill")
+                    }
+                } else {
+                    Button {
+                        startAutomation()
+                        
+                        enqueuingTask = Task {
+                            defer {
+                                print("-------> finalizou a enqueuingTask")
+                            }
+                            await naviEnfileiramentoParaProcessamento()
+                        }
+                    } label: {
+                        Label("Rodar", systemImage: "play.fill")
+                    }
+                }
                 Spacer()
                 Button(role: .destructive) {
                     Task {
                         await store.send(clearAction)
-                        queue = NaviQueue<String>()
+                        if resetsQueueOnClear {
+                            queue = NaviQueue<String>()
+                        }
                     }
                 } label: {
                     Label("Limpar", systemImage: "trash")

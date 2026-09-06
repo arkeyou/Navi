@@ -15,6 +15,11 @@ import Foundation
     
     private var config: NaviConfig = NaviConfig()
     
+    private var mainVerifyScript: String = ""
+    private var mainActionScript: String = ""
+    private var secondaryVerifyScript: String? = ""
+    private var secondaryActionScript: String? = ""
+    
     //public var allJobs: [String] = []
     public let actionEvents: AsyncStream<ActionEvent>
     private let continuation: AsyncStream<ActionEvent>.Continuation
@@ -53,6 +58,15 @@ import Foundation
         do {
             //print(naviConfig.utf8)
             config = try JSONDecoder().decode(NaviConfig.self, from: Data(naviConfig.utf8))
+            
+            mainVerifyScript = try JavaScriptBuilder.generate(config.mainVerify)
+            mainActionScript = try JavaScriptBuilder.generate(config.mainAction)
+            secondaryVerifyScript = try config.secondaryVerify.map {
+                try JavaScriptBuilder.generate($0)
+            }
+            secondaryActionScript = try config.secondaryAction.map {
+                try JavaScriptBuilder.generate($0)
+            }
             
             if let urlSessionIdentifier = config.urlSessionIdentifier, sessionId.isEmpty {
                 do {
@@ -121,6 +135,9 @@ import Foundation
                 case .notFound:
                     emit(.sendMsg(message: "Codigo nao encontrado: \(job.payload.codigo) (\(job.payload.username)) ", stop: false))
                     continue
+                case .dupe:
+                    emit(.sendMsg(message: "Codigo duplicado: \(job.payload.codigo) (\(job.payload.username)) ", stop: false))
+                    continue
                 case .ok:
                     break
                 default:
@@ -128,7 +145,7 @@ import Foundation
                 }
                 
                 print("AutomationManager - enviando pro browser: \(job.payload.codigo)")
-                emit(.enqueuePage(codigo: job.payload.codigo, url: job.payload.url, username: job.payload.username, script: config.script, scriptVerify: config.scriptVerify, script2: config.script2, scriptVerify2: config.scriptVerify2))
+                emit(.enqueuePage(codigo: job.payload.codigo, url: job.payload.url, username: job.payload.username, script: mainActionScript, scriptVerify: mainVerifyScript, script2: secondaryActionScript ?? "", scriptVerify2: secondaryVerifyScript ?? ""))
             }
             //await syncJobs()
         }
