@@ -38,8 +38,8 @@ struct SettingsView: View {
 
                 Section {
                     intervalRow(
-                        title: "Verifica Live Online",
-                        subtitle: "Tempo entre verificações para confirmar se a live está online.",
+                        title: "Verifica Online",
+                        subtitle: "Tempo entre verificações para confirmar se a pagina monitorada está ativa.",
                         value: $store.monitorLiveOnlineInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeMonitorLiveOnlineInterval(newValue)) }
@@ -55,15 +55,15 @@ struct SettingsView: View {
                     )
                     intervalRow(
                         title: "Processa Codigos Validados (FLOW)",
-                        subtitle: "Espera antes de processar códigos que já foram validados.",
+                        subtitle: "Espera antes de processar novos códigos que já foram validados na etapa MONITOR.",
                         value: $store.idsWaitInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeIdsWaitInterval(newValue)) }
                         }
                     )
                     intervalRow(
-                        title: "Verifica Tela (ACTION)",
-                        subtitle: "Intervalo usado para aguardar e conferir mudanças na tela.",
+                        title: "Processa Tela (ACTION)",
+                        subtitle: "Intervalo de espera antes de conferir mudanças na tela e executar as ações.",
                         value: $store.likeWaitInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeLikeWaitInterval(newValue)) }

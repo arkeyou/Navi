@@ -35,7 +35,7 @@ public struct UserDefaultsRepository: Sendable {
     }
 
     public var monitorInterval: Double {
-        get { userDefaultsClient.double(.monitorInterval) ?? 4.0 }
+        get { userDefaultsClient.double(.monitorInterval) ?? 60.0 }
         nonmutating set { userDefaultsClient.setDouble(newValue, .monitorInterval) }
     }
 

@@ -131,7 +131,7 @@ struct NaviPanelView: View {
                 HStack(spacing: 10) {
                     if store.naviIsRunning {
                         Button {
-                            store.updateLog(with: "Interrompido pelo usuario!")
+                            store.updateLog(with: "Interrompido pelo usuário!")
                             stopAutomation()
                         } label: {
                             Label("Parar", systemImage: "square.fill")
@@ -229,7 +229,7 @@ struct NaviPanelView: View {
                 }
             } catch {
                 if (!store.scriptText.starts(with: "{")) {
-                    store.updateLog(with: "\nIniciou automacao! ")
+                    store.updateLog(with: "\nIniciou automação! ")
                     store.naviIsRunning = true
                     store.scriptHasError = false
                     while !Task.isCancelled {
@@ -287,7 +287,7 @@ struct NaviPanelView: View {
                 try? await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.cookieWaitInterval))
             }*/
             
-            store.updateLog(with: "\nIniciou automacao! ")
+            store.updateLog(with: "\nIniciou automação! ")
             store.naviIsRunning = true
             await am.start(naviConfig: config, sessionId: configStruct.sessionId ?? "", cookieList: cookies, monitorInterval: store.userDefaultsRepository.monitorInterval, monitorLiveOnlineInterval: store.userDefaultsRepository.monitorLiveOnlineInterval)
         }
@@ -390,7 +390,7 @@ struct NaviPanelView: View {
         store.naviIsRunning = false
         isLoadingNaviProcess = false
         store.isPaginaFoiCarregada = false
-        store.updateLog(with: "Parou automacao. Verifique o log!")
+        store.updateLog(with: "Parou automação. Verifique o log!")
 
         print("Automation stopped and cleaned up.")
         
@@ -503,7 +503,7 @@ struct NaviPanelView: View {
                     let (url, info) = await queue.dequeue()
                     
                     print("NAVI: abrindo pagina: \(url ?? "0")")
-                    store.updateLog(with: "Abrindo pagina (\(info ?? "sem username"))! ")//: \(url ?? "0")!")
+                    store.updateLog(with: "Abrindo página (\(info ?? "sem username"))! ")//: \(url ?? "0")!")
                     
                     store.inputText = url ?? "0"
                     await store.send(.onSubmit(url ?? "0"))
@@ -521,7 +521,7 @@ struct NaviPanelView: View {
                         store.isButtonPresentOnPage = false
                         
                         print("NAVI: achou o botao, rodando script")
-                        store.updateLog(with: "Encontrou! Executou 1a acao! ")
+                        store.updateLog(with: "Encontrou! Executou 1a ação! ")
                         
                         await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
                         
@@ -541,14 +541,14 @@ struct NaviPanelView: View {
                         }
                     } else {
                         await store.send(.scriptRunVerify(VERIFY_SCRIPT2))
-                        store.updateLog(with: "Verifiando 2o na tela")
+                        store.updateLog(with: "Verificando 2o na tela")
                         
                         HapticManager.shared.trigger(.warning)
                         
                         if (store.isButtonPresentOnPage) {
                             store.isButtonPresentOnPage = false
                             
-                            store.updateLog(with: "Encontrou! Executou 2a acao! ")
+                            store.updateLog(with: "Encontrou! Executou 2a ação! ")
                             
                             await store.send(.scriptRunButtonTapped(UNLIKE_SCRIPT))
                             
@@ -574,7 +574,7 @@ struct NaviPanelView: View {
             HStack {
                 if store.naviIsRunning {
                     Button {
-                        store.updateLog(with: "Interrompido pelo usuario!")
+                        store.updateLog(with: "Interrompido pelo usuário!")
                         stopAutomation()
                     } label: {
                         Label("Parar", systemImage: "square.fill")

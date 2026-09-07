@@ -42,7 +42,6 @@ final class MonitorAgent {
             do {
                 while !Task.isCancelled {
                     print("MonitorAgent - monitorando mensagens")
-                    try await Task.sleep(for: monitorInterval)
                     try await scan()
                     
                     
@@ -54,6 +53,8 @@ final class MonitorAgent {
                     }
                     print("automation ------------")
                     //await dump(store.all())
+                    
+                    try await Task.sleep(for: monitorInterval)
                 }
             } catch is CancellationError {
                 
