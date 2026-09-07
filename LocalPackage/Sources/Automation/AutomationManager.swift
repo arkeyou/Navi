@@ -72,6 +72,13 @@ import Foundation
                 do {
                     sessionIdLocal = try await getSessionIdentifier(urlSessionIdentifier: urlSessionIdentifier, cookies: cookieList)
                 } catch {
+                    if "\(error.localizedDescription)".contains("token") {
+                        if let url = URL(string: config.urlMonitor) {
+                            let baseURL = "\(url.scheme ?? "")://\(url.host ?? "")"
+                            emit(.openPage(url: baseURL))
+                            emit(.sendMsg(message: "\nSession Error: Realize o login para concluir a configuração da automação. Após concluir, inicie novamente a automação.\n", stop: true))
+                        }
+                    }
                     emit(.sendMsg(message: "Session Error: \(error.localizedDescription)! ", stop: false))
                     print("\(error.localizedDescription)")
                 }
@@ -135,9 +142,9 @@ import Foundation
                 case .notFound:
                     emit(.sendMsg(message: "Codigo nao encontrado: \(job.payload.codigo) (\(job.payload.username)) ", stop: false))
                     continue
-                case .dupe:
+                /*case .dupe:
                     emit(.sendMsg(message: "Codigo duplicado: \(job.payload.codigo) (\(job.payload.username)) ", stop: false))
-                    continue
+                    continue*/
                 case .ok:
                     break
                 default:

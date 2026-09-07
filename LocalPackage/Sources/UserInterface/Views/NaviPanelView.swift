@@ -150,6 +150,15 @@ struct NaviPanelView: View {
                             Label("Rodar", systemImage: "play.fill")
                         }
                     }
+                    
+                    Button {
+                        Task {
+                            await store.send(.scriptLoadButtonTapped)
+                        }
+                    } label: {
+                        Label("Carregar", systemImage: "folder")
+                    }
+                    
                     Button {
                         Task {
                             await store.send(.scriptNewButtonTapped)
@@ -166,13 +175,6 @@ struct NaviPanelView: View {
                         Label("Salvar", systemImage: "square.and.arrow.down")
                     }
 
-                    Button {
-                        Task {
-                            await store.send(.scriptLoadButtonTapped)
-                        }
-                    } label: {
-                        Label("Carregar", systemImage: "folder")
-                    }
                 }
                 .buttonStyle(.bordered)
             }
@@ -212,21 +214,6 @@ struct NaviPanelView: View {
         var cookies = ""
         
         runTask = Task {
-                        
-            if cookies.isEmpty {
-                cookies = await getBrowserCookies()
-                /*if cookies.isEmpty {
-                    store.inputText = "shopee.com.br"
-                    await store.send(.onSubmit("shopee.com.br"))
-                }*/
-            }
-            
-            while cookies.isEmpty {
-                if Task.isCancelled { return }
-                store.updateLog(with: "Waiting for cookies...")
-                cookies = await getBrowserCookies()
-                try? await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.cookieWaitInterval))
-            }
             
             if Task.isCancelled { return }
             print("script \(store.scriptText)")
@@ -268,6 +255,36 @@ struct NaviPanelView: View {
                 store.updateLog(with: "Sem sessionID.. Abrindo pagina inicial. ")
                 stopAutomation()
                 return
+            }*/
+            
+            //if cookies.isEmpty {
+                cookies = await getBrowserCookies()
+                if cookies.isEmpty {
+                    //store.inputText = "shopee.com.br"
+                    //await store.send(.onSubmit("shopee.com.br"))
+                    if let data = config.data(using: .utf8),
+                       let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let urlMonitor = json["urlMonitor"] as? String {
+                        if let url = URL(string: urlMonitor) {
+                            let baseURL = "\(url.scheme ?? "")://\(url.host ?? "")"
+                            
+                            store.updateLog(with: "\nA página monitorada será aberta para que você conclua a configuração necessária para a automação. Após concluir, inicie novamente a automação.\n")
+                            
+                            store.inputText = baseURL
+                            await store.send(.onSubmit(baseURL))
+                            
+                            stopAutomation()
+                            return
+                        }
+                    }
+                }
+            //}
+            
+            /*while cookies.isEmpty {
+                if Task.isCancelled { return }
+                store.updateLog(with: "Waiting for cookies")
+                cookies = await getBrowserCookies()
+                try? await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.cookieWaitInterval))
             }*/
             
             store.updateLog(with: "\nIniciou automacao! ")
@@ -436,7 +453,7 @@ struct NaviPanelView: View {
                  return
                  }*/
                 
-                store.updateProcessed(with: "- \n\(codigo) - \(username)")
+                store.updateProcessed(with: "\n \(codigo) - \(username)")
                 
                 if LIKE_SCRIPT.isEmpty {
                     LIKE_SCRIPT.append(script)

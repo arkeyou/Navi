@@ -38,7 +38,7 @@ import Observation
         
         self.bookmarkItems.append(.init(
             id: uuidClient.create(),
-            url: URL(string: "https://github.com/arkeyou/NaviBrowser")!,
+            url: URL(string: "https://github.com/arkeyou/NaviBrowser/blob/main/README.md#navi--navegação-inteligente")!,
             title: "Ajuda - Navi",
             action: { [weak self] in
                 await self?.send(.bookmarkItem($0))

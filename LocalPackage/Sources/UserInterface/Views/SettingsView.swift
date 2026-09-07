@@ -69,14 +69,14 @@ struct SettingsView: View {
                             Task { await store.send(.onChangeLikeWaitInterval(newValue)) }
                         }
                     )
-                    intervalRow(
+                    /*intervalRow(
                         title: "Espera Cookie",
                         subtitle: "Tempo máximo de espera para carregar ou detectar cookies necessários.",
                         value: $store.cookieWaitInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeCookieWaitInterval(newValue)) }
                         }
-                    )
+                    )*/
                 } header: {
                     Text("Intervalos de Automação (segundos)")
                 }

@@ -135,7 +135,7 @@ final class MonitorAgent {
                 codigos = String(data: data, encoding: .utf8)?
                     .matches(of: TRIGGER_MONITOR)
                     .reduce(into: [String: String]()) { result, match in
-                        result[String(match.output)] = ""
+                        result[String(match.output)] = "\(match.output)"
                     } ?? [:]
             }
             
