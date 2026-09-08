@@ -17,7 +17,7 @@ import WebUI
 
     public var isPresentedNaviPanel = true
     public var isButtonPresentOnPage = false
-    public var isButtonPressed: Bool? = nil
+    public var isButtonConfirmPressed: Bool? = nil
     public var naviIsRunning = false
     public var isPresentedPaywall = false
     public var isSubscribed: Bool {
@@ -351,7 +351,7 @@ import WebUI
             do {
                 let result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
                 print(result)
-                isButtonPressed = result as? Bool ?? true
+                isButtonConfirmPressed = result as? Bool ?? true
                 naviPanelMessage = "Script executado."
             } catch {
                 naviPanelMessage = error.localizedDescription

@@ -45,13 +45,13 @@ final class MonitorAgent {
                     try await scan()
                     
                     
-                    var i = 0;
+                    /*var i = 0;
                     print("automation ------------")
                     await store.all().filter{ $0.status != JobStatus.dupe }.forEach {
                         i += 1
                         print("\(i): \($0.payload.codigo) - \($0.status)")
                     }
-                    print("automation ------------")
+                    print("automation ------------")*/
                     //await dump(store.all())
                     
                     try await Task.sleep(for: monitorInterval)

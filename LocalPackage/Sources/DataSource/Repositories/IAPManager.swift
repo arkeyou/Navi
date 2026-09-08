@@ -40,8 +40,9 @@ public struct IAPPlan: Identifiable, Sendable, Equatable {
 public final class IAPManager {
     public static let shared = IAPManager()
 
-    public static let monthlyProductID = "com.navi.subscription.monthly"
-    public static let annualProductID = "com.navi.subscription.annual"
+    public static let monthlyProductID = "navipay01"
+    public static let annualProductID = "navipay02"
+    public static let allProductIDs: Set<String> = [monthlyProductID, annualProductID]
 
     public var availablePlans: [IAPPlan] = []
     public var selectedPlanID: String = IAPManager.annualProductID
@@ -54,13 +55,16 @@ public final class IAPManager {
     public init() {
         setupDefaultPlans()
         listenForTransactions()
+        Task {
+            await updateSubscriptionStatus()
+        }
     }
 
     deinit {
         transactionListener?.cancel()
     }
 
-    /// Sets up default fallback plans matching app requirements (Plano Mensal R$100, Plano Anual R$1000).
+    /// Sets up default fallback plans matching app requirements (Plano Mensal navipay01, Plano Anual navipay02).
     public func setupDefaultPlans() {
         self.availablePlans = [
             IAPPlan(
@@ -68,7 +72,7 @@ public final class IAPManager {
                 title: "Plano Mensal",
                 priceText: "R$ 99,90",
                 periodText: "/ mês",
-                rawPrice: 100.0,
+                rawPrice: 99.90,
                 savingsBadge: nil
             ),
             IAPPlan(
@@ -76,10 +80,44 @@ public final class IAPManager {
                 title: "Plano Anual",
                 priceText: "R$ 999,90",
                 periodText: "/ ano",
-                rawPrice: 1000.0,
-                savingsBadge: "Economize 16%"
+                rawPrice: 999.90,
+                savingsBadge: "16% off"
             )
         ]
+    }
+
+    /// Validates current entitlements against Apple's StoreKit 2 APIs.
+    /// Updates `NaviQueueTracker.shared.isSubscribed` according to active unrevoked entitlements.
+    public func updateSubscriptionStatus() async {
+        var activeSubscribed = false
+
+        for await result in Transaction.currentEntitlements {
+            do {
+                let transaction = try checkVerified(result)
+
+                // Verify product ID is one of our subscription plans
+                guard Self.allProductIDs.contains(transaction.productID) else { continue }
+
+                // Check if transaction is revoked or expired
+                if transaction.revocationDate == nil {
+                    if let expirationDate = transaction.expirationDate {
+                        if expirationDate > Date() {
+                            activeSubscribed = true
+                            break
+                        }
+                    } else {
+                        // Non-expiring entitlement
+                        activeSubscribed = true
+                        break
+                    }
+                }
+            } catch {
+                print("Assinatura não verificada pela Apple: \(error.localizedDescription)")
+            }
+        }
+
+        let isSub = activeSubscribed
+        NaviQueueTracker.shared.isSubscribed = isSub
     }
 
     /// Fetches products from StoreKit if available.
@@ -88,25 +126,31 @@ public final class IAPManager {
         defer { isLoading = false }
 
         do {
-            let productIDs: Set<String> = [Self.monthlyProductID, Self.annualProductID]
-            let storeProducts = try await Product.products(for: productIDs)
+            let storeProducts = try await Product.products(for: Self.allProductIDs)
 
             if !storeProducts.isEmpty {
                 var plans: [IAPPlan] = []
                 for product in storeProducts {
                     let isAnnual = product.id == Self.annualProductID
+                    let periodText: String
+                    if let period = product.subscription?.subscriptionPeriod {
+                        periodText = formatSubscriptionPeriod(period)
+                    } else {
+                        periodText = isAnnual ? "/ ano" : "/ mês"
+                    }
+
                     let plan = IAPPlan(
                         id: product.id,
-                        title: isAnnual ? "Plano Anual" : "Plano Mensal",
+                        title: product.displayName.isEmpty ? (isAnnual ? "Plano Anual" : "Plano Mensal") : product.displayName,
                         priceText: product.displayPrice,
-                        periodText: isAnnual ? "/ ano" : "/ mês",
+                        periodText: periodText,
                         rawPrice: product.price,
-                        savingsBadge: isAnnual ? "Economize 16%" : nil,
+                        savingsBadge: isAnnual ? "16% off" : nil,
                         product: product
                     )
                     plans.append(plan)
                 }
-                // Sort annual first
+                // Sort annual plan first
                 plans.sort { $0.id == Self.annualProductID && $1.id != Self.annualProductID }
                 self.availablePlans = plans
             }
@@ -114,9 +158,12 @@ public final class IAPManager {
             print("StoreKit fetch error: \(error.localizedDescription)")
             // Retain default plans on error/simulator mode
         }
+
+        // Validate active subscriptions whenever fetching products
+        await updateSubscriptionStatus()
     }
 
-    /// Purchases the given plan.
+    /// Purchases the given plan using StoreKit 2.
     public func purchase(plan: IAPPlan) async -> Bool {
         isLoading = true
         errorMessage = nil
@@ -130,7 +177,7 @@ public final class IAPManager {
                 case .success(let verification):
                     let transaction = try checkVerified(verification)
                     await transaction.finish()
-                    NaviQueueTracker.shared.isSubscribed = true
+                    await updateSubscriptionStatus()
                     purchaseSuccessMessage = "Assinatura realizada com sucesso! Aproveite envios ilimitados."
                     return true
                 case .userCancelled:
@@ -154,7 +201,7 @@ public final class IAPManager {
         }
     }
 
-    /// Restores previous IAP purchases.
+    /// Restores previous IAP purchases via AppStore.sync() and validates entitlements.
     public func restorePurchases() async -> Bool {
         isLoading = true
         errorMessage = nil
@@ -163,32 +210,17 @@ public final class IAPManager {
 
         do {
             try await AppStore.sync()
+            await updateSubscriptionStatus()
 
-            var foundActive = false
-            for await result in Transaction.currentEntitlements {
-                if case .verified(let transaction) = result {
-                    if transaction.revocationDate == nil {
-                        foundActive = true
-                        break
-                    }
-                }
-            }
-
-            if foundActive {
-                NaviQueueTracker.shared.isSubscribed = true
+            if NaviQueueTracker.shared.isSubscribed {
                 purchaseSuccessMessage = "Sua assinatura foi restaurada com sucesso!"
                 return true
             } else {
-                // If in demo/dev mode with local test subscription, retain or activate
-                if NaviQueueTracker.shared.isSubscribed {
-                    purchaseSuccessMessage = "Assinatura ativada previamente restaurada."
-                    return true
-                }
                 errorMessage = "Nenhuma assinatura ativa foi encontrada para restaurar."
                 return false
             }
         } catch {
-            // Fallback for demo environment
+            await updateSubscriptionStatus()
             if NaviQueueTracker.shared.isSubscribed {
                 purchaseSuccessMessage = "Assinatura restaurada com sucesso."
                 return true
@@ -198,19 +230,23 @@ public final class IAPManager {
         }
     }
 
+    /// Listens for StoreKit transaction updates (renewals, revocations, external purchases).
     private func listenForTransactions() {
-        transactionListener = Task.detached {
+        transactionListener = Task.detached { [weak self] in
             for await result in Transaction.updates {
-                if case .verified(let transaction) = result {
+                do {
+                    guard let self = self else { return }
+                    let transaction = try await self.checkVerified(result)
                     await transaction.finish()
-                    await MainActor.run {
-                        NaviQueueTracker.shared.isSubscribed = true
-                    }
+                    await self.updateSubscriptionStatus()
+                } catch {
+                    print("Erro na atualização de transação StoreKit: \(error.localizedDescription)")
                 }
             }
         }
     }
 
+    /// Verifies transaction signature from Apple StoreKit.
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
         switch result {
         case .unverified(_, let error):
@@ -219,4 +255,20 @@ public final class IAPManager {
             return safe
         }
     }
+
+    private func formatSubscriptionPeriod(_ period: Product.SubscriptionPeriod) -> String {
+        switch period.unit {
+        case .day:
+            return period.value == 1 ? "/ dia" : "/ \(period.value) dias"
+        case .week:
+            return period.value == 1 ? "/ semana" : "/ \(period.value) semanas"
+        case .month:
+            return period.value == 1 ? "/ mês" : "/ \(period.value) meses"
+        case .year:
+            return period.value == 1 ? "/ ano" : "/ \(period.value) anos"
+        @unknown default:
+            return ""
+        }
+    }
 }
+

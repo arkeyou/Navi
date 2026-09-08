@@ -24,8 +24,10 @@ public struct PaywallView: View {
                     // Header / Badge
                     headerView
 
-                    // Daily limit banner
-                    limitBannerView
+                    if !queueTracker.isSubscribed {
+                        // Daily limit banner
+                        limitBannerView
+                    }
 
                     // Plan selection section
                     planSelectionView
@@ -67,6 +69,7 @@ public struct PaywallView: View {
             }
             .task {
                 await iapManager.fetchProducts()
+                await iapManager.updateSubscriptionStatus()
             }
         }
     }
@@ -221,7 +224,7 @@ public struct PaywallView: View {
     private var actionButtonsView: some View {
         VStack(spacing: 12) {
             // Success / Error alerts
-            if let successMsg = iapManager.purchaseSuccessMessage {
+            if let successMsg = iapManager.purchaseSuccessMessage, queueTracker.isSubscribed {
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)

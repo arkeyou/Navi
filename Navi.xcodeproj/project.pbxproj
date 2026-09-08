@@ -10,6 +10,7 @@
 		1C56FC332E2BD03000D92D7B /* UserInterface in Frameworks */ = {isa = PBXBuildFile; productRef = 1C56FC322E2BD03000D92D7B /* UserInterface */; };
 		1C56FCAA2E2C8E6000D92D7B /* NaviShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1C56FCA02E2C8E6000D92D7B /* NaviShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1C56FCB22E2C8F1C00D92D7B /* UserInterface in Frameworks */ = {isa = PBXBuildFile; productRef = 1C56FCB12E2C8F1C00D92D7B /* UserInterface */; };
+		AC202476304F0298007E53F8 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC202475304F0298007E53F8 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,8 @@
 		1C67D1242AE02C8F009F4A60 /* Navi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Navi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C67D13E2AE02C90009F4A60 /* NaviUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NaviUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CE7245E2AF69EE9000B24EC /* Navi.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Navi.xctestplan; sourceTree = "<group>"; };
+		AC202475304F0298007E53F8 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		ACFBE01A304F6C5F00F3E49C /* Navi.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = Navi.storekit; path = Resources/Navi.storekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -109,6 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				1C56FC332E2BD03000D92D7B /* UserInterface in Frameworks */,
+				AC202476304F0298007E53F8 /* StoreKit.framework in Frameworks */,
 			);
 		};
 		1C67D13B2AE02C90009F4A60 /* Frameworks */ = {
@@ -122,6 +126,7 @@
 		1C56FB9D2E2A9E9900D92D7B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AC202475304F0298007E53F8 /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -129,6 +134,7 @@
 		1C67D11B2AE02C8F009F4A60 = {
 			isa = PBXGroup;
 			children = (
+				ACFBE01A304F6C5F00F3E49C /* Navi.storekit */,
 				1CE7245E2AF69EE9000B24EC /* Navi.xctestplan */,
 				1C56FB9C2E2A9B5100D92D7B /* LocalPackage */,
 				1C56FBA72E2B6BCA00D92D7B /* Navi */,

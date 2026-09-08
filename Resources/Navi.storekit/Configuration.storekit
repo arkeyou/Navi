@@ -1,0 +1,180 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "B2E76510",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_locale" : "pt_BR",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "BRA",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "03791D0B",
+      "localizations" : [
+
+      ],
+      "name" : "Navi Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "99.90",
+              "displayPrice" : "99.90",
+              "internalID" : "A3BF02E3",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "99.90",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "0577345F",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "navipay01",
+          "promotionalImageID" : "A3521497",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Plano Mensal",
+          "subscriptionGroupID" : "03791D0B",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "999.90",
+              "displayPrice" : "999.90",
+              "internalID" : "15AC8C89",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "999.90",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6228DB98",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "navipay02",
+          "promotionalImageID" : "CE1BFD58",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Plano Anual",
+          "subscriptionGroupID" : "03791D0B",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "subscriptions" : [
+    {
+      "adHocOffers" : [
+
+      ],
+      "codeOffers" : [
+
+      ],
+      "displayPrice" : "99.90",
+      "familyShareable" : false,
+      "groupNumber" : 1,
+      "internalID" : "64700001",
+      "introductoryOffer" : null,
+      "localizations" : [
+        {
+          "description" : "Assinatura Mensal Navi Premium com automações ilimitadas",
+          "displayName" : "Plano Mensal",
+          "locale" : "pt_BR"
+        }
+      ],
+      "productID" : "navipay01",
+      "recurringSubscriptionPeriod" : "P1M",
+      "referenceName" : "Plano Mensal",
+      "subscriptionGroupID" : "21400001",
+      "type" : "RecurringSubscription"
+    },
+    {
+      "adHocOffers" : [
+
+      ],
+      "codeOffers" : [
+
+      ],
+      "displayPrice" : "999.90",
+      "familyShareable" : false,
+      "groupNumber" : 1,
+      "internalID" : "64700002",
+      "introductoryOffer" : null,
+      "localizations" : [
+        {
+          "description" : "Assinatura Anual Navi Premium com automações ilimitadas e desconto",
+          "displayName" : "Plano Anual",
+          "locale" : "pt_BR"
+        }
+      ],
+      "productID" : "navipay02",
+      "recurringSubscriptionPeriod" : "P1Y",
+      "referenceName" : "Plano Anual",
+      "subscriptionGroupID" : "21400001",
+      "type" : "RecurringSubscription"
+    }
+  ],
+  "version" : {
+    "major" : 5,
+    "minor" : 0
+  }
+}

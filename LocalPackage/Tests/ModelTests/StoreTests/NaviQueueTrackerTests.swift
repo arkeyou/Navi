@@ -35,8 +35,8 @@ struct NaviQueueTrackerTests {
         #expect(!tracker.canEnqueue())
         #expect(tracker.remainingToday() == 0)
         
-        let 11thResult = tracker.recordEnqueue()
-        #expect(11thResult == false)
+        let eleventhResult = tracker.recordEnqueue()
+        #expect(eleventhResult == false)
         #expect(tracker.countToday == 10)
     }
 

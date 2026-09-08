@@ -174,6 +174,17 @@ struct NaviPanelView: View {
                     } label: {
                         Label("Salvar", systemImage: "square.and.arrow.down")
                     }
+                    
+                    Button {
+                        Task {
+                            store.isSubscribed = false
+                            //Reseta a lista de ids adicionados hj
+                            NaviQueueTracker.shared.resetEnqueueToday()
+                            store.updateLog(with: "\nResetou hoje e cancelou inscrição\n")
+                        }
+                    } label: {
+                        Label("Reset IAP", systemImage: "square.and.arrow.down")
+                    }
 
                 }
                 .buttonStyle(.bordered)
@@ -195,15 +206,12 @@ struct NaviPanelView: View {
     }
     
     private func startAutomation() {
-        //Reseta a lista de ids adicionados hj
-        //NaviQueueTracker.shared.resetEnqueueToday()
-        
         //Desabiita o bloqueio de tela por inatividade
         UIApplication.shared.isIdleTimerDisabled = true
         print("Bloqueio de tela desativado")
         
         if NaviQueueTracker.shared.isLimitReached {
-            store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) processamentos atingido para hoje. A automação não permite nova execução até o próximo dia!")
+            store.updateLog(with: "\nLimite de \(NaviQueueConfig.dailyLimit) processamentos atingido para hoje. A automação não permite nova execução até o próximo dia!\n")
 
             Task {
                 await store.send(.showPaywallButtonTapped)
@@ -492,9 +500,9 @@ struct NaviPanelView: View {
                 let timestamp = ISO8601DateFormatter().string(from: Date())
                 //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
                 
-                print("queue -------")
+                /*print("queue -------")
                 await queue.list()
-                print("queue -------")
+                print("queue -------")*/
                 
                 try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.idsWaitInterval))
                 if Task.isCancelled { break }
@@ -525,8 +533,8 @@ struct NaviPanelView: View {
                         
                         await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
                         
-                        print(store.isButtonPressed)
-                        if (!store.isButtonPressed!) {
+                        print(store.isButtonConfirmPressed)
+                        if (!store.isButtonConfirmPressed!) {
                             stopAutomation()
                         }
                         
@@ -534,11 +542,14 @@ struct NaviPanelView: View {
                         store.isPaginaFoiCarregada = false
                         isLoadingNaviProcess = false
                         
-                        if await queue.isEmpty && NaviQueueTracker.shared.isLimitReached {
-                            store.updateLog(with: "Limite de \(NaviQueueConfig.dailyLimit) processamentos atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.")
+                        if /*await queue.isEmpty &&*/ NaviQueueTracker.shared.isLimitReached {
+                            store.updateLog(with: "\nLimite de \(NaviQueueConfig.dailyLimit) processamentos atingido para hoje. A NaviQueue não recebe mais itens. Automação parada até o próximo dia.\n")
                             stopAutomation()
                             await store.send(.showPaywallButtonTapped)
                         }
+                        
+                        NaviQueueTracker.shared.recordEnqueue(isSubscribed: store.isSubscribed)
+                        
                     } else {
                         await store.send(.scriptRunVerify(VERIFY_SCRIPT2))
                         store.updateLog(with: "Verificando 2o na tela")

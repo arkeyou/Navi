@@ -247,10 +247,12 @@ struct SettingsView: View {
         .sheet(isPresented: $isPresentedPaywall) {
             PaywallView()
                 .preferredColorScheme(store.appearance.colorScheme)
+            
         }
         .preferredColorScheme(store.appearance.colorScheme)
         .task {
             await store.send(.task(String(describing: Self.self)))
+            await IAPManager.shared.updateSubscriptionStatus()
         }
         .onChange(of: store.appearance) { _, newValue in
             Task {

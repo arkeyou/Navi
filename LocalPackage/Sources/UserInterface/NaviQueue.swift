@@ -18,10 +18,10 @@ actor NaviQueue<T> {
             return false
         }
         
-        let recorded = NaviQueueTracker.shared.recordEnqueue(isSubscribed: isSubscribed)
+        /*let recorded = NaviQueueTracker.shared.recordEnqueue(isSubscribed: isSubscribed)
         guard recorded else {
             return false
-        }
+        }*/
 
         items.append(item)
         infos.append(info)

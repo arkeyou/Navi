@@ -12,9 +12,9 @@
     "codeCoverage" : false,
     "language" : "en",
     "targetForVariableExpansion" : {
-      "containerPath" : "container:Telescopure.xcodeproj",
+      "containerPath" : "container:Navi.xcodeproj",
       "identifier" : "1C67D1232AE02C8F009F4A60",
-      "name" : "Telescopure"
+      "name" : "Navi"
     }
   },
   "testTargets" : [
@@ -27,9 +27,9 @@
     },
     {
       "target" : {
-        "containerPath" : "container:Telescopure.xcodeproj",
+        "containerPath" : "container:Navi.xcodeproj",
         "identifier" : "1C67D13D2AE02C90009F4A60",
-        "name" : "TelescopureUITests"
+        "name" : "NaviUITests"
       }
     }
   ],
