@@ -206,6 +206,13 @@ struct NaviPanelView: View {
     }
     
     private func startAutomation() {
+        
+        if store.scriptText.isEmpty {
+            store.updateLog(with: "\nAcesse Bookmarks (ícone no canto superior esquerdo) e selecione “Ajuda - Navi” para conhecer as funcionalidades do aplicativo.\n")
+            stopAutomation()
+            return
+        }
+        
         //Desabiita o bloqueio de tela por inatividade
         UIApplication.shared.isIdleTimerDisabled = true
         print("Bloqueio de tela desativado")
@@ -236,19 +243,19 @@ struct NaviPanelView: View {
                     config = try await buscaConfiguracoes(npoint: configStruct.npoint ?? "", secret: configStruct.secret ?? "")
                 }
             } catch {
-                if (!store.scriptText.starts(with: "{")) {
+                if (store.scriptText.starts(with: "javascript:")) {
                     store.updateLog(with: "\nIniciou automação! ")
                     store.naviIsRunning = true
                     store.scriptHasError = false
-                    while !Task.isCancelled {
-                        await store.send(.scriptRunJavascriptButtonTapped(store.scriptText))
-                        if store.scriptHasError {
-                            stopAutomation()
-                            break
-                        }
-                        try? await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.idsWaitInterval))
-                    }
-                    //stopAutomation()
+                    //while !Task.isCancelled {
+                        await store.send(.scriptRunJavascriptButtonTapped(store.scriptText.replacing("javascript:", with: "")))
+                        //if store.scriptHasError {
+                        //    stopAutomation()
+                        //    break
+                        //}
+                        //try? await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.idsWaitInterval))
+                    //}
+                    stopAutomation()
                     return
                 }
                 print(error)
@@ -533,6 +540,8 @@ struct NaviPanelView: View {
                         
                         await store.send(.scriptRunButtonTapped(LIKE_SCRIPT))
                         
+                        NaviQueueTracker.shared.recordEnqueue(isSubscribed: store.isSubscribed)
+                        
                         print(store.isButtonConfirmPressed)
                         if (!store.isButtonConfirmPressed!) {
                             stopAutomation()
@@ -547,8 +556,6 @@ struct NaviPanelView: View {
                             stopAutomation()
                             await store.send(.showPaywallButtonTapped)
                         }
-                        
-                        NaviQueueTracker.shared.recordEnqueue(isSubscribed: store.isSubscribed)
                         
                     } else {
                         await store.send(.scriptRunVerify(VERIFY_SCRIPT2))

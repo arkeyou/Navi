@@ -83,7 +83,8 @@ import WebUI
         isPresentedConfirmationDialog: Bool = false,
         isPresentedAlert: Bool = false,
         naviPanelSelection: NaviPanelSelection = .script,
-        scriptText: String = "alert(\"Escreva seus scripts aqui\")",
+        scriptText: String = "",
+        //scriptText: String = "javascript:window.location.href=\"https://github.com/arkeyou/NaviBrowser/blob/main/README.md#navi--navegação-inteligente\"",
         scriptFileName: String = "Sem titulo",
         pendingScriptFileName: String = "",
         isPresentedScriptSaveDialog: Bool = false,
@@ -330,8 +331,8 @@ import WebUI
         case let .scriptRunJavascriptButtonTapped(scriptToExecute):
             do {
                 let result = try await webViewProxyClient.evaluateJavaScript(scriptToExecute)
-                print(result)
-                updateProcessed(with: "\(result.map { String(describing: $0) } ?? "-")\n")
+                //print(result)
+                //updateProcessed(with: "\(result.map { String(describing: $0) } ?? "-")\n")
                 //naviPanelMessage = "Script executado."
             } catch {
                 naviPanelMessage = error.localizedDescription
