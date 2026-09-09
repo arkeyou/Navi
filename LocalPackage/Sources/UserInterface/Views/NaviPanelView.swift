@@ -175,7 +175,7 @@ struct NaviPanelView: View {
                         Label("Salvar", systemImage: "square.and.arrow.down")
                     }
                     
-                    Button {
+                    /*Button {
                         Task {
                             store.isSubscribed = false
                             //Reseta a lista de ids adicionados hj
@@ -184,7 +184,7 @@ struct NaviPanelView: View {
                         }
                     } label: {
                         Label("Reset IAP", systemImage: "square.and.arrow.down")
-                    }
+                    }*/
 
                 }
                 .buttonStyle(.bordered)

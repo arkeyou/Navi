@@ -46,9 +46,23 @@ public final class IAPManager {
 
     public var availablePlans: [IAPPlan] = []
     public var selectedPlanID: String = IAPManager.annualProductID
+    public var activeSubscriptionPlanID: String? = nil
+    public var activeSubscriptionExpirationDate: Date? = nil
     public var isLoading = false
     public var errorMessage: String? = nil
     public var purchaseSuccessMessage: String? = nil
+
+    public var activePlanTitle: String? {
+        guard let planID = activeSubscriptionPlanID ?? (NaviQueueTracker.shared.isSubscribed ? selectedPlanID : nil) else {
+            return NaviQueueTracker.shared.isSubscribed ? "Plano Premium" : nil
+        }
+        if planID == Self.annualProductID {
+            return "Plano Anual"
+        } else if planID == Self.monthlyProductID {
+            return "Plano Mensal"
+        }
+        return "Plano Premium"
+    }
 
     private nonisolated(unsafe) var transactionListener: Task<Void, Never>? = nil
 
@@ -90,6 +104,8 @@ public final class IAPManager {
     /// Updates `NaviQueueTracker.shared.isSubscribed` according to active unrevoked entitlements.
     public func updateSubscriptionStatus() async {
         var activeSubscribed = false
+        var activePlanID: String? = nil
+        var activeExpDate: Date? = nil
 
         for await result in Transaction.currentEntitlements {
             do {
@@ -103,11 +119,14 @@ public final class IAPManager {
                     if let expirationDate = transaction.expirationDate {
                         if expirationDate > Date() {
                             activeSubscribed = true
+                            activePlanID = transaction.productID
+                            activeExpDate = expirationDate
                             break
                         }
                     } else {
                         // Non-expiring entitlement
                         activeSubscribed = true
+                        activePlanID = transaction.productID
                         break
                     }
                 }
@@ -116,8 +135,9 @@ public final class IAPManager {
             }
         }
 
-        let isSub = activeSubscribed
-        NaviQueueTracker.shared.isSubscribed = isSub
+        self.activeSubscriptionPlanID = activePlanID
+        self.activeSubscriptionExpirationDate = activeExpDate
+        NaviQueueTracker.shared.isSubscribed = activeSubscribed
     }
 
     /// Fetches products from StoreKit if available.

@@ -24,7 +24,10 @@ public struct PaywallView: View {
                     // Header / Badge
                     headerView
 
-                    if !queueTracker.isSubscribed {
+                    if queueTracker.isSubscribed {
+                        // Active subscription info card
+                        activeSubscriptionBannerView
+                    } else {
                         // Daily limit banner
                         limitBannerView
                     }
@@ -32,7 +35,7 @@ public struct PaywallView: View {
                     // Plan selection section
                     planSelectionView
 
-                    // Action buttons (Assinar & Restaurar)
+                    // Action buttons (Gerenciar / Assinar & Restaurar)
                     actionButtonsView
 
                     // Terms and security disclaimer
@@ -82,15 +85,15 @@ public struct PaywallView: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [.blue, .purple],
+                            colors: queueTracker.isSubscribed ? [.green, .blue] : [.blue, .purple],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
                     .frame(width: 72, height: 72)
-                    .shadow(color: .purple.opacity(0.3), radius: 10, x: 0, y: 5)
+                    .shadow(color: (queueTracker.isSubscribed ? Color.green : Color.purple).opacity(0.3), radius: 10, x: 0, y: 5)
 
-                Image(systemName: "sparkles")
+                Image(systemName: queueTracker.isSubscribed ? "checkmark.seal.fill" : "sparkles")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundStyle(.white)
             }
@@ -99,10 +102,104 @@ public struct PaywallView: View {
             Text("Navi Premium")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
 
-            Text("Automatize sem interrupções")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            if queueTracker.isSubscribed {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text("Assinatura Ativa")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.green)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(Color.green.opacity(0.12)))
+            } else {
+                Text("Automatize sem interrupções")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
         }
+    }
+
+    private var activeSubscriptionBannerView: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [.green.opacity(0.2), .blue.opacity(0.2)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 44, height: 44)
+
+                    Image(systemName: "sparkles")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.green)
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text("Sua Assinatura está Ativa")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.subheadline)
+                            .foregroundStyle(.green)
+                    }
+
+                    if let planTitle = iapManager.activePlanTitle {
+                        Text(planTitle)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Spacer()
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Image(systemName: "bolt.shield.fill")
+                        .foregroundStyle(.blue)
+                    Text("Processamentos e envios ilimitados liberados")
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(.primary)
+                }
+
+                if let expDate = iapManager.activeSubscriptionExpirationDate {
+                    HStack(spacing: 8) {
+                        Image(systemName: "calendar.badge.clock")
+                            .foregroundStyle(.secondary)
+                        Text("Próxima renovação: \(expDate.formatted(date: .numeric, time: .omitted))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.triangle.2.circlepath.circle")
+                            .foregroundStyle(.secondary)
+                        Text("Renovação automática via App Store")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(.tertiarySystemBackground))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(LinearGradient(colors: [.green.opacity(0.4), .blue.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1.5)
+                )
+        )
     }
 
     private var limitBannerView: some View {
@@ -159,6 +256,7 @@ public struct PaywallView: View {
         VStack(spacing: 14) {
             ForEach(iapManager.availablePlans) { plan in
                 let isSelected = iapManager.selectedPlanID == plan.id
+                let isActivePlan = queueTracker.isSubscribed && (iapManager.activeSubscriptionPlanID == plan.id || (iapManager.activeSubscriptionPlanID == nil && plan.id == IAPManager.annualProductID))
 
                 Button {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -167,9 +265,9 @@ public struct PaywallView: View {
                 } label: {
                     HStack(spacing: 16) {
                         // Radio indicator
-                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        Image(systemName: isActivePlan ? "checkmark.circle.fill" : (isSelected ? "checkmark.circle.fill" : "circle"))
                             .font(.title3)
-                            .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+                            .foregroundStyle(isActivePlan ? Color.green : (isSelected ? Color.accentColor : Color.secondary))
 
                         // Details
                         VStack(alignment: .leading, spacing: 4) {
@@ -178,7 +276,14 @@ public struct PaywallView: View {
                                     .font(.headline)
                                     .foregroundStyle(.primary)
 
-                                if let badge = plan.savingsBadge {
+                                if isActivePlan {
+                                    Text("Plano Atual")
+                                        .font(.caption2.weight(.bold))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(Capsule().fill(Color.green.opacity(0.2)))
+                                        .foregroundStyle(.green)
+                                } else if let badge = plan.savingsBadge {
                                     Text(badge)
                                         .font(.caption2.weight(.bold))
                                         .padding(.horizontal, 8)
@@ -209,10 +314,10 @@ public struct PaywallView: View {
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(isSelected ? Color.accentColor.opacity(0.08) : Color(.tertiarySystemBackground))
+                            .fill(isActivePlan ? Color.green.opacity(0.08) : (isSelected ? Color.accentColor.opacity(0.08) : Color(.tertiarySystemBackground)))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
+                                    .stroke(isActivePlan ? Color.green : (isSelected ? Color.accentColor : Color.clear), lineWidth: 2)
                             )
                     )
                 }
@@ -224,7 +329,7 @@ public struct PaywallView: View {
     private var actionButtonsView: some View {
         VStack(spacing: 12) {
             // Success / Error alerts
-            if let successMsg = iapManager.purchaseSuccessMessage, queueTracker.isSubscribed {
+            if let successMsg = iapManager.purchaseSuccessMessage {
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
@@ -248,44 +353,69 @@ public struct PaywallView: View {
                 .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.1)))
             }
 
-            // Primary "Assinar" button
-            Button {
-                Task {
-                    if let selectedPlan = iapManager.availablePlans.first(where: { $0.id == iapManager.selectedPlanID }) {
-                        let success = await iapManager.purchase(plan: selectedPlan)
-                        if success {
-                            try? await Task.sleep(for: .seconds(1.5))
-                            await store?.send(.paywallDismissed)
-                            dismiss()
+            if queueTracker.isSubscribed {
+                // Button to manage subscription on Apple App Store
+                Button {
+                    openManageSubscriptions()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "creditcard.fill")
+                        Text("Gerenciar Assinatura")
+                            .font(.headline.weight(.semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.green, Color.blue],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .shadow(color: Color.green.opacity(0.3), radius: 8, x: 0, y: 4)
+                }
+            } else {
+                // Primary "Assinar" button
+                Button {
+                    Task {
+                        if let selectedPlan = iapManager.availablePlans.first(where: { $0.id == iapManager.selectedPlanID }) {
+                            let success = await iapManager.purchase(plan: selectedPlan)
+                            if success {
+                                try? await Task.sleep(for: .seconds(1.5))
+                                await store?.send(.paywallDismissed)
+                                dismiss()
+                            }
                         }
                     }
-                }
-            } label: {
-                HStack {
-                    if iapManager.isLoading {
-                        ProgressView()
-                            .tint(.white)
-                            .padding(.trailing, 8)
+                } label: {
+                    HStack {
+                        if iapManager.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                                .padding(.trailing, 8)
+                        }
+                        Text("Assinar")
+                            .font(.headline.weight(.semibold))
                     }
-                    Text("Assinar")
-                        .font(.headline.weight(.semibold))
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(
-                    LinearGradient(
-                        colors: [Color.blue, Color.accentColor],
-                        startPoint: .leading,
-                        endPoint: .trailing
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.blue, Color.accentColor],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
                     )
-                )
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                }
+                .disabled(iapManager.isLoading)
             }
-            .disabled(iapManager.isLoading)
 
-            // Secondary "Restaurar IAP" button
+            // Secondary "Restaurar Compras" button
             Button {
                 Task {
                     let restored = await iapManager.restorePurchases()
@@ -308,12 +438,25 @@ public struct PaywallView: View {
 
     private var footerDisclaimerView: some View {
         VStack(spacing: 6) {
-            Text("Renovado automaticamente. Cancele a qualquer momento nas configurações da App Store.")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-                .multilineTextAlignment(.center)
+            if queueTracker.isSubscribed {
+                Text("Assinatura gerenciada pela sua conta da App Store. Você pode alterar ou cancelar a qualquer momento nas Configurações do seu Apple ID.")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+            } else {
+                Text("Renovado automaticamente. Cancele a qualquer momento nas configurações da App Store.")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+            }
         }
         .padding(.top, 4)
+    }
+
+    private func openManageSubscriptions() {
+        if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+            UIApplication.shared.open(url)
+        }
     }
 }
 
