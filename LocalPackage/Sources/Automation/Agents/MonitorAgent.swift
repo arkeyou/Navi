@@ -56,8 +56,14 @@ final class MonitorAgent {
                     }
                     print("automation ------------")*/
                     //await dump(store.all())
-                    am.emit(.sendMsg(message: "•", stop: false, lineBreak: false))//"."
+                    am.emit(.sendMsg(message: "˙", stop: false, lineBreak: false))//"."
                     try await Task.sleep(for: monitorInterval)
+                    
+                    //˙··˙···˙··˙···˙··˙···˙
+                    //●··●···●··●···●··●···●
+                    //○··○···○··○···○··○···○
+                    //◦··◦···◦··◦···◦··◦···◦
+                    //•··•···•··•···•··•···•
                 }
             } catch is CancellationError {
                 
