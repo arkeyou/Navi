@@ -46,8 +46,8 @@ struct SettingsView: View {
                         }
                     )
                     intervalRow(
-                        title: "Monitora Mensagens (MONITOR)",
-                        subtitle: "Tempo entre leituras de novas mensagens durante a automação.",
+                        title: "Monitora URL (MONITOR)",
+                        subtitle: "Tempo entre leituras do endereço informado durante a automação.",
                         value: $store.monitorInterval,
                         onChange: { newValue in
                             Task { await store.send(.onChangeMonitorInterval(newValue)) }
