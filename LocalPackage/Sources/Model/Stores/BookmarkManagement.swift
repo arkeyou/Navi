@@ -35,16 +35,6 @@ import Observation
         self.currentTitle = currentTitle
         self.bookmarkItems = bookmarkItems
         self.action = action
-        
-        self.bookmarkItems.append(.init(
-            id: uuidClient.create(),
-            url: URL(string: "https://github.com/arkeyou/NaviBrowser/blob/main/README.md#navi--navegação-inteligente")!,
-            title: "Ajuda - Navi",
-            action: { [weak self] in
-                await self?.send(.bookmarkItem($0))
-            }
-        ))
-        saveCurrentBookmaks()
     }
 
     public func reduce(_ action: Action) async {

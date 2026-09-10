@@ -205,24 +205,46 @@ public struct PaywallView: View {
     private var limitBannerView: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(Color.orange.opacity(0.15))
-                        .frame(width: 40, height: 40)
-
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.headline)
-                        .foregroundStyle(.orange)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Limite atingido para hoje")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-
-                    Text("\(queueTracker.countToday) de \(NaviQueueConfig.dailyLimit) processamentos utilizados")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                if queueTracker.countToday >= NaviQueueConfig.dailyLimit {
+                    ZStack {
+                        Circle()
+                            .fill(Color.orange.opacity(0.15))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.headline)
+                            .foregroundStyle(.orange)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Limite atingido para hoje")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        
+                        Text("\(queueTracker.countToday) de \(NaviQueueConfig.dailyLimit) processamentos utilizados")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    ZStack {
+                        Circle()
+                            .fill(Color.blue.opacity(0.15))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.headline)
+                            .foregroundStyle(.blue)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Tudo ok por hoje")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        
+                        Text("\(queueTracker.countToday) de \(NaviQueueConfig.dailyLimit) processamentos utilizados")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 Spacer()

@@ -23,25 +23,32 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add Currently Page"
+            "value" : "Adicionar Página Atual"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "閲覧中のページを追加する"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "현재 페이지 추가"
           }
         }
       }
     },
     "Appearance" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aparência"
+          }
+        }
+      }
     },
     "Assinar" : {
       "comment" : "A button that allows the user to purchase a subscription.",
@@ -242,18 +249,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Done"
+            "value" : "Ok"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "完了"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "완료"
           }
         }
@@ -472,18 +479,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Licenses"
+            "value" : "Licenças"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "ライセンス"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "라이센스"
           }
         }
@@ -669,18 +676,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Settings"
+            "value" : "Abrir Ajustes"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "設定を開く"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "설정 열기"
           }
         }
@@ -782,18 +789,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search"
+            "value" : "Pesquisar"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "検索"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "검색"
           }
         }
@@ -804,18 +811,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search…"
+            "value" : "Pesquisar…"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "検索…"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "검색..."
           }
         }
@@ -870,18 +877,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Settings"
+            "value" : "Ajustes"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "設定"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "설정"
           }
         }
