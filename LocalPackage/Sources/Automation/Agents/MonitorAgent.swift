@@ -16,6 +16,7 @@ final class MonitorAgent {
     private let store: JobStore
     private var task: Task<Void, any Error>?
     private let cookies: String
+    private let am: AutomationManager
 
     init(
         store: JobStore,
@@ -23,7 +24,8 @@ final class MonitorAgent {
         triggerMonitor: String,
         sessionId: String,
         cookieList: String,
-        monitorInterval: Duration
+        monitorInterval: Duration,
+        am: AutomationManager
     ) {
 
         self.store = store
@@ -32,6 +34,7 @@ final class MonitorAgent {
         self.SESSION_ID = sessionId
         self.cookies = cookieList
         self.monitorInterval = monitorInterval
+        self.am = am
     }
 
     func start() {
@@ -53,7 +56,7 @@ final class MonitorAgent {
                     }
                     print("automation ------------")*/
                     //await dump(store.all())
-                    
+                    am.emit(.sendMsg(message: "•", stop: false, lineBreak: false))//"."
                     try await Task.sleep(for: monitorInterval)
                 }
             } catch is CancellationError {

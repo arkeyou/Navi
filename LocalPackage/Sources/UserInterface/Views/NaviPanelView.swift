@@ -483,9 +483,9 @@ struct NaviPanelView: View {
                 if VERIFY_SCRIPT2.isEmpty {
                     VERIFY_SCRIPT2.append(scriptVerify2)
                 }
-            case .sendMsg(let msg, let stop):
+            case .sendMsg(let msg, let stop, let lineBreak):
                 print(msg)
-                store.updateLog(with: msg)
+                store.updateLog(with: msg, lineBreak: lineBreak)
                 if stop {
                     stopAutomation()
                     return

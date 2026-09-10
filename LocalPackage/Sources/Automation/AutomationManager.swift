@@ -90,7 +90,8 @@ import Foundation
                 triggerMonitor: config.triggerMonitor,
                 sessionId: sessionIdLocal,
                 cookieList: cookieList,
-                monitorInterval: Duration.seconds(monitorInterval)
+                monitorInterval: Duration.seconds(monitorInterval),
+                am: self
             )
 
             flowAgent = FlowAgent(
