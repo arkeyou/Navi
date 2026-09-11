@@ -138,7 +138,16 @@ final class MonitorAgent {
                     print("------> Username: \(comment.username)")
                     //codigos.formUnion(codigosComment)
                     codigos = codigosComment.reduce(into: codigos) { resultado, codigo in
-                        resultado[codigo] = comment.username
+                        //Troca . por -
+                        var codigoTratado = codigo.contains(".")
+                            ? codigo.replacingOccurrences(of: ".", with: "-")
+                            : codigo
+                        //Se o codigo nao tem separacao, adiciona -
+                        if codigoTratado.count == 9 &&
+                            codigoTratado.allSatisfy({ $0.isLetter }) {
+                            codigoTratado = "\(codigoTratado.prefix(3))-\(codigoTratado.dropFirst(3).prefix(3))-\(codigoTratado.dropFirst(6))"
+                        }
+                        resultado[codigoTratado] = comment.username
                     }
                 }
             } else {
@@ -168,7 +177,7 @@ final class MonitorAgent {
             param2: 0,
             url: "",
             username: ""
-        ),JobPayload (
+        ),*/JobPayload (
             codigo: "CFE-QDM-TBT",
             param1: 0,
             param2: 0,
@@ -192,8 +201,8 @@ final class MonitorAgent {
             param2: 0,
             url: "",
             username: "CFE-QDM-TBT"
-        )*/
-            JobPayload (
+        )
+            /*JobPayload (
                 codigo: "TAM3330",
                 param1: 0,
                 param2: 0,
@@ -217,7 +226,7 @@ final class MonitorAgent {
                 param2: 0,
                 url: "",
                 username: "TAM3672"
-            )
+            )*/
             /*,JobPayload (
             codigo: "BZZ-FGN-LTQ",
             param1: 0,
