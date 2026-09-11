@@ -138,6 +138,7 @@ struct NaviPanelView: View {
                         }
                     } else {
                         Button {
+                            store.naviPanelSelection = .log
                             startAutomation()
                             
                             enqueuingTask = Task {
@@ -147,7 +148,7 @@ struct NaviPanelView: View {
                                 await naviEnfileiramentoParaProcessamento()
                             }
                         } label: {
-                            Label("Rodar", systemImage: "play.fill")
+                            Label("Iniciar", systemImage: "play.fill")
                         }
                     }
                     
@@ -608,7 +609,7 @@ struct NaviPanelView: View {
                             await naviEnfileiramentoParaProcessamento()
                         }
                     } label: {
-                        Label("Rodar", systemImage: "play.fill")
+                        Label("Iniciar", systemImage: "play.fill")
                     }
                 }
                 Spacer()
