@@ -138,7 +138,7 @@ final class MonitorAgent {
                     print("------> Username: \(comment.username)")
                     //codigos.formUnion(codigosComment)
                     codigos = codigosComment.reduce(into: codigos) { resultado, codigo in
-                        //Troca . por -
+                        //TODO Alterar de modo que nao impacte outros tipos de codigo
                         var codigoTratado = codigo.contains(".")
                             ? codigo.replacingOccurrences(of: ".", with: "-")
                             : codigo
