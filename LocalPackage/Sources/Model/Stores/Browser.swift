@@ -160,8 +160,10 @@ import WebUI
         self.action = action
         weakSelf = self
         
-        let bookmark = Bookmark(id: UUID(), title: "Ajuda - Navi", url: URL(string: "https://github.com/arkeyou/NaviBrowser/blob/main/README.md#navi--navegação-inteligente")!)
-        userDefaultsRepository.bookmarks = [bookmark]
+        if userDefaultsRepository.bookmarks.isEmpty {
+            let bookmark = Bookmark(id: UUID(), title: "Ajuda - Navi", url: URL(string: "https://github.com/arkeyou/NaviBrowser/blob/main/README.md#navi--navegação-inteligente")!)
+            userDefaultsRepository.bookmarks = [bookmark]
+        }
         
     }
 
