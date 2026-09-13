@@ -8,13 +8,14 @@ struct BrowserView: View {
     @State private var naviPanelDetent = PresentationDetent.medium
     @AppStorage(.appearance) private var appearance = Appearance.dark.rawValue
     
+    @Environment(\.horizontalSizeClass) var tamanhoTela
+    
     var body: some View {
-        mainContent
+        let conteudoSecundario = naviPanelSheet
             .preferredColorScheme(preferredColorScheme)
-            .sheet(isPresented: $store.isPresentedNaviPanel) {
-                naviPanelSheet
-                    .preferredColorScheme(preferredColorScheme)
-            }
+        
+        let conteudoPrincipal  = mainContent
+            .preferredColorScheme(preferredColorScheme)
             .sheet(item: $store.settings, onDismiss: {
                 store.isPresentedNaviPanel = true
             }) { store in
@@ -55,6 +56,23 @@ struct BrowserView: View {
                 }
             }
             .animation(.easeIn(duration: 0.2), value: store.isPresentedToolbar)
+            .frame(maxWidth: .infinity)
+        
+        //Adaptar o estilo de exibicao ao tamanho da tela
+        if tamanhoTela == .regular {
+            HStack(spacing: 0) {
+                conteudoPrincipal
+                
+                conteudoSecundario
+                    .frame(maxWidth: 320)
+            }
+        } else {
+            conteudoPrincipal
+                .sheet(isPresented: $store.isPresentedNaviPanel) {
+                    conteudoSecundario
+                        .frame(maxWidth: .infinity)
+             }
+        }
     }
 
     private var preferredColorScheme: ColorScheme? {
@@ -124,9 +142,9 @@ struct BrowserView: View {
                         .transition(.move(edge: .bottom))
                 }
             }
+            .ignoresSafeArea(.container, edges: store.isPresentedToolbar ? [] : .all)
+            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
-        .ignoresSafeArea(.container, edges: store.isPresentedToolbar ? [] : .all)
-        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 
     private var naviPanelSheet: some View {
