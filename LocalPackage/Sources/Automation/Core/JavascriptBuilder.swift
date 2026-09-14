@@ -41,8 +41,14 @@ struct JavaScriptBuilder {
                   !selector.isEmpty else {
                 throw BuilderError.missingParameter("selector")
             }
+                        
+            var script = "document.querySelectorAll(\"\(selector)\").length > 0"
             
-            return "document.querySelectorAll(\"\(selector)\").length > 0"
+            if let customSelector = automationScript.customSelector {
+                script.append(" || \(customSelector)")
+            }
+            
+            return script
             
             
         case "click":
@@ -52,10 +58,16 @@ struct JavaScriptBuilder {
                 throw BuilderError.missingParameter("selector")
             }
             
-            return """
+            
+            var script = """
             (document.querySelectorAll("\(selector)")).forEach(button => button.click());
             """
             
+            if let customSelector = automationScript.customSelector {
+                script.append("\(customSelector);")
+            }
+            
+            return script
             
         default:
             

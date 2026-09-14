@@ -39,4 +39,5 @@ struct AutomationScript: Decodable {
     var type: String = ""
     var message: String?
     var selector: String?
+    var customSelector: String?
 }
