@@ -32,6 +32,31 @@ struct BookmarkItemView: View {
             }
             .tint(.green)
         }
+        .contextMenu {
+            Button {
+                Task {
+                    await store.send(.editButtonTapped)
+                }
+            } label: {
+                Label {
+                    Text("edit", bundle: .module)
+                } icon: {
+                    Image(systemName: "pencil")
+                }
+            }
+
+            Button(role: .destructive) {
+                Task {
+                    await store.send(.deleteButtonTapped(store.id))
+                }
+            } label: {
+                Label {
+                    Text("delete", bundle: .module)
+                } icon: {
+                    Image(systemName: "trash")
+                }
+            }
+        }
         .alert(Text("editBookmark", bundle: .module), isPresented: $store.isPresentedEditDialog) {
             TextField(text: $store.editingTitle) {
                 Text("inputTitle", bundle: .module)

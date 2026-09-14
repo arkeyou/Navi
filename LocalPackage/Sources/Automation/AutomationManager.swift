@@ -280,7 +280,7 @@ import Foundation
                     
                     return true
                 }
-                throw SessionError.live("Esta live não está online!")
+                throw SessionError.live("A live NÃO está online!")
             }
 
             throw SessionError.login("Gentileza efetuar o login!")

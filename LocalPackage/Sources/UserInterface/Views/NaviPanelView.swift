@@ -559,20 +559,22 @@ struct NaviPanelView: View {
                         }
                         
                     } else {
-                        await store.send(.scriptRunVerify(VERIFY_SCRIPT2))
-                        store.updateLog(with: "Verificando 2o na tela")
-                        
-                        HapticManager.shared.trigger(.warning)
-                        
-                        if (store.isButtonPresentOnPage) {
-                            store.isButtonPresentOnPage = false
+                        if !VERIFY_SCRIPT2.isEmpty {
+                            await store.send(.scriptRunVerify(VERIFY_SCRIPT2))
+                            store.updateLog(with: "Verificando 2o na tela")
                             
-                            store.updateLog(with: "Encontrou! Executou 2a ação! ")
+                            HapticManager.shared.trigger(.warning)
                             
-                            await store.send(.scriptRunButtonTapped(UNLIKE_SCRIPT))
-                            
-                            try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.likeWaitInterval))
-                            
+                            if (store.isButtonPresentOnPage) {
+                                store.isButtonPresentOnPage = false
+                                
+                                store.updateLog(with: "Encontrou! Executou 2a ação! ")
+                                
+                                await store.send(.scriptRunButtonTapped(UNLIKE_SCRIPT))
+                                
+                                try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.likeWaitInterval))
+                                
+                            }
                         }
                     }
                     continue

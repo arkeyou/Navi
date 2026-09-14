@@ -151,6 +151,7 @@ struct BrowserView: View {
         VStack(spacing: 0) {
             NaviPanelView(store: store)
             NaviBottomTabView(store: store)
+                .labelStyle(.iconOnly)
         }
         .background(Color(.systemBackground))
         .presentationDetents([.height(240), .medium, .large], selection: $naviPanelDetent)
