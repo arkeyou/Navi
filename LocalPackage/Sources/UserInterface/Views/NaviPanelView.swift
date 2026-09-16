@@ -243,7 +243,13 @@ struct NaviPanelView: View {
                 configStruct = try JSONDecoder().decode(ConfigStruct.self, from: Data(config.utf8))
                 
                 if configStruct.newVersion {
-                    config = try await buscaConfiguracoes(npoint: configStruct.npoint ?? "", secret: configStruct.secret ?? "")
+                    do {
+                        config = try await buscaConfiguracoes(npoint: configStruct.npoint ?? "", secret: configStruct.secret ?? "")
+                    } catch {
+                        store.updateLog(with: "buscaConfiguracoes: \(error.localizedDescription)")
+                        stopAutomation()
+                        return
+                    }
                 }
             } catch {
                 if (store.scriptText.starts(with: "javascript:")) {
