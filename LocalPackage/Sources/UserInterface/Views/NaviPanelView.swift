@@ -1,5 +1,6 @@
 import DataSource
 import Model
+import Foundation
 import WebKit
 import Automation
 import SwiftUI
@@ -58,6 +59,7 @@ struct NaviPanelView: View {
     @State private var enqueuingTask: Task<Void, Never>? = nil
     private let URL_NPOINT_API = "https://api.npoint.io/"
     @State private var isLoadingNaviProcess = false
+    @State private var pageLoadStartedAt: Date?
     @State private var count = 0
     
     private let uuid = UUID()
@@ -405,6 +407,7 @@ struct NaviPanelView: View {
         
         store.naviIsRunning = false
         isLoadingNaviProcess = false
+        pageLoadStartedAt = nil
         store.isPaginaFoiCarregada = false
         store.updateLog(with: "Parou automação. Verifique o log!")
 
@@ -505,8 +508,7 @@ struct NaviPanelView: View {
             while !Task.isCancelled {
                 count+=1
                 print("NAVI: esperando \(count)")
-                let timestamp = ISO8601DateFormatter().string(from: Date())
-                //store.updateLog(with: "[\(timestamp)] Esperando ids...\n")
+                //store.updateLog(with: "Esperando ids...\n")
                 
                 /*print("queue -------")
                 await queue.list()
@@ -515,18 +517,46 @@ struct NaviPanelView: View {
                 try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.idsWaitInterval))
                 if Task.isCancelled { break }
                 if await !queue.isEmpty && !isLoadingNaviProcess {
+                    store.isPaginaFoiCarregada = false
                     isLoadingNaviProcess = true
                     let (url, info) = await queue.dequeue()
                     
-                    print("NAVI: abrindo pagina: \(url ?? "0")")
-                    store.updateLog(with: "Abrindo página (\(info ?? "sem username"))! ")//: \(url ?? "0")!")
+                    let pageLoadStartedAt = Date()
+                    self.pageLoadStartedAt = Date()
+                    print("NAVI: inicio carregamento pagina: \(url ?? "0") em \(ISO8601DateFormatter().string(from: pageLoadStartedAt))")
                     
+                    store.updateLog(with: "Abrindo página (\(info ?? "sem username"))! ")//: \(url ?? "0")!")
                     store.inputText = url ?? "0"
                     await store.send(.onSubmit(url ?? "0"))
                     continue
                 }
                 
+                if isLoadingNaviProcess && !store.isPaginaFoiCarregada {
+                    
+                    print("NAVI: Pagina carregando... \(Int(Date().timeIntervalSince(pageLoadStartedAt ?? Date())))s")
+                    if Int(Date().timeIntervalSince(pageLoadStartedAt ?? Date())) > Int(store.userDefaultsRepository.pageWaitInterval) {
+                        await store.send(.scriptRunButtonTapped("confirm('A página está demorando para carregar! Ir para o próximo?')"))
+                        
+                        if store.isButtonConfirmPressed! {
+                            try await Task.sleep(for: Duration.seconds(store.userDefaultsRepository.likeWaitInterval))
+                            store.isPaginaFoiCarregada = false
+                            isLoadingNaviProcess = false
+                        } else {
+                            self.pageLoadStartedAt = Date()
+                            //store.isPaginaFoiCarregada = true
+                            continue
+                        }
+                    }
+                }
+
                 if isLoadingNaviProcess && store.isPaginaFoiCarregada {
+                    
+                    if let pageLoadStartedAt {
+                        let elapsedTime = Date().timeIntervalSince(pageLoadStartedAt)
+                        print("NAVI: pagina carregou em \(formatPageLoadDuration(elapsedTime))")
+                        self.pageLoadStartedAt = nil
+                    }
+                    
                     //print("NAVI: esperando botao aparecer...")
                     await store.send(.scriptRunVerify(VERIFY_SCRIPT))
                     store.updateLog(with: "Verificando 1o na tela")
@@ -585,9 +615,16 @@ struct NaviPanelView: View {
             print("Parou processamento na tela")
         }
     }
-    
-    private func loadedPage() async -> Bool {
-        return false
+
+    private func formatPageLoadDuration(_ duration: TimeInterval) -> String {
+        let minutes = Int(duration) / 60
+        let seconds = duration.truncatingRemainder(dividingBy: 60)
+
+        if minutes > 0 {
+            return String(format: "%dm %.2fs", minutes, seconds)
+        }
+
+        return String(format: "%.2fs", seconds)
     }
 
     private func dataView(text: Binding<String>, clearAction: Browser.Action, resetsQueueOnClear: Bool = false) -> some View {

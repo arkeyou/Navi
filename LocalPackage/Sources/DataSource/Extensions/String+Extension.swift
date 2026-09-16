@@ -7,4 +7,5 @@ extension String {
     public static let idsWaitInterval = "ids-wait-interval"
     public static let likeWaitInterval = "like-wait-interval"
     public static let cookieWaitInterval = "cookie-wait-interval"
+    public static let pageWaitInterval = "page-wait-interval"
 }

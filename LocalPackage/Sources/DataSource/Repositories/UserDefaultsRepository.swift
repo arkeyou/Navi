@@ -58,6 +58,11 @@ public struct UserDefaultsRepository: Sendable {
         get { userDefaultsClient.double(.cookieWaitInterval) ?? 5.0 }
         nonmutating set { userDefaultsClient.setDouble(newValue, .cookieWaitInterval) }
     }
+    
+    public var pageWaitInterval: Double {
+        get { userDefaultsClient.double(.pageWaitInterval) ?? 6.0 }
+        nonmutating set { userDefaultsClient.setDouble(newValue, .pageWaitInterval) }
+    }
 
     public init(_ userDefaultsClient: UserDefaultsClient) {
         self.userDefaultsClient = userDefaultsClient

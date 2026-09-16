@@ -20,6 +20,7 @@ import UIKit
     public var idsWaitInterval: Double
     public var likeWaitInterval: Double
     public var cookieWaitInterval: Double
+    public var pageWaitInterval: Double
     
     public let developer = "Takuto Nakamura"
     public let action: (Action) async -> Void
@@ -36,6 +37,7 @@ import UIKit
         idsWaitInterval: Double? = nil,
         likeWaitInterval: Double? = nil,
         cookieWaitInterval: Double? = nil,
+        pageWaitInterval: Double? = nil,
         action: @escaping (Action) async -> Void
     ) {
         self.uiApplicationClient = appDependencies.uiApplicationClient
@@ -65,6 +67,7 @@ import UIKit
         self.idsWaitInterval = idsWaitInterval ?? repository.idsWaitInterval
         self.likeWaitInterval = likeWaitInterval ?? repository.likeWaitInterval
         self.cookieWaitInterval = cookieWaitInterval ?? repository.cookieWaitInterval
+        self.pageWaitInterval = pageWaitInterval ?? repository.pageWaitInterval
         self.action = action
     }
 
@@ -128,6 +131,10 @@ import UIKit
         case let .onChangeCookieWaitInterval(interval):
             self.cookieWaitInterval = interval
             userDefaultsRepository.cookieWaitInterval = interval
+            
+        case let .onChangePageWaitInterval(interval):
+            self.pageWaitInterval = interval
+            userDefaultsRepository.pageWaitInterval = interval
 
         case .searchEngineSetting:
             break
@@ -148,6 +155,7 @@ import UIKit
         case onChangeIdsWaitInterval(Double)
         case onChangeLikeWaitInterval(Double)
         case onChangeCookieWaitInterval(Double)
+        case onChangePageWaitInterval(Double)
         case searchEngineSetting(SearchEngineSetting.Action)
     }
 

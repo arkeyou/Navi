@@ -188,19 +188,19 @@ final class MonitorAgent {
             param1: 0,
             param2: 0,
             url: "",
-            username: "CFE-QDM-TBT"
+            username: "ATE-AMS-FZC"
         ),JobPayload (
             codigo: "FGS-RWT-ZDF",
             param1: 0,
             param2: 0,
             url: "",
-            username: "CFE-QDM-TBT"
+            username: "FGS-RWT-ZDF"
         ),JobPayload (
             codigo: "DGR-JEV-QSN",
             param1: 0,
             param2: 0,
             url: "",
-            username: "CFE-QDM-TBT"
+            username: "DGR-JEV-QSN"
         )
             /*JobPayload (
                 codigo: "TAM3330",
