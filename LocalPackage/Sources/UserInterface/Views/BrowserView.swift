@@ -65,6 +65,7 @@ struct BrowserView: View {
                 
                 conteudoSecundario
                     .frame(maxWidth: 320)
+                    .labelStyle(.iconOnly)
             }
         } else {
             conteudoPrincipal
@@ -151,7 +152,7 @@ struct BrowserView: View {
         VStack(spacing: 0) {
             NaviPanelView(store: store)
             NaviBottomTabView(store: store)
-                .labelStyle(.iconOnly)
+                //.labelStyle(.iconOnly)
         }
         .background(Color(.systemBackground))
         .presentationDetents([.height(240), .medium, .large], selection: $naviPanelDetent)
