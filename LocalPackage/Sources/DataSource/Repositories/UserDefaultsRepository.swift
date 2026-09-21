@@ -63,7 +63,19 @@ public struct UserDefaultsRepository: Sendable {
         get { userDefaultsClient.double(.pageWaitInterval) ?? 6.0 }
         nonmutating set { userDefaultsClient.setDouble(newValue, .pageWaitInterval) }
     }
+    
+    
+    public var ultimoScriptCarregado: String {
+        get { userDefaultsClient.string(.ultimoScriptCarregado) ?? "" }
+        nonmutating set { userDefaultsClient.setString(newValue, .ultimoScriptCarregado) }
+    }
+    
+    public var nomeUltimoScriptCarregado: String {
+        get { userDefaultsClient.string(.nomeUltimoScriptCarregado) ?? "" }
+        nonmutating set { userDefaultsClient.setString(newValue, .nomeUltimoScriptCarregado) }
+    }
 
+    
     public init(_ userDefaultsClient: UserDefaultsClient) {
         self.userDefaultsClient = userDefaultsClient
 

@@ -165,6 +165,11 @@ import WebUI
             userDefaultsRepository.bookmarks = [bookmark]
         }
         
+        if !userDefaultsRepository.ultimoScriptCarregado.isEmpty {
+            self.scriptText = userDefaultsRepository.ultimoScriptCarregado
+            self.scriptFileName = userDefaultsRepository.nomeUltimoScriptCarregado
+        }
+        
     }
 
     public func reduce(_ action: Action) async {
@@ -547,6 +552,9 @@ import WebUI
             try scriptText.write(to: url, atomically: true, encoding: .utf8)
             scriptFileName = fileName
             naviPanelMessage = "Script salvo."
+            
+            userDefaultsRepository.ultimoScriptCarregado = scriptText
+            userDefaultsRepository.nomeUltimoScriptCarregado = scriptFileName
         } catch {
             naviPanelMessage = error.localizedDescription
         }
@@ -582,6 +590,9 @@ import WebUI
             scriptText = try String(contentsOf: finalURL, encoding: .utf8)
             scriptFileName = finalURL.lastPathComponent
             naviPanelMessage = "Script carregado."
+            
+            userDefaultsRepository.ultimoScriptCarregado = scriptText
+            userDefaultsRepository.nomeUltimoScriptCarregado = scriptFileName
         } catch {
             naviPanelMessage = error.localizedDescription
         }
