@@ -17,6 +17,10 @@ final class MonitorAgent {
     private var task: Task<Void, any Error>?
     private let cookies: String
     private let am: AutomationManager
+    
+    private var count: Int = 0
+    private let codes: [String] = ["AUG-TPF-TVA", "FXP-SBJ-XSN", "FRM-VWU-PFF", "FKJ-VGL-RVE", "AZL-SRD-CFH", "ABK-WCC-FAP", "ASX-AME-GZJ", "FRL-JMM-RWE", "BZH-CFW-GXY", "AEF-GGF-UGU", "AGQ-DQF-WJK", "ABX-BUU-XJB", "FXG-DWQ-VSN", "DAW-PLA-GYE", "CHG-MMX-STC", "CJS-XLP-PQN", "AZE-TGU-TTK", "BXE-WZF-UJT", "APX-KBU-TAF", "BEV-PRB-WPR", "DDF-BWT-JPE", "DKS-KMY-TYE", "BWU-JDD-CGD", "ERT-XXS-UYM", "END-TCF-XSI", "EAW-EGQ-ATE", "EXT-MXG-SWE", "DGR-LAN-QSN", "FXE-KAV-PFF", "DXG-YLG-PSN", "DRT-GPP-WSN", "FUH-YVA-RSN", "DDS-KUD-XSN", "FKX-ZQP-WSN", "DKB-PTJ-TXE", "FXD-QTF-RSN", "FKM-CBK-FCN", "AEZ-WWX-PUD", "ART-ZLN-XQA", "FUS-BQM-RJE", "BQR-PFQ-KEH", "EKP-ABW-VZE", "AQJ-GJL-XKE", "DNM-CVG-RSN", "BAD-XNT-BEU", "BNV-RTR-PUR", "FGQ-JCH-BFF", "ABF-QXC-NXW", "AGV-KYQ-CNA", "EAH-LFW-HLB", "AZG-CZX-PCR", "AZE-TGV-MLH", "AUZ-QAS-VGP", "AJF-DAV-FQW", "ADQ-DUZ-KFR", "EDU-WCY-VSN", "DDN-BXB-FXE", "FNV-WFL-HNE", "EKE-ALD-ECM", "ANY-PGR-LLJ", "ASS-LWE-FQL"]
+    let usernames: [String] = ["mari_88", "carlosss21", "ana.luiza7", "pedro123", "biazinha_44", "lucasdev99", "juuh_2026", "rafael_mg", "camila33", "brunoo_17", "amanda.shop", "gui1234", "leticia_88", "matheusx9", "feeh_2025", "gabriela77", "rodrigoo21", "dudinha_3", "marcos123", "isabelaa88", "thiagomg7", "larissinha22", "vinicius_09", "carolzinha5", "felipe444", "jessica_27", "andreluiz8", "nathalia33", "gugaa_12", "beatriz_2026", "leonardo77", "juju123", "danielzinho9", "monique_88", "gustavo21", "alineee7", "ricardomg33", "tati_2025", "eduardo123", "paulinha44", "renan_09", "sarahzinha7", "wellington22", "livias2", "arthur_mg", "marianaaa88", "caio1234", "fer_2026", "diegooo17", "clarinha33", "igor_mg9", "priscila_77", "henrique21", "juliaa_08", "otavio123", "vivi_444", "samuelzinho9", "aline.shop27", "bruninha88", "gabriel_2026", "manu123", "robertomg7"]
 
     init(
         store: JobStore,
@@ -170,14 +174,24 @@ final class MonitorAgent {
     }
     
     private func fetchApiChangesMock() async throws -> [JobPayload] {
-        
-        return [/*JobPayload (
+        count = count+1
+        if (count>=codes.count) {
+            count = 0
+        }
+        return [JobPayload (
+            codigo: codes[count],
+            param1: 0,
+            param2: 0,
+            url: "",
+            username: usernames[count]
+        )
+        /*JobPayload (
             codigo: randomCodigo(),//"BLL-ATM-RVH",
             param1: 0,
             param2: 0,
             url: "",
             username: ""
-        ),*/JobPayload (
+        ),JobPayload (
             codigo: "CFE-QDM-TBT",
             param1: 0,
             param2: 0,
@@ -201,7 +215,7 @@ final class MonitorAgent {
             param2: 0,
             url: "",
             username: "DGR-JEV-QSN"
-        )
+        )*/
             /*JobPayload (
                 codigo: "TAM3330",
                 param1: 0,

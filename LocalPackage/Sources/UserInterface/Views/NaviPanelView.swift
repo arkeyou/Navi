@@ -30,7 +30,7 @@ struct NaviBottomTabView: View {
                 .tag(Browser.NaviPanelSelection.processed)
                 .badge(store.hasUnreadProcessed ? store.qtProcessed : 0)
         }
-        .frame(height: 72)
+        //.frame(height: 10)
         .background(Color(.systemBackground))
     }
 
@@ -64,27 +64,35 @@ struct NaviPanelView: View {
     
     private let uuid = UUID()
     
-    var body: some View {
-        NavigationStack {
-            Group {
-                switch store.naviPanelSelection {
-                case .script:
-                    scriptView
-                case .log:
-                    dataView(
-                        text: $store.logText,
-                        clearAction: .clearLogButtonTapped
-                    )
-                case .processed:
-                    dataView(
-                        text: $store.processedText,
-                        clearAction: .clearProcessedButtonTapped,
-                        resetsQueueOnClear: true
-                    )
-                }
+    private var selection: Binding<Browser.NaviPanelSelection> {
+        Binding {
+            store.naviPanelSelection
+        } set: { newValue in
+            Task {
+                await store.send(.naviPanelSelectionChanged(newValue))
             }
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+    
+    var body: some View {
+        
+        TabView(selection: selection) {
+            Tab("Script", systemImage: "doc.text", value: .script) {
+                scriptView
+            }
+            Tab("Log", systemImage: "list.bullet.rectangle", value: .log) {
+                dataView(
+                    text: $store.logText,
+                    clearAction: .clearLogButtonTapped
+                )
+            }.badge(store.hasUnreadLogs ? 1 : 0)
+            Tab("Processados", systemImage: "checklist", value: .processed) {
+                dataView(
+                    text: $store.processedText,
+                    clearAction: .clearProcessedButtonTapped,
+                    resetsQueueOnClear: true
+                )
+            }.badge(store.hasUnreadProcessed ? store.qtProcessed : 0)
         }
         .fileImporter(
             isPresented: $store.isPresentedScriptImporter,
@@ -129,6 +137,8 @@ struct NaviPanelView: View {
 
     private var scriptView: some View {
         VStack(spacing: 0) {
+            Spacer(minLength: 20)
+            Text(title)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     if store.naviIsRunning {
@@ -635,6 +645,8 @@ struct NaviPanelView: View {
 
     private func dataView(text: Binding<String>, clearAction: Browser.Action, resetsQueueOnClear: Bool = false) -> some View {
         VStack(spacing: 0) {
+            Spacer(minLength: 20)
+            Text(title)
             HStack {
                 if store.naviIsRunning {
                     Button {

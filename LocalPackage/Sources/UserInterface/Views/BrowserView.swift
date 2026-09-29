@@ -66,6 +66,7 @@ struct BrowserView: View {
                 conteudoSecundario
                     .frame(maxWidth: 320)
                     .labelStyle(.iconOnly)
+                    .defaultTabBarPlacement(.)
             }
         } else {
             conteudoPrincipal
@@ -149,12 +150,15 @@ struct BrowserView: View {
     }
 
     private var naviPanelSheet: some View {
-        VStack(spacing: 0) {
+        //ZStack(alignment: .bottom) {
             NaviPanelView(store: store)
-            NaviBottomTabView(store: store)
+                //.aspectRatio(contentMode: .fill)
+            //NaviBottomTabView(store: store)
                 //.labelStyle(.iconOnly)
-        }
-        .background(Color(.systemBackground))
+            //Text("TEXTO AQUI")
+            
+        //}
+        //.background(Color(.systemBackground))
         .presentationDetents([.height(240), .medium, .large], selection: $naviPanelDetent)
         .presentationDragIndicator(.visible)
         .presentationBackground(Color(.systemBackground))
