@@ -66,7 +66,6 @@ struct BrowserView: View {
                 conteudoSecundario
                     .frame(maxWidth: 320)
                     .labelStyle(.iconOnly)
-                    .defaultTabBarPlacement(.)
             }
         } else {
             conteudoPrincipal
