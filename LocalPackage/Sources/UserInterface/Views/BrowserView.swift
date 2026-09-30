@@ -5,7 +5,7 @@ import WebUI
 
 struct BrowserView: View {
     @StateObject var store: Browser
-    @State private var naviPanelDetent = PresentationDetent.medium
+    @State private var naviPanelDetent = PresentationDetent.height(240)
     @AppStorage(.appearance) private var appearance = Appearance.dark.rawValue
     
     @Environment(\.horizontalSizeClass) var tamanhoTela
@@ -89,62 +89,74 @@ struct BrowserView: View {
     }
 
     private var mainContent: some View {
-        ZStack(alignment: .bottomTrailing) {
-            WebViewReader { proxy in
-                VStack(spacing: 0) {
-                    if store.isPresentedToolbar {
-                        Header(store: store)
-                            .transition(.move(edge: .top))
-                            .environment(\.isLoading, proxy.isLoading)
-                            .environment(\.estimatedProgress, proxy.estimatedProgress)
-                            .environment(\.canGoBack, proxy.canGoBack)
-                            .environment(\.canGoForward, proxy.canGoForward)
-                    }
-                    WebView(configuration: .forNavi)
-                        .navigationDelegate(store.navigationDelegate)
-                        .uiDelegate(store.uiDelegate)
-                        .refreshable()
-                        .allowsBackForwardNavigationGestures(true)
-                        .allowsOpaqueDrawing(proxy.url != nil)
-                        .allowsInspectable(true)
-                        .pageScaleFactor(store.pageScale.value)
-                        .overlay {
-                            if proxy.url == nil {
-                                LogoView()
+        NavigationStack {
+            GeometryReader { geometry in
+                ZStack(alignment: .bottomTrailing) {
+                    WebViewReader { proxy in
+                        VStack(spacing: 0) {
+                            ProgressView(value: proxy.estimatedProgress)
+                                .opacity(proxy.isLoading ? 1.0 : 0.0)
+                            WebView(configuration: .forNavi)
+                                .navigationDelegate(store.navigationDelegate)
+                                .uiDelegate(store.uiDelegate)
+                                .refreshable()
+                                .allowsBackForwardNavigationGestures(true)
+                                .allowsOpaqueDrawing(proxy.url != nil)
+                                .allowsInspectable(true)
+                                .pageScaleFactor(store.pageScale.value)
+                                .overlay {
+                                    if proxy.url == nil {
+                                        LogoView()
+                                    }
+                                }
+                        }
+                        .background(Color(.secondarySystemBackground))
+                        .toolbar {
+                            Header(
+                                store: store,
+                                availableWidth: geometry.size.width,
+                                safeAreaLeading: geometry.safeAreaInsets.leading,
+                                safeAreaTrailing: geometry.safeAreaInsets.trailing
+                            )
+                        }
+                        .toolbarBackground(Color(.header), for: .navigationBar)
+                        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
+                        .toolbarVisibility(store.isPresentedToolbar ? .visible : .hidden, for: .navigationBar)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .environment(\.canGoBack, proxy.canGoBack)
+                        .environment(\.canGoForward, proxy.canGoForward)
+                        .task {
+                            await store.send(.task(
+                                String(describing: Self.self),
+                                .init(getResourceURL: { Bundle.module.url(forResource: $0, withExtension: $1) }),
+                                proxy
+                            ))
+                        }
+                        .onChange(of: proxy.url) { _, newValue in
+                            Task {
+                                await store.send(.onChangeURL(newValue))
                             }
                         }
-                }
-                .background(Color(.secondarySystemBackground))
-                .task {
-                    await store.send(.task(
-                        String(describing: Self.self),
-                        .init(getResourceURL: { Bundle.module.url(forResource: $0, withExtension: $1) }),
-                        proxy
-                    ))
-                }
-                .onChange(of: proxy.url) { _, newValue in
-                    Task {
-                        await store.send(.onChangeURL(newValue))
+                        .onChange(of: proxy.title) { _, newValue in
+                            Task {
+                                await store.send(.onChangeTitle(newValue))
+                            }
+                        }
+                        .onChange(of: proxy.isLoading) { _, newValue in
+                            Task {
+                                await store.send(.onChangeIsLoading(newValue))
+                            }
+                        }
+                        if !store.isPresentedToolbar {
+                            ShowToolbarButton(store: store)
+                                .padding(20)
+                                .transition(.move(edge: .bottom))
+                        }
                     }
-                }
-                .onChange(of: proxy.title) { _, newValue in
-                    Task {
-                        await store.send(.onChangeTitle(newValue))
-                    }
-                }
-                .onChange(of: proxy.isLoading) { _, newValue in
-                    Task {
-                        await store.send(.onChangeIsLoading(newValue))
-                    }
-                }
-                if !store.isPresentedToolbar {
-                    ShowToolbarButton(store: store)
-                        .padding(20)
-                        .transition(.move(edge: .bottom))
+                    .ignoresSafeArea(.container, edges: store.isPresentedToolbar ? [] : .all)
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
             }
-            .ignoresSafeArea(.container, edges: store.isPresentedToolbar ? [] : .all)
-            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
     }
 

@@ -8,48 +8,46 @@ struct SearchBar: View {
     @Bindable var store: Browser
 
     var body: some View {
-        HStack(spacing: 8) {
-            HStack(spacing: 4) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(Color(.systemGray))
-                TextField(
-                    String(localized: "search…", bundle: .module),
-                    text: $store.inputText,
-                    selection: $store.textSelection
-                )
-                .keyboardType(.webSearch)
-                .accessibilityIdentifier("searchTextField")
-                .disableAutocorrection(true)
-                .textInputAutocapitalization(.never)
-                .textSelectionAffinity(.upstream)
-                .focused($focusedField, equals: .search)
+        HStack(spacing: 4) {
+            Image(systemName: "magnifyingglass")
                 .foregroundStyle(Color(.systemGray))
-                .onSubmit {
-                    Task {
-                        await store.send(.onSubmit(store.inputText))
-                    }
+            TextField(
+                String(localized: "search…", bundle: .module),
+                text: $store.inputText,
+                selection: $store.textSelection
+            )
+            .keyboardType(.webSearch)
+            .accessibilityIdentifier("searchTextField")
+            .disableAutocorrection(true)
+            .textInputAutocapitalization(.never)
+            .textSelectionAffinity(.upstream)
+            .focused($focusedField, equals: .search)
+            .foregroundStyle(Color(.systemGray))
+            .onSubmit {
+                Task {
+                    await store.send(.onSubmit(store.inputText))
                 }
-                Button {
-                    Task {
-                        await store.send(.clearSearchButtonTapped)
-                    }
-                } label: {
-                    Label {
-                        Text("clear", bundle: .module)
-                    } icon: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(store.inputText.isEmpty ? Color(.systemGray3) : Color(.systemGray))
-                    }
-                    .labelStyle(.iconOnly)
-                }
-                .accessibilityIdentifier("clearButton")
-                .disabled(store.inputText.isEmpty)
             }
-            .padding(.horizontal, 8)
-            .frame(height: height)
-            .background(Color(.systemGray5), in: .rect(cornerRadius: 10))
-
+            Button {
+                Task {
+                    await store.send(.clearSearchButtonTapped)
+                }
+            } label: {
+                Label {
+                    Text("clear", bundle: .module)
+                } icon: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(store.inputText.isEmpty ? Color(.systemGray3) : Color(.systemGray))
+                }
+                .labelStyle(.iconOnly)
+            }
+            .accessibilityIdentifier("clearButton")
+            .disabled(store.inputText.isEmpty)
         }
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity)
+        .frame(height: height)
+        .background(Color(.systemGray5), in: .rect(cornerRadius: 10))
         .animation(.easeInOut, value: store.isInputingSearchBar)
         .onChange(of: focusedField) { _, newValue in
             Task {

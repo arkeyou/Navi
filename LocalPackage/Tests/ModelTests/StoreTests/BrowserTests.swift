@@ -423,12 +423,13 @@ struct BrowserTests {
         let fm = FileManager.default
         let tempDir = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try? fm.createDirectory(at: tempDir, withIntermediateDirectories: true)
-        let scriptURL = tempDir.appendingPathComponent("test.navi")
+        let fileName = "test-\(UUID().uuidString).navi"
+        let scriptURL = tempDir.appendingPathComponent(fileName)
         try? "test script content".write(to: scriptURL, atomically: true, encoding: .utf8)
         
         await sut.send(.scriptSelected(scriptURL))
         #expect(sut.scriptText == "test script content")
-        #expect(sut.scriptFileName == "test.navi")
+        #expect(sut.scriptFileName == fileName)
         #expect(!sut.isPresentedScriptSelection)
         
         try? fm.removeItem(at: tempDir)
