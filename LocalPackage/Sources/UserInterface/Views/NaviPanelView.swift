@@ -85,7 +85,7 @@ struct NaviPanelView: View {
                     text: $store.logText,
                     clearAction: .clearLogButtonTapped
                 )
-            }.badge(store.hasUnreadLogs ? 1 : 0)
+            }.badge(store.hasUnreadLogs ? Text("!") : nil)
             Tab("Processados", systemImage: "checklist", value: .processed) {
                 dataView(
                     text: $store.processedText,

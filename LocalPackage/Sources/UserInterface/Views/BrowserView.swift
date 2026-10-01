@@ -11,67 +11,19 @@ struct BrowserView: View {
     @Environment(\.horizontalSizeClass) var tamanhoTela
     
     var body: some View {
-        let conteudoSecundario = naviPanelSheet
-            .preferredColorScheme(preferredColorScheme)
-        
-        let conteudoPrincipal  = mainContent
-            .preferredColorScheme(preferredColorScheme)
-            .sheet(item: $store.settings, onDismiss: {
-                store.isPresentedNaviPanel = true
-            }) { store in
-                SettingsView(store: store)
-                    .preferredColorScheme(store.appearance.colorScheme)
-            }
-            .sheet(item: $store.bookmarkManagement, onDismiss: {
-                store.isPresentedNaviPanel = true
-            }) { store in
-                BookmarkManagementView(store: store)
-                    .preferredColorScheme(preferredColorScheme)
-            }
-            .sheet(isPresented: paywallPresentation) {
-                PaywallView(store: store)
-                    .preferredColorScheme(preferredColorScheme)
-            }
-            .webDialog(
-                isPresented: $store.isPresentedWebDialog,
-                presenting: store.webDialog,
-                promptInput: $store.promptInput,
-                okButtonTapped: { await store.send(.dialogOKButtonTapped) },
-                cancelButtonTapped: { await store.send(.dialogCancelButtonTapped) },
-                onChangeIsPresented: { await store.send(.onChangeIsPresentedWebDialog($0)) }
-            )
-            .externalAppConfirmationDialog(
-                isPresented: $store.isPresentedConfirmationDialog,
-                presenting: store.customSchemeURL,
-                okButtonTapped: { await store.send(.confirmButtonTapped($0)) }
-            )
-            .alert(
-                Text("failedToOpenExternalApp", bundle: .module),
-                isPresented: $store.isPresentedAlert,
-                actions: {}
-            )
-            .onOpenURL { url in
-                Task {
-                    await store.send(.onOpenURL(url))
-                }
-            }
-            .animation(.easeIn(duration: 0.2), value: store.isPresentedToolbar)
-            .frame(maxWidth: .infinity)
-        
         //Adaptar o estilo de exibicao ao tamanho da tela
         if tamanhoTela == .regular {
             HStack(spacing: 0) {
-                conteudoPrincipal
+                mainContent
                 
-                conteudoSecundario
+                naviPanelSheet
                     .frame(maxWidth: 320)
                     .labelStyle(.iconOnly)
             }
         } else {
-            conteudoPrincipal
+            mainContent
                 .sheet(isPresented: $store.isPresentedNaviPanel) {
-                    conteudoSecundario
-                        .frame(maxWidth: .infinity)
+                    naviPanelSheet
              }
         }
     }
@@ -122,7 +74,7 @@ struct BrowserView: View {
                         .toolbarBackground(Color(.header), for: .navigationBar)
                         .toolbarBackgroundVisibility(.visible, for: .navigationBar)
                         .toolbarVisibility(store.isPresentedToolbar ? .visible : .hidden, for: .navigationBar)
-                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationBarTitleDisplayMode(.automatic)
                         .environment(\.canGoBack, proxy.canGoBack)
                         .environment(\.canGoForward, proxy.canGoForward)
                         .task {
@@ -158,23 +110,58 @@ struct BrowserView: View {
                 }
             }
         }
+        .preferredColorScheme(preferredColorScheme)
+        .sheet(item: $store.settings, onDismiss: {
+            store.isPresentedNaviPanel = true
+        }) { store in
+            SettingsView(store: store)
+                .preferredColorScheme(store.appearance.colorScheme)
+        }
+        .sheet(item: $store.bookmarkManagement, onDismiss: {
+            store.isPresentedNaviPanel = true
+        }) { store in
+            BookmarkManagementView(store: store)
+                .preferredColorScheme(preferredColorScheme)
+        }
+        .sheet(isPresented: paywallPresentation) {
+            PaywallView(store: store)
+                .preferredColorScheme(preferredColorScheme)
+        }
+        .webDialog(
+            isPresented: $store.isPresentedWebDialog,
+            presenting: store.webDialog,
+            promptInput: $store.promptInput,
+            okButtonTapped: { await store.send(.dialogOKButtonTapped) },
+            cancelButtonTapped: { await store.send(.dialogCancelButtonTapped) },
+            onChangeIsPresented: { await store.send(.onChangeIsPresentedWebDialog($0)) }
+        )
+        .externalAppConfirmationDialog(
+            isPresented: $store.isPresentedConfirmationDialog,
+            presenting: store.customSchemeURL,
+            okButtonTapped: { await store.send(.confirmButtonTapped($0)) }
+        )
+        .alert(
+            Text("failedToOpenExternalApp", bundle: .module),
+            isPresented: $store.isPresentedAlert,
+            actions: {}
+        )
+        .onOpenURL { url in
+            Task {
+                await store.send(.onOpenURL(url))
+            }
+        }
+        .animation(.easeIn(duration: 0.2), value: store.isPresentedToolbar)
+        .frame(maxWidth: .infinity)
     }
 
     private var naviPanelSheet: some View {
-        //ZStack(alignment: .bottom) {
-            NaviPanelView(store: store)
-                //.aspectRatio(contentMode: .fill)
-            //NaviBottomTabView(store: store)
-                //.labelStyle(.iconOnly)
-            //Text("TEXTO AQUI")
-            
-        //}
-        //.background(Color(.systemBackground))
+        NaviPanelView(store: store)
         .presentationDetents([.height(240), .medium, .large], selection: $naviPanelDetent)
         .presentationDragIndicator(.visible)
         .presentationBackground(Color(.systemBackground))
         .presentationBackgroundInteraction(.enabled)
         .interactiveDismissDisabled()
+        .preferredColorScheme(preferredColorScheme)
     }
 }
 
