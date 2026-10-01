@@ -24,6 +24,7 @@ struct BrowserView: View {
             mainContent
                 .sheet(isPresented: $store.isPresentedNaviPanel) {
                     naviPanelSheet
+                        .frame(maxWidth: .infinity)
              }
         }
     }
@@ -74,7 +75,7 @@ struct BrowserView: View {
                         .toolbarBackground(Color(.header), for: .navigationBar)
                         .toolbarBackgroundVisibility(.visible, for: .navigationBar)
                         .toolbarVisibility(store.isPresentedToolbar ? .visible : .hidden, for: .navigationBar)
-                        .navigationBarTitleDisplayMode(.automatic)
+                        .navigationBarTitleDisplayMode(.inline)
                         .environment(\.canGoBack, proxy.canGoBack)
                         .environment(\.canGoForward, proxy.canGoForward)
                         .task {
