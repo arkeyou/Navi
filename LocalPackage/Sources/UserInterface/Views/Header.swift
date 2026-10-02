@@ -58,7 +58,7 @@ struct Header: ToolbarContent {
 
         ToolbarItem(placement: .principal) {
             SearchBar(store: store)
-                .frame(width: searchBarWidth)
+                //.frame(width: searchBarWidth)
         }
 
         ToolbarItemGroup(placement: .topBarTrailing) {

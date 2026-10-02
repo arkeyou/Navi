@@ -11,21 +11,35 @@ struct BrowserView: View {
     @Environment(\.horizontalSizeClass) var tamanhoTela
     
     var body: some View {
-        //Adaptar o estilo de exibicao ao tamanho da tela
-        if tamanhoTela == .regular {
-            HStack(spacing: 0) {
-                mainContent
-                
-                naviPanelSheet
-                    .frame(maxWidth: 320)
-                    .labelStyle(.iconOnly)
-            }
-        } else {
+        HStack(spacing: 0) {
             mainContent
-                .sheet(isPresented: $store.isPresentedNaviPanel) {
+                .sheet(isPresented: naviPanelPresentation) {
                     naviPanelSheet
                         .frame(maxWidth: .infinity)
-             }
+                }
+
+            if tamanhoTela == .regular {
+                naviPanelSheet
+                    .frame(width: 320)
+            }
+        }
+        .onAppear {
+            updateNaviPanelPresentation()
+        }
+        .onChange(of: tamanhoTela) {
+            updateNaviPanelPresentation()
+        }
+    }
+
+    private func updateNaviPanelPresentation() {
+        store.isPresentedNaviPanel = tamanhoTela != .regular
+    }
+
+    private var naviPanelPresentation: Binding<Bool> {
+        Binding {
+            tamanhoTela != .regular && store.isPresentedNaviPanel
+        } set: { isPresented in
+            store.isPresentedNaviPanel = isPresented
         }
     }
 

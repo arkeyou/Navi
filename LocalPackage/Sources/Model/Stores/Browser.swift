@@ -15,7 +15,7 @@ import WebUI
     @ObservationIgnored private var operateWebViewProxy: ((WebViewProxy) -> Void)?
     @ObservationIgnored private var lastDialogClosedDate = Date.distantPast
 
-    public var isPresentedNaviPanel = true
+    public var isPresentedNaviPanel = false
     public var isButtonPresentOnPage = false
     public var isButtonConfirmPressed: Bool? = nil
     public var naviIsRunning = false
