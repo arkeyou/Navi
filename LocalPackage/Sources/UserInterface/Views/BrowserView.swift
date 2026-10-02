@@ -21,6 +21,7 @@ struct BrowserView: View {
             if tamanhoTela == .regular {
                 naviPanelSheet
                     .frame(width: 320)
+                    .labelStyle(.iconOnly)
             }
         }
         .onAppear {
